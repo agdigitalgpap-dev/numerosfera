@@ -974,7 +974,7 @@
   // ── Progresso ──────────────────────────────────────────────────────────────
   function onProgress(pct, cur) {
     document.getElementById('prog-fill').style.width = (pct * 100).toFixed(1) + '%';
-    if (!_emailOverlayShown && cur >= 243) {
+    if (!_emailOverlayShown && cur >= 220) {
       _emailOverlayShown = true;
       showEmailOverlay();
     }
@@ -1069,7 +1069,7 @@
         if (lead && lead.email) {
           window.location.href = 'audio2.html';
         } else if (!_emailOverlayShown) {
-          // Áudio com menos de 245s — overlay ainda não foi exibido
+          // Áudio com menos de 220s — overlay ainda não foi exibido
           _emailOverlayShown = true;
           showEmailOverlay();
         }
