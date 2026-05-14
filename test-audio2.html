@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>TEST — Audio2 Isolado · ASTRANUMERICA</title>
+  <link rel="stylesheet" href="assets/shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: var(--bg); font-family: 'Poppins', sans-serif; }
+
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 16px 48px;
+    }
+
+    .test-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 0 60px rgba(196,164,72,0.07), 0 24px 48px rgba(0,0,0,0.5);
+    }
+
+    .test-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin: 0 0 4px;
+      text-align: center;
+    }
+    .test-subtitle {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dimmer);
+      text-align: center;
+      margin: 0 0 28px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 12px;
+    }
+    .field-row > * { flex: 1; }
+
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dimmer);
+      margin-bottom: 5px;
+    }
+
+    input[type=text], input[type=number], select {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(18,13,8,0.65);
+      border: 1px solid rgba(196,164,72,0.22);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.22s, box-shadow 0.22s;
+      appearance: none;
+    }
+    input:focus, select:focus {
+      border-color: rgba(196,164,72,0.55);
+      box-shadow: 0 0 0 3px rgba(196,164,72,0.08);
+    }
+    select option { background: #0a0806; color: var(--text); }
+
+    .btn-gerar {
+      display: block;
+      width: 100%;
+      padding: 17px 24px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+      color: #1a1000;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-bottom: 24px;
+    }
+    .btn-gerar:hover  { opacity: 0.92; transform: translateY(-1px); }
+    .btn-gerar:active { transform: translateY(0); }
+    .btn-gerar:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    /* ── Player Section ── */
+    #player-section { display: none; }
+
+    .player-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-align: center;
+      margin: 0 0 16px;
+    }
+
+    /* Loading bar */
+    .gen-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .gen-bar-track {
+      flex: 1;
+      height: 3px;
+      background: rgba(196,164,72,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .gen-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.4s linear;
+    }
+    .gen-bar-pct {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold-light);
+      min-width: 30px;
+      text-align: right;
+    }
+    .gen-status {
+      font-size: 13px;
+      color: var(--text-dimmer);
+      text-align: center;
+      margin: 0 0 18px;
+      min-height: 20px;
+    }
+
+    /* Wave equalizer */
+    .wave-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 5px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+    .wave-bar {
+      width: 4px;
+      border-radius: 3px;
+      background: linear-gradient(to top, var(--gold-dark), var(--gold-light));
+      transform-origin: bottom;
+      animation: wave-anim 1.4s ease-in-out infinite;
+      opacity: 0.85;
+    }
+    .wave-bar:nth-child(1)  { height:28%; animation-delay:0s;    }
+    .wave-bar:nth-child(2)  { height:55%; animation-delay:0.1s;  }
+    .wave-bar:nth-child(3)  { height:80%; animation-delay:0.2s;  }
+    .wave-bar:nth-child(4)  { height:95%; animation-delay:0.05s; }
+    .wave-bar:nth-child(5)  { height:60%; animation-delay:0.15s; }
+    .wave-bar:nth-child(6)  { height:40%; animation-delay:0.25s; }
+    .wave-bar:nth-child(7)  { height:75%; animation-delay:0.1s;  }
+    .wave-bar:nth-child(8)  { height:90%; animation-delay:0.3s;  }
+    .wave-bar:nth-child(9)  { height:50%; animation-delay:0.08s; }
+    .wave-bar:nth-child(10) { height:30%; animation-delay:0.2s;  }
+    .wave-bar:nth-child(11) { height:65%; animation-delay:0.12s; }
+    .wave-bar:nth-child(12) { height:85%; animation-delay:0.35s; }
+    #wave-test.eq-realtime .wave-bar { animation: none !important; transition: height 0.08s ease-out; }
+    @keyframes wave-anim {
+      0%,100%{ transform:scaleY(0.25); }
+      50%{ transform:scaleY(1); }
+    }
+    #player-section.paused .wave-bar { animation-play-state: paused; opacity: 0.4; }
+
+    /* Controls */
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 8px 0;
+    }
+    .play-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,164,72,0.35);
+      background: rgba(196,164,72,0.08);
+      color: var(--gold-light);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.22s;
+    }
+    .play-btn:hover { background: rgba(196,164,72,0.16); border-color: var(--gold); }
+    .play-btn svg { width: 20px; height: 20px; }
+
+    .prog-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(196,164,72,0.15);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+      border-radius: 3px;
+      transition: width 0.3s linear;
+      width: 0%;
+    }
+
+    /* Autoplay state */
+    #state-autoplay-test {
+      display: none;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .start-btn {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(196,164,72,0.45);
+      background: rgba(196,164,72,0.1);
+      color: var(--gold-light);
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s;
+      animation: orb-breathe 3s ease-in-out infinite;
+    }
+    .start-btn:hover { background: rgba(196,164,72,0.2); }
+    @keyframes orb-breathe {
+      0%,100%{ box-shadow: 0 0 10px rgba(196,164,72,0.1); }
+      50%{ box-shadow: 0 0 24px rgba(196,164,72,0.25); }
+    }
+
+    /* Error */
+    #state-error-test { display: none; text-align: center; padding: 8px 0; }
+    .error-msg-test { font-size: 13px; color: #ff7070; margin-bottom: 14px; }
+
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(196,164,72,0.2), transparent); margin: 20px 0; }
+
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .vol-icon { font-size: 14px; color: var(--text-dimmer); cursor: pointer; }
+    input[type=range].vol-slider {
+      -webkit-appearance: none;
+      width: 90px; height: 3px;
+      border-radius: 3px;
+      background: rgba(196,164,72,0.2);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range].vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div id="stars" aria-hidden="true"></div>
+
+<div class="page">
+  <div class="test-card">
+    <h1 class="test-title">TEST · Audio2 Isolado</h1>
+    <p class="test-subtitle">Teste direto sem fluxo do quiz</p>
+
+    <!-- Form -->
+    <div class="field-group">
+      <div class="field-row">
+        <div>
+          <label for="t-nome">Nome</label>
+          <input type="text" id="t-nome" placeholder="Ex: Maria" value="Maria">
+        </div>
+        <div>
+          <label for="t-idade">Idade</label>
+          <input type="number" id="t-idade" min="18" max="99" placeholder="Ex: 42" value="42">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label for="t-sexo">Sexo</label>
+          <select id="t-sexo">
+            <option value="feminino">Feminino</option>
+            <option value="masculino">Masculino</option>
+          </select>
+        </div>
+        <div>
+          <label for="t-signo">Signo</label>
+          <select id="t-signo">
+            <option value="aries">Áries</option>
+            <option value="touro">Touro</option>
+            <option value="gemeos">Gêmeos</option>
+            <option value="cancer">Câncer</option>
+            <option value="leao">Leão</option>
+            <option value="virgem" selected>Virgem</option>
+            <option value="libra">Libra</option>
+            <option value="escorpiao">Escorpião</option>
+            <option value="sagitario">Sagitário</option>
+            <option value="capricornio">Capricórnio</option>
+            <option value="aquario">Aquário</option>
+            <option value="peixes">Peixes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label for="t-estado-civil">Estado Civil</label>
+          <select id="t-estado-civil">
+            <option value="casada">Casada/o</option>
+            <option value="relacionamento">Em Relacionamento</option>
+            <option value="noivado">Noivada/o</option>
+            <option value="sozinha" selected>Solteira/o</option>
+            <option value="separada">Separada/o</option>
+            <option value="viuva">Viúva/o</option>
+          </select>
+        </div>
+        <div>
+          <label for="t-dor">Desafio Principal</label>
+          <select id="t-dor">
+            <option value="financas">Finanças</option>
+            <option value="saude">Saúde</option>
+            <option value="vida-amorosa" selected>Vida Amorosa</option>
+            <option value="felicidade">Felicidade</option>
+            <option value="familia">Família</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-gerar" id="btn-gerar" onclick="gerarAudio2()">
+      &#9654; Gerar Audio2
+    </button>
+
+    <!-- Player / Loading -->
+    <div id="player-section">
+      <div class="divider"></div>
+      <p class="player-title" id="player-title">Gerando áudio...</p>
+
+      <!-- Loading bar -->
+      <div class="gen-bar-wrap" id="gen-bar-wrap">
+        <div class="gen-bar-track">
+          <div class="gen-bar-fill" id="t-gen-bar"></div>
+        </div>
+        <span class="gen-bar-pct" id="t-gen-pct">0%</span>
+      </div>
+      <p class="gen-status" id="t-gen-status">Canalizando leitura...</p>
+
+      <!-- Autoplay blocked -->
+      <div id="state-autoplay-test">
+        <button class="start-btn" id="btn-iniciar-test">&#9654; Toque para ouvir</button>
+      </div>
+
+      <!-- Error -->
+      <div id="state-error-test">
+        <p class="error-msg-test" id="t-error-msg">Erro ao gerar áudio.</p>
+      </div>
+
+      <!-- Player controls (hidden until ready) -->
+      <div id="player-controls" style="display:none">
+        <div class="wave-wrap" id="wave-test">
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill" id="t-prog-fill"></div>
+        </div>
+        <div class="ctrl-row">
+          <button class="play-btn" id="t-play-btn" onclick="togglePlay()" aria-label="Pausar/Retomar">
+            <svg id="t-icon-play" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg id="t-icon-pause" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="vol-row">
+          <span class="vol-icon" id="t-vol-icon" onclick="toggleMute()">🔊</span>
+          <input type="range" class="vol-slider" id="t-vol-slider"
+                 min="0" max="100" value="82"
+                 oninput="setVolume(this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/audio.js"></script>
+<script src="assets/lead-manager.js"></script>
+<script src="assets/audio-player.js"></script>
+<script>
+  // ── Stars ──────────────────────────────────────────────────────────────────
+  (function(){
+    const colors = ['rgba(255,235,180,V)','rgba(255,215,140,V)','rgba(200,180,120,V)','rgba(242,237,228,V)'];
+    const wrap = document.getElementById('stars');
+    for(let i=0;i<80;i++){
+      const s = document.createElement('span');
+      s.className = 'star';
+      const c = colors[Math.floor(Math.random()*colors.length)];
+      const op = (0.2+Math.random()*0.7).toFixed(2);
+      s.style.cssText = [
+        `left:${Math.random()*100}%`,
+        `top:${Math.random()*100}%`,
+        `width:${1+Math.random()*2.5}px`,
+        `height:${1+Math.random()*2.5}px`,
+        `background:${c.replace('V',op)}`,
+        `animation-delay:${(Math.random()*4).toFixed(2)}s`,
+        `animation-duration:${(2+Math.random()*3).toFixed(2)}s`,
+      ].join(';');
+      wrap.appendChild(s);
+    }
+  })();
+
+  // ── Player ─────────────────────────────────────────────────────────────────
+  let _testPlayer = null;
+  let _muted = false;
+  let _eqRaf = null;
+
+  function _calcFaixaEtaria(idade, sexo) {
+    if (idade < 30) return 'jovem';
+    return sexo === 'masculino' ? 'homem-maduro' : 'mulher-madura';
+  }
+
+  function gerarAudio2() {
+    console.log('AUDIO2 TEST START');
+
+    // Reset absoluto
+    sessionStorage.clear();
+    window.audioPlayer1?.destroy?.();
+    window.audioPlayer1?.stop?.();
+    window.audioPlayer2?.destroy?.();
+    window.audioPlayer2?.stop?.();
+    if (_testPlayer) {
+      _testPlayer.destroy();
+      _testPlayer = null;
+    }
+    stopEqualizer();
+
+    // Coletar dados do form
+    const nome       = document.getElementById('t-nome').value.trim();
+    const idade      = parseInt(document.getElementById('t-idade').value, 10) || 30;
+    const sexo       = document.getElementById('t-sexo').value;
+    const signo      = document.getElementById('t-signo').value;
+    const estadoCivil= document.getElementById('t-estado-civil').value;
+    const dor        = document.getElementById('t-dor').value;
+
+    if (!nome) { alert('Preencha o nome.'); return; }
+
+    const faixaEtaria = _calcFaixaEtaria(idade, sexo);
+
+    const lead = {
+      nome,
+      sexo,
+      signo,
+      estadoCivil,
+      dor,
+      faixaEtaria,
+      email: '',
+      sessionId: crypto.randomUUID(),
+    };
+
+    const payload = LeadManager.toApiPayload(lead, 'audio2');
+    console.log('AUDIO2 PAYLOAD', JSON.stringify(payload));
+
+    // UI: mostrar seção de loading
+    document.getElementById('player-section').style.display = '';
+    document.getElementById('gen-bar-wrap').style.display = '';
+    document.getElementById('t-gen-status').style.display = '';
+    document.getElementById('state-autoplay-test').style.display = 'none';
+    document.getElementById('state-error-test').style.display = 'none';
+    document.getElementById('player-controls').style.display = 'none';
+    document.getElementById('player-title').textContent = 'Gerando áudio para ' + nome + '...';
+    document.getElementById('t-gen-bar').style.width = '0%';
+    document.getElementById('t-gen-pct').textContent = '0%';
+    document.getElementById('t-gen-status').textContent = 'Canalizando leitura...';
+    document.getElementById('t-prog-fill').style.width = '0%';
+    document.getElementById('player-section').classList.remove('paused');
+
+    const btn = document.getElementById('btn-gerar');
+    btn.disabled = true;
+
+    // Loading bar animation enquanto API gera
+    let _genStart = performance.now();
+    let _genRaf2;
+    const GEN_MAX = 88;
+    const GEN_MS  = 22000;
+    const barEl   = document.getElementById('t-gen-bar');
+    const pctEl   = document.getElementById('t-gen-pct');
+    function tickBar(now) {
+      const t = Math.min((now - _genStart) / GEN_MS, 1);
+      const pct = (1 - Math.pow(1 - t, 3)) * GEN_MAX;
+      barEl.style.width  = pct.toFixed(1) + '%';
+      pctEl.textContent  = Math.floor(pct) + '%';
+      if (t < 1) _genRaf2 = requestAnimationFrame(tickBar);
+    }
+    _genRaf2 = requestAnimationFrame(tickBar);
+
+    function finishBar(cb) {
+      cancelAnimationFrame(_genRaf2);
+      barEl.style.transition = 'width 0.5s ease-out';
+      barEl.style.width = '100%';
+      pctEl.textContent = '100%';
+      document.getElementById('t-gen-status').textContent = 'Pronto!';
+      setTimeout(cb, 600);
+    }
+
+    // Player fresco
+    _testPlayer = createAudioPlayer();
+
+    _testPlayer.loadAndPlay('audio2', lead, {
+      onReady() {
+        console.log('AUDIO2 RESPONSE ok');
+        finishBar(() => {
+          document.getElementById('gen-bar-wrap').style.display = 'none';
+          document.getElementById('t-gen-status').style.display = 'none';
+          document.getElementById('player-controls').style.display = '';
+          document.getElementById('player-title').textContent = 'Reproduzindo · ' + nome;
+          btn.disabled = false;
+          console.log('AUDIO2 PLAY STARTED');
+          setTimeout(startEqualizer, 200);
+        });
+      },
+      onAutoplayBlocked() {
+        cancelAnimationFrame(_genRaf2);
+        document.getElementById('gen-bar-wrap').style.display = 'none';
+        document.getElementById('t-gen-status').style.display = 'none';
+        document.getElementById('player-controls').style.display = 'none';
+        document.getElementById('state-autoplay-test').style.display = '';
+        document.getElementById('player-title').textContent = 'Áudio pronto — toque para ouvir';
+        btn.disabled = false;
+      },
+      onProgress(pct) {
+        document.getElementById('t-prog-fill').style.width = (pct * 100).toFixed(1) + '%';
+      },
+      onEnd() {
+        stopEqualizer();
+      },
+      onError(err) {
+        cancelAnimationFrame(_genRaf2);
+        document.getElementById('gen-bar-wrap').style.display = 'none';
+        document.getElementById('t-gen-status').style.display = 'none';
+        document.getElementById('state-error-test').style.display = '';
+        document.getElementById('t-error-msg').textContent = 'Erro: ' + (err.message || err);
+        document.getElementById('player-title').textContent = 'Falha na geração';
+        btn.disabled = false;
+        console.error('AUDIO2 ERROR', err);
+      },
+    });
+
+    // Listener do botão manual (adicionado fresco a cada geração)
+    const btnIniciar = document.getElementById('btn-iniciar-test');
+    const btnFresh = btnIniciar.cloneNode(true);
+    btnIniciar.parentNode.replaceChild(btnFresh, btnIniciar);
+    btnFresh.addEventListener('click', function() {
+      console.log('AUDIO2 PLAY STARTED (manual)');
+      document.getElementById('state-autoplay-test').style.display = 'none';
+      document.getElementById('player-controls').style.display = '';
+      document.getElementById('player-section').classList.remove('paused');
+      document.getElementById('t-icon-play').style.display  = 'none';
+      document.getElementById('t-icon-pause').style.display = '';
+      _testPlayer.manualPlay();
+      setTimeout(startEqualizer, 200);
+    });
+  }
+
+  // ── Equalizer ──────────────────────────────────────────────────────────────
+  function startEqualizer() {
+    if (!_testPlayer) return;
+    const analyser = _testPlayer.getAnalyser();
+    const waveWrap = document.getElementById('wave-test');
+    if (!analyser || !waveWrap) return;
+
+    const bars = waveWrap.querySelectorAll('.wave-bar');
+    if (!bars.length) return;
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    waveWrap.classList.add('eq-realtime');
+
+    function frame() {
+      if (!_testPlayer || !_testPlayer.isPlaying()) {
+        waveWrap.classList.remove('eq-realtime');
+        _eqRaf = null;
+        return;
+      }
+      analyser.getByteFrequencyData(data);
+      const n = bars.length;
+      const binCount = data.length;
+      for (let i = 0; i < n; i++) {
+        const binIdx = Math.round((i / n) * binCount * 0.55);
+        const val = data[Math.min(binIdx, binCount - 1)] || 0;
+        const pct = Math.max(10, (val / 255) * 100);
+        bars[i].style.height = pct.toFixed(0) + '%';
+      }
+      _eqRaf = requestAnimationFrame(frame);
+    }
+    _eqRaf = requestAnimationFrame(frame);
+  }
+
+  function stopEqualizer() {
+    if (_eqRaf) { cancelAnimationFrame(_eqRaf); _eqRaf = null; }
+    const w = document.getElementById('wave-test');
+    if (w) w.classList.remove('eq-realtime');
+  }
+
+  // ── Player controls ────────────────────────────────────────────────────────
+  function togglePlay() {
+    if (!_testPlayer) return;
+    _testPlayer.toggle();
+    const playing = _testPlayer.isPlaying();
+    document.getElementById('player-section').classList.toggle('paused', !playing);
+    document.getElementById('t-icon-play').style.display  = playing ? 'none' : '';
+    document.getElementById('t-icon-pause').style.display = playing ? '' : 'none';
+    if (playing) startEqualizer(); else stopEqualizer();
+  }
+
+  function setVolume(v) {
+    if (!_testPlayer) return;
+    _testPlayer.setVolume(v / 100);
+    document.getElementById('t-vol-icon').textContent = v > 0 ? '🔊' : '🔇';
+  }
+
+  function toggleMute() {
+    if (!_testPlayer) return;
+    _muted = !_muted;
+    _testPlayer.mute(_muted);
+    document.getElementById('t-vol-icon').textContent = _muted ? '🔇' : '🔊';
+  }
+
+  // Log: URL capturada (hook via console override para AUDIO2 URL)
+  const _origLog = console.log.bind(console);
+  console.log = function(...args) {
+    if (args[0] === 'AUDIO2 PAYLOAD FINAL' && args[1]) {
+      try {
+        const data = JSON.parse(args[1]);
+        // já logado como AUDIO2 PAYLOAD antes do loadAndPlay
+      } catch(_) {}
+    }
+    if (typeof args[0] === 'string' && args[0].includes('Audio URL:')) {
+      _origLog('AUDIO2 URL', args[0]);
+    }
+    _origLog(...args);
+  };
+</script>
+</body>
+</html>

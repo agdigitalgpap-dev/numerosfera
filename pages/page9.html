@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carregando — Quiz Astrológico</title>
+<link rel="stylesheet" href="../assets/shared.css">
+<script src="../assets/audio.js"></script>
+<style>
+body { display:flex; align-items:center; justify-content:center; }
+
+.loading-wrap {
+  position: relative; z-index:10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 32px; text-align: center;
+  min-height: 100vh; width: 100%;
+}
+
+/* Cinematic orb behind bar */
+.orb {
+  position: absolute;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,164,72,0.07) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+@keyframes orb-breathe {
+  0%,100%{ transform:scale(1); opacity:0.6; }
+  50%{ transform:scale(1.15); opacity:1; }
+}
+
+.loading-title {
+  font-size: 18px; font-weight: 700; color: var(--text);
+  letter-spacing: 1px; margin-bottom: 40px; position: relative;
+}
+
+/* Track */
+.bar-track {
+  width: 280px; height: 6px;
+  background: rgba(196,164,72,0.1);
+  border-radius: 50px; overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(196,164,72,0.12);
+}
+
+/* Fill */
+.bar-fill {
+  height: 100%; width: 0%;
+  border-radius: 50px;
+  background: linear-gradient(90deg, #9A7A2C 0%, #C4A44A 50%, #E8D08A 100%);
+  transition: width 0.1s linear;
+  position: relative; overflow: hidden;
+}
+.bar-fill::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: bar-shimmer 1.4s infinite;
+}
+@keyframes bar-shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(250%)} }
+
+.pct-text {
+  margin-top: 16px;
+  font-size: 12px; font-weight: 500; letter-spacing: 2px;
+  color: var(--text-dim); position: relative;
+}
+
+/* Message row */
+.loading-msg {
+  margin-top: 28px; font-size:13px; color:var(--text-dimmer);
+  font-style: italic; letter-spacing: 0.3px; position: relative;
+  transition: opacity 0.4s ease;
+}
+
+@keyframes fadeOut { to{opacity:0;transform:translateY(-8px)} }
+.fade-out { animation: fadeOut 0.5s ease forwards; }
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+
+<div class="loading-wrap" id="wrap">
+  <div class="orb"></div>
+  <p class="loading-title">Carregando o Teste</p>
+  <div class="bar-track">
+    <div class="bar-fill" id="barFill"></div>
+  </div>
+  <p class="pct-text" id="pctText">0%</p>
+  <p class="loading-msg" id="loadingMsg">Analisando sua energia astral...</p>
+</div>
+
+<script>
+const bg=document.getElementById('bgLayer');
+const wc=['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
+for(let i=0;i<70;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.8+0.4;const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;bg.appendChild(s);}
+
+const msgs = [
+  'Analisando sua energia astral...',
+  'Mapeando seu campo vibracional...',
+  'Consultando os registros cósmicos...',
+  'Calculando influências planetárias...',
+  'Sua leitura está sendo preparada...',
+];
+let mIdx=0;
+const msgEl=document.getElementById('loadingMsg');
+const msgTimer=setInterval(()=>{
+  mIdx=(mIdx+1)%msgs.length;
+  msgEl.style.opacity='0';
+  setTimeout(()=>{msgEl.textContent=msgs[mIdx];msgEl.style.opacity='1';},300);
+},1200);
+
+const fill=document.getElementById('barFill');
+const pct=document.getElementById('pctText');
+const wrap=document.getElementById('wrap');
+let step=0; const steps=3200/40;
+
+function ease(t){ return t<0.5?2*t*t:-1+(4-2*t)*t; }
+
+const timer=setInterval(()=>{
+  step++;
+  const t=step/steps;
+  const p=Math.min(ease(t)*100,100);
+  fill.style.width=p+'%';
+  pct.textContent=Math.floor(p)+'%';
+  if(p>=100){
+    clearInterval(timer); clearInterval(msgTimer);
+    setTimeout(()=>{
+      wrap.classList.add('fade-out');
+      setTimeout(()=>{window.location.href='../vsl.html';},500);
+    },300);
+  }
+},40);
+</script>
+</body>
+</html>

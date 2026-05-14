@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prévia Tipográfica — ASTRA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Montserrat:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  background:#080604;
+  color:#F2EDE4;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+:root{
+  --gold:#C4A44A;
+  --gold-light:#D4B86E;
+  --gold-dark:#9A7A2C;
+  --text:#F2EDE4;
+  --text-dim:rgba(242,237,228,.55);
+  --text-dimmer:rgba(242,237,228,.32);
+  --lilac:#C8B4E0;
+  --card-bg:rgba(18,13,8,.92);
+  --card-border:rgba(172,134,58,.2);
+}
+
+.bg-layer{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(172,134,58,.12) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 60%,rgba(120,80,30,.09) 0%,transparent 55%),
+    linear-gradient(180deg,#0e0b07 0%,#080604 50%,#050403 100%);
+}
+
+.star{position:absolute;border-radius:50%;animation:tw var(--dur,4s) ease-in-out infinite var(--delay,0s);}
+@keyframes tw{0%,100%{opacity:.06;transform:scale(1)}50%{opacity:var(--op,.5);transform:scale(1.5)}}
+
+.wrap{
+  position:relative;z-index:10;
+  max-width:520px;margin:0 auto;
+  padding:40px 16px 80px;
+}
+
+/* Page title */
+.page-title{
+  text-align:center;
+  font-family:'Poppins',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(196,164,72,.55);
+  margin-bottom:8px;
+}
+.page-heading{
+  text-align:center;
+  font-family:'Poppins',sans-serif;
+  font-size:18px;font-weight:700;
+  color:var(--text);margin-bottom:6px;
+}
+.page-sub{
+  text-align:center;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;color:var(--text-dimmer);
+  margin-bottom:40px;
+}
+.gold-line{
+  width:60px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:0 auto 40px;opacity:.5;
+}
+
+/* Combo card */
+.combo{
+  background:var(--card-bg);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border:1px solid var(--card-border);
+  border-radius:22px;
+  padding:32px 26px 28px;
+  margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.combo::before{
+  content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,164,72,.4),transparent);
+}
+.combo-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(196,164,72,.08);
+  border:1px solid rgba(196,164,72,.22);
+  border-radius:50px;padding:5px 16px;
+  font-family:'Poppins',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-light);margin-bottom:22px;
+}
+.combo-tag{
+  font-family:'Poppins',sans-serif;
+  font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dimmer);margin-bottom:6px;
+}
+.font-pair{
+  margin-bottom:20px;
+  padding:16px;
+  background:rgba(196,164,72,.04);
+  border:1px solid rgba(196,164,72,.1);
+  border-radius:12px;
+}
+.font-name{
+  font-family:'Poppins',sans-serif;
+  font-size:9px;color:rgba(196,164,72,.5);
+  letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.divider{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,164,72,.2),transparent);
+  margin:20px 0;
+}
+
+/* ── COMBINAÇÃO 1: Cinzel + Cormorant Garamond ── */
+.c1-title{
+  font-family:'Cinzel',serif;
+  font-size:24px;font-weight:700;
+  color:var(--text);line-height:1.3;
+  letter-spacing:.5px;
+}
+.c1-title .hl{color:var(--lilac);}
+.c1-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;font-weight:300;font-style:italic;
+  color:var(--text-dim);line-height:1.7;
+  margin-top:8px;
+}
+.c1-cta{
+  font-family:'Cinzel',serif;
+  font-size:11px;font-weight:600;letter-spacing:3.5px;
+  color:var(--gold-light);text-transform:uppercase;
+  margin-top:10px;opacity:.8;
+}
+.c1-body{
+  font-family:'Cormorant Garamond',serif;
+  font-size:14px;color:var(--text-dim);line-height:1.75;margin-top:8px;
+}
+
+/* ── COMBINAÇÃO 2: Playfair Display + Montserrat ── */
+.c2-title{
+  font-family:'Playfair Display',serif;
+  font-size:24px;font-weight:900;font-style:italic;
+  color:var(--text);line-height:1.25;
+  background:linear-gradient(135deg,#C4A44A 0%,#E8D08A 50%,#C4A44A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.c2-sub{
+  font-family:'Montserrat',sans-serif;
+  font-size:12px;font-weight:300;letter-spacing:.3px;
+  color:var(--text-dim);line-height:1.65;margin-top:8px;
+}
+.c2-cta{
+  font-family:'Montserrat',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:4px;
+  color:rgba(196,164,72,.7);text-transform:uppercase;margin-top:10px;
+}
+.c2-body{
+  font-family:'Montserrat',sans-serif;
+  font-size:12.5px;font-weight:400;color:var(--text-dim);
+  line-height:1.7;margin-top:8px;
+}
+
+/* ── COMBINAÇÃO 3: Outfit + Poppins (current) ── */
+.c3-title{
+  font-family:'Outfit',sans-serif;
+  font-size:24px;font-weight:800;
+  color:var(--text);line-height:1.3;letter-spacing:-.3px;
+}
+.c3-title .hl{color:var(--lilac);font-style:italic;}
+.c3-sub{
+  font-family:'Poppins',sans-serif;
+  font-size:13px;font-weight:400;
+  color:var(--text-dim);line-height:1.65;margin-top:8px;
+}
+.c3-cta{
+  font-family:'Outfit',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:3.5px;
+  color:var(--gold-light);text-transform:uppercase;margin-top:10px;
+}
+.c3-body{
+  font-family:'Poppins',sans-serif;
+  font-size:13px;font-weight:400;color:var(--text-dim);
+  line-height:1.65;margin-top:8px;
+}
+
+/* Amostra de botão */
+.sample-btn{
+  display:inline-block;margin-top:14px;
+  background:linear-gradient(135deg,#C4A44A 0%,#E8D08A 50%,#C4A44A 100%);
+  border-radius:50px;padding:13px 32px;
+  color:#0e0a04;font-weight:700;font-size:14px;
+  letter-spacing:.3px;cursor:default;
+}
+.sample-btn-c1{font-family:'Cinzel',serif;letter-spacing:2px;font-size:12px;}
+.sample-btn-c2{font-family:'Montserrat',sans-serif;letter-spacing:1px;font-size:12px;}
+.sample-btn-c3{font-family:'Outfit',sans-serif;letter-spacing:.5px;font-size:14px;}
+
+/* Header sample */
+.header-sample{
+  text-align:center;padding:18px 0 14px;border-bottom:1px solid rgba(196,164,72,.1);
+  margin-bottom:16px;
+}
+.alert-c1{font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:4px;text-transform:uppercase;background:linear-gradient(135deg,#C4A44A,#E8D08A,#C4A44A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.alert-c2{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;font-style:italic;background:linear-gradient(135deg,#C4A44A,#E8D08A,#C4A44A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.alert-c3{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(135deg,#C4A44A,#E8D08A,#C4A44A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+
+<div class="wrap">
+
+  <p class="page-title">Prévia Visual</p>
+  <h1 class="page-heading">Teste A/B — Tipografia</h1>
+  <p class="page-sub">3 combinações de fontes para aprovação. O quiz não foi modificado.</p>
+  <div class="gold-line"></div>
+
+  <!-- ══════════════════════════════════
+       COMBINAÇÃO 1
+       Cinzel + Cormorant Garamond
+       Direcção: Luxury Mystical Clássico
+  ═══════════════════════════════════ -->
+  <div class="combo">
+    <div class="combo-badge">✦ Combinação 1</div>
+
+    <!-- Header sample -->
+    <div class="header-sample">
+      <div class="alert-c1">Alerta de Maio</div>
+      <div style="height:6px;"></div>
+      <div class="c1-title" style="font-size:16px;text-align:center;">3 Signos Estão Perdendo <span class="hl">Dinheiro e Amor</span></div>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Títulos — Cinzel 700</p>
+      <p class="c1-title">Resultado para<br><span class="hl">Gustavo</span></p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Subtítulos / Corpo — Cormorant Garamond 300 Italic</p>
+      <p class="c1-sub">Por favor, aumente o volume para ouvir a apresentação e clique no botão abaixo para iniciar sua leitura personalizada.</p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Labels / CTA text</p>
+      <p class="c1-cta">↓ Clique no seu signo ↓</p>
+    </div>
+
+    <div class="sample-btn sample-btn-c1">COMEÇAR</div>
+
+    <div class="divider"></div>
+    <p class="combo-tag">Sensação: Clássico · Arcano · Luxury Astral · Alta Cerimônia</p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       COMBINAÇÃO 2
+       Playfair Display + Montserrat
+       Direcção: Editorial High-Ticket
+  ═══════════════════════════════════ -->
+  <div class="combo">
+    <div class="combo-badge">✦ Combinação 2</div>
+
+    <!-- Header sample -->
+    <div class="header-sample">
+      <div class="alert-c2">Alerta de Maio</div>
+      <div style="height:6px;"></div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;text-align:center;color:var(--text);">3 Signos Estão Perdendo <span style="color:var(--lilac);">Dinheiro e Amor</span></div>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Títulos — Playfair Display 900 Italic</p>
+      <p class="c2-title">Resultado para Gustavo</p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Subtítulos / Corpo — Montserrat 300</p>
+      <p class="c2-sub">Por favor, aumente o volume para ouvir a apresentação e clique no botão abaixo para iniciar sua leitura personalizada.</p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Labels / CTA text</p>
+      <p class="c2-cta">↓ Clique no seu signo ↓</p>
+    </div>
+
+    <div class="sample-btn sample-btn-c2">COMEÇAR</div>
+
+    <div class="divider"></div>
+    <p class="combo-tag">Sensação: Editorial · Sofisticado · Moderno Premium · High-Ticket</p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       COMBINAÇÃO 3
+       Outfit + Poppins (atual melhorado)
+       Direcção: Cinematic Modern
+  ═══════════════════════════════════ -->
+  <div class="combo">
+    <div class="combo-badge">✦ Combinação 3 <span style="font-size:8px;opacity:.6;">(base atual)</span></div>
+
+    <!-- Header sample -->
+    <div class="header-sample">
+      <div class="alert-c3">Alerta de Maio</div>
+      <div style="height:6px;"></div>
+      <div style="font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;text-align:center;color:var(--text);">3 Signos Estão Perdendo <span style="color:var(--lilac);font-style:italic;">Dinheiro e Amor</span></div>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Títulos — Outfit 800</p>
+      <p class="c3-title">Resultado para<br><span class="hl">Gustavo</span></p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Subtítulos / Corpo — Poppins 400 (atual)</p>
+      <p class="c3-sub">Por favor, aumente o volume para ouvir a apresentação e clique no botão abaixo para iniciar sua leitura personalizada.</p>
+    </div>
+
+    <div class="font-pair">
+      <p class="font-name">Labels / CTA text</p>
+      <p class="c3-cta">↓ Clique no seu signo ↓</p>
+    </div>
+
+    <div class="sample-btn sample-btn-c3">COMEÇAR</div>
+
+    <div class="divider"></div>
+    <p class="combo-tag">Sensação: Moderno · Cinematográfico · Fluido · Clean Premium</p>
+  </div>
+
+</div>
+
+<script>
+const bg=document.getElementById('bgLayer');
+const wc=['rgba(255,235,180,V)','rgba(255,215,140,V)','rgba(220,180,110,V)','rgba(255,250,230,V)','rgba(196,164,72,V)'];
+for(let i=0;i<80;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*1.8+0.4;
+  const c=wc[i%wc.length].replace('V',(0.3+Math.random()*0.5).toFixed(2));
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;
+  bg.appendChild(s);
+}
+</script>
+</body>
+</html>

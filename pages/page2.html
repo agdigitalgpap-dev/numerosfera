@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dia de Nascimento — Quiz Astrológico</title>
+<link rel="stylesheet" href="../assets/shared.css">
+<script src="../assets/audio.js"></script>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+<div class="page">
+
+  <header class="header anim-1">
+    <div class="header-alert">Alerta de Maio</div>
+    <p class="header-title">
+      3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
+      <span class="hl">O Seu é Um Deles?</span>
+    </p>
+    <div class="gold-divider"></div>
+    <p class="header-sub">
+      Teste rápido de 30 segundos revela o que está bloqueando sua energia <span class="hl">(e como liberar)</span>.
+    </p>
+  </header>
+
+  <div class="main-card anim-2">
+    <h2 class="card-title">Qual seu dia de nascimento?</h2>
+    <div id="daysContainer"></div>
+    <button class="back-btn" onclick="window.location.href='../index.html'">Voltar</button>
+  </div>
+
+</div>
+<script>
+const bg = document.getElementById('bgLayer');
+const wc = ['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
+for (let i=0;i<80;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*1.8+0.4;
+  const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;
+  bg.appendChild(s);
+}
+
+const signDays = {
+  'Áries':       [{m:'Março',    d:[21,22,23,24,25,26,27,28,29,30,31]},{m:'Abril',     d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}],
+  'Touro':       [{m:'Abril',    d:[20,21,22,23,24,25,26,27,28,29,30]},{m:'Maio',      d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}],
+  'Gêmeos':      [{m:'Maio',     d:[21,22,23,24,25,26,27,28,29,30,31]},{m:'Junho',     d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}],
+  'Câncer':      [{m:'Junho',    d:[21,22,23,24,25,26,27,28,29,30]},   {m:'Julho',     d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]}],
+  'Leão':        [{m:'Julho',    d:[23,24,25,26,27,28,29,30,31]},      {m:'Agosto',    d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]}],
+  'Virgem':      [{m:'Agosto',   d:[23,24,25,26,27,28,29,30,31]},      {m:'Setembro',  d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]}],
+  'Libra':       [{m:'Setembro', d:[23,24,25,26,27,28,29,30]},         {m:'Outubro',   d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]}],
+  'Escorpião':   [{m:'Outubro',  d:[23,24,25,26,27,28,29,30,31]},      {m:'Novembro',  d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}],
+  'Sagitário':   [{m:'Novembro', d:[22,23,24,25,26,27,28,29,30]},      {m:'Dezembro',  d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}],
+  'Capricórnio': [{m:'Dezembro', d:[22,23,24,25,26,27,28,29,30,31]},   {m:'Janeiro',   d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}],
+  'Aquário':     [{m:'Janeiro',  d:[20,21,22,23,24,25,26,27,28,29,30,31]},{m:'Fevereiro',d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]}],
+  'Peixes':      [{m:'Fevereiro',d:[19,20,21,22,23,24,25,26,27,28,29]},{m:'Março',     d:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}],
+};
+
+const signo = localStorage.getItem('signo') || 'Virgem';
+const container = document.getElementById('daysContainer');
+
+(signDays[signo] || signDays['Virgem']).forEach(section => {
+  const title = document.createElement('p');
+  title.className = 'month-title'; title.textContent = section.month;
+  container.appendChild(title);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid-6col';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:7px;';
+
+  section.d.forEach(day => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.style.cssText = 'padding:11px 4px;font-size:14px;border-radius:12px;';
+    btn.textContent = String(day).padStart(2,'0');
+    btn.onclick = () => {
+      document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      localStorage.setItem('dia', `${String(day).padStart(2,'0')} de ${section.month}`);
+      setTimeout(() => { window.location.href = 'page3.html'; }, 300);
+    };
+    grid.appendChild(btn);
+  });
+  container.appendChild(grid);
+});
+</script>
+</body>
+</html>

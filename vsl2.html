@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sua Leitura Completa — Quiz Astrológico</title>
+<link rel="stylesheet" href="assets/shared.css">
+<script src="assets/audio.js"></script>
+<style>
+body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+
+.vsl-page {
+  position:relative; z-index:10;
+  width:100%; max-width:500px;
+  padding:28px 16px 52px;
+  display:flex; flex-direction:column; align-items:center; gap:0;
+}
+
+.video-frame {
+  width:100%; border-radius:18px; overflow:hidden;
+  border:1px solid rgba(196,164,72,0.28);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 24px 80px rgba(0,0,0,0.85),0 0 40px rgba(196,164,72,0.07);
+  position:relative;
+}
+.video-frame::before,.video-frame::after {
+  content:'';position:absolute;z-index:25;
+  width:18px;height:18px;border-color:rgba(196,164,72,0.45);border-style:solid;
+}
+.video-frame::before{top:10px;left:10px;border-width:1.5px 0 0 1.5px;border-radius:3px 0 0 0;}
+.video-frame::after {top:10px;right:10px;border-width:1.5px 1.5px 0 0;border-radius:0 3px 0 0;}
+.corner-bl,.corner-br{position:absolute;z-index:25;width:18px;height:18px;border-color:rgba(196,164,72,0.45);border-style:solid;}
+.corner-bl{bottom:10px;left:10px;border-width:0 0 1.5px 1.5px;border-radius:0 0 0 3px;}
+.corner-br{bottom:10px;right:10px;border-width:0 1.5px 1.5px 0;border-radius:0 0 3px 0;}
+
+.overlay {
+  position:absolute;inset:0;z-index:20;
+  background:rgba(8,6,4,0.96);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 28px;text-align:center;
+  transition:transform 0.75s cubic-bezier(0.22,1,0.36,1),opacity 0.6s ease;
+  backdrop-filter:blur(8px);
+}
+.overlay.hidden{transform:translateY(-108%);opacity:0;pointer-events:none;}
+
+.ov-eyebrow{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(196,164,72,0.6);margin-bottom:14px;}
+.ov-title{font-size:22px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:10px;}
+.ov-title span{color:var(--lilac);font-style:italic;}
+.ov-sub{font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:30px;max-width:260px;}
+
+.btn-wrap{position:relative;display:inline-block;}
+.pulse-r {position:absolute;inset:-10px;border-radius:50px;border:1px solid rgba(196,164,72,0.3);animation:pr 2.5s ease-out infinite;}
+.pulse-r2{position:absolute;inset:-20px;border-radius:50px;border:1px solid rgba(196,164,72,0.15);animation:pr 2.5s ease-out 1s infinite;}
+@keyframes pr{0%{transform:scale(1);opacity:0.7}100%{transform:scale(1.2);opacity:0}}
+
+.start-btn {
+  background:linear-gradient(135deg,#1a1208,#2e2010);
+  border:1px solid rgba(196,164,72,0.45);border-radius:50px;
+  padding:15px 52px;font-size:16px;font-weight:800;color:var(--gold-light);
+  letter-spacing:4px;text-transform:uppercase;cursor:pointer;
+  transition:all 0.25s ease;
+  box-shadow:0 0 24px rgba(196,164,72,0.2),0 8px 24px rgba(0,0,0,0.6);
+}
+.start-btn:hover{transform:scale(1.06);border-color:rgba(196,164,72,0.7);box-shadow:0 0 40px rgba(196,164,72,0.35),0 8px 32px rgba(0,0,0,0.7);}
+.start-btn:active{transform:scale(0.97);}
+
+.video-wrap{width:100%;aspect-ratio:16/9;background:#040302;position:relative;display:flex;align-items:center;justify-content:center;min-height:200px;}
+.video-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+.vid-ph{width:100%;height:100%;position:absolute;inset:0;background:linear-gradient(135deg,#0d0b08,#181410);display:flex;align-items:center;justify-content:center;}
+.play-icon{width:52px;height:52px;border-radius:50%;background:rgba(196,164,72,0.12);border:1px solid rgba(196,164,72,0.28);display:flex;align-items:center;justify-content:center;opacity:0.5;}
+
+.sign-strip{width:100%;margin-top:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.attn-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(196,164,72,0.08);border:1px solid rgba(196,164,72,0.22);border-radius:50px;padding:6px 20px;font-size:12px;font-weight:600;color:var(--gold-light);letter-spacing:0.5px;}
+.sign-orb{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle,rgba(196,164,72,0.1),rgba(8,6,4,0.9));border:1px solid rgba(196,164,72,0.28);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 28px rgba(196,164,72,0.15),0 0 60px rgba(196,164,72,0.06);}
+.sign-lbl{color:var(--gold-light);font-weight:700;font-size:13px;letter-spacing:3.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+
+<div class="vsl-page anim-1">
+
+  <div class="video-frame" style="width:100%;">
+    <div class="corner-bl"></div>
+    <div class="corner-br"></div>
+
+    <div class="overlay" id="overlay">
+      <p class="ov-eyebrow">Leitura Completa</p>
+      <h2 class="ov-title">Resultado para<br><span id="nameDisplay">você</span></h2>
+      <p class="ov-sub">Por favor, aumente o volume para ouvir a apresentação e clique no botão abaixo...</p>
+      <div class="btn-wrap">
+        <div class="pulse-r"></div>
+        <div class="pulse-r2"></div>
+        <button class="start-btn" onclick="startVideo()">COMEÇAR</button>
+      </div>
+    </div>
+
+    <div class="video-wrap" id="videoWrap">
+      <video id="mainVideo" playsinline preload="metadata" style="width:100%;height:100%;display:block;">
+        <!-- <source src="assets/video/vsl2.mp4" type="video/mp4"> -->
+      </video>
+      <div class="vid-ph" id="vidPh">
+        <div class="play-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M6 3.5 L16 10 L6 16.5 Z" fill="rgba(196,164,72,0.5)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-strip" id="signStrip" style="display:none;">
+    <div class="attn-badge"><span>⚠</span><span id="attnText">Atenção!</span></div>
+    <div class="sign-orb"><span id="signIcon"></span></div>
+    <p class="sign-lbl" id="signLbl"></p>
+  </div>
+
+</div>
+
+<script>
+const bg=document.getElementById('bgLayer');
+const wc=['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
+for(let i=0;i<100;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.8+0.3;const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;bg.appendChild(s);}
+
+const nome=localStorage.getItem('primeiroNome')||'';
+const signo=localStorage.getItem('signo')||'';
+if(nome)document.getElementById('nameDisplay').textContent=nome;
+
+const icons={'Áries':'♈','Touro':'♉','Gêmeos':'♊','Câncer':'♋','Leão':'♌','Virgem':'♍','Libra':'♎','Escorpião':'♏','Sagitário':'♐','Capricórnio':'♑','Aquário':'♒','Peixes':'♓'};
+if(signo){
+  const strip=document.getElementById('signStrip');
+  document.getElementById('attnText').textContent=nome?`Atenção, ${nome}!`:'Atenção!';
+  document.getElementById('signIcon').textContent=icons[signo]||'✦';
+  document.getElementById('signLbl').textContent=signo;
+  strip.style.display='flex';
+}
+
+function startVideo(){
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('vidPh').style.display='none';
+  const v=document.getElementById('mainVideo');
+  // Fade out ambient audio, then start VSL2 video
+  AudioManager.fadeOut(() => {
+    AudioManager.stop();
+    if(v.src||v.querySelector('source'))v.play().catch(()=>{});
+  });
+  if(!v.src && !v.querySelector('source')) AudioManager.stop();
+}
+document.getElementById('mainVideo').addEventListener('loadeddata',()=>{document.getElementById('vidPh').style.display='none';});
+document.getElementById('mainVideo').addEventListener('ended',()=>{window.location.href='pages/page11.html';});
+</script>
+</body>
+</html>

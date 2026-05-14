@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '{print $NF, $5}')",
+      "Bash(brew install *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m venv .venv)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(/Users/teste/Desktop/VS CODE - ASTRA/.venv/bin/pip install *)",
+      "Bash(mkdir -p \"/Users/teste/Desktop/VS CODE - ASTRA/api/models\" \\\\ *)",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(.venv/bin/python -m uvicorn api.main:app --port 8765 --log-level warning)",
+      "Bash(curl -s http://localhost:8765/)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost:8765/api/audio/status)",
+      "Bash(curl -s -X POST http://localhost:8765/api/audio/preview -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(curl -s -X POST http://localhost:8765/api/audio/blocos -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(time curl -s -X POST http://localhost:8765/api/audio/generate -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(pkill -f \"uvicorn api.main:app\")",
+      "Bash(node -e ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -c \"from elevenlabs import VoiceSettings; import inspect; print\\(inspect.signature\\(VoiceSettings.__init__\\)\\)\")",
+      "Bash(python3 -c \"from elevenlabs import VoiceSettings; print\\(VoiceSettings.__fields__.keys\\(\\) if hasattr\\(VoiceSettings,'__fields__'\\) else dir\\(VoiceSettings\\)\\)\")"
+    ],
+    "additionalDirectories": [
+      "/Users/teste/Desktop/VS CODE - ASTRA/Briefing/AUDIO/audio-1 "
+    ]
+  }
+}

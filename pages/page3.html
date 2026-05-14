@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Década — Quiz Astrológico</title>
+<link rel="stylesheet" href="../assets/shared.css">
+<script src="../assets/audio.js"></script>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+<div class="page">
+
+  <header class="header anim-1">
+    <div class="header-alert">Alerta de Maio</div>
+    <p class="header-title">
+      3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
+      <span class="hl">O Seu é Um Deles?</span>
+    </p>
+    <div class="gold-divider"></div>
+    <p class="header-sub">
+      Teste rápido de 30 segundos revela o que está bloqueando sua energia <span class="hl">(e como liberar)</span>.
+    </p>
+  </header>
+
+  <div class="main-card anim-2">
+    <h2 class="card-title">Em qual década você nasceu?</h2>
+    <div class="grid-3">
+      <button class="opt-btn" onclick="pick('1910')">1910</button>
+      <button class="opt-btn" onclick="pick('1920')">1920</button>
+      <button class="opt-btn" onclick="pick('1930')">1930</button>
+      <button class="opt-btn" onclick="pick('1940')">1940</button>
+      <button class="opt-btn" onclick="pick('1950')">1950</button>
+      <button class="opt-btn" onclick="pick('1960')">1960</button>
+      <button class="opt-btn" onclick="pick('1970')">1970</button>
+      <button class="opt-btn" onclick="pick('1980')">1980</button>
+      <button class="opt-btn" onclick="pick('1990')">1990</button>
+      <button class="opt-btn" onclick="pick('2000')">2000</button>
+      <button class="opt-btn" onclick="pick('2010')">2010</button>
+    </div>
+    <button class="back-btn" onclick="history.back()">Voltar</button>
+  </div>
+
+</div>
+<script>
+const bg=document.getElementById('bgLayer');
+const wc=['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.8+0.4;const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;bg.appendChild(s);}
+function pick(d){document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));event.target.classList.add('selected');localStorage.setItem('decada',d);setTimeout(()=>{window.location.href='page4.html';},300);}
+</script>
+</body>
+</html>

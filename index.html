@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALERTA DE MAIO — Quiz Astrológico</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --bg:          #06081a;
+  --card-bg:     rgba(18,13,8,0.90);
+  --card-border: rgba(172,134,58,0.20);
+  --gold:        #C4A44A;
+  --gold-light:  #D4B86E;
+  --gold-dark:   #9A7A2C;
+  --text:        #F2EDE4;
+  --text-dim:    rgba(242,237,228,0.55);
+  --text-dimmer: rgba(242,237,228,0.32);
+  --lilac:       #C8B4E0;
+  --opt-bg:      rgba(28,20,10,0.80);
+  --opt-bg-h:    rgba(42,30,12,0.95);
+  --opt-border:  rgba(172,134,58,0.22);
+  --opt-border-h:rgba(196,164,72,0.55);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ─── Background ─── */
+.bg-layer{
+  position:fixed;inset:0;z-index:0;
+  background:
+    /* Vignette escura nas bordas */
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(2,3,12,0.65) 100%),
+    /* Coluna de luz celestial — topo centro */
+    radial-gradient(ellipse 30% 60% at 50% 0%, rgba(100,130,255,0.22) 0%, transparent 60%),
+    /* Nebulosa violeta — esquerda */
+    radial-gradient(ellipse 55% 65% at 8% 42%,  rgba(90,55,185,0.17) 0%, transparent 65%),
+    /* Névoa azul-teal — direita */
+    radial-gradient(ellipse 50% 55% at 93% 52%, rgba(35,80,175,0.13) 0%, transparent 58%),
+    /* Aura inferior — energia espiritual */
+    radial-gradient(ellipse 45% 38% at 50% 98%, rgba(100,65,160,0.12) 0%, transparent 55%),
+    /* Centro — brilho lilás suave */
+    radial-gradient(ellipse 60% 50% at 50% 55%, rgba(85,70,160,0.07) 0%, transparent 65%),
+    /* Base deep space */
+    linear-gradient(175deg, #080c20 0%, #05090f 35%, #050810 65%, #040609 100%);
+}
+.star{position:absolute;border-radius:50%;animation:twinkle var(--dur,4s) ease-in-out infinite var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:.06;transform:scale(1)}50%{opacity:var(--op,.65);transform:scale(1.6)}}
+
+/* Nebulosas flutuantes */
+.nebula{
+  position:absolute;border-radius:50%;pointer-events:none;
+  filter:blur(72px);
+  animation:nebulaFloat var(--dur,20s) ease-in-out infinite var(--delay,0s);
+}
+@keyframes nebulaFloat{
+  0%,100%{transform:scale(1) translate(0,0);      opacity:var(--op,.1);}
+  33%    {transform:scale(1.09) translate(2%,2%);  opacity:calc(var(--op,.1)*1.5);}
+  66%    {transform:scale(0.95) translate(-1%,-1%);opacity:calc(var(--op,.1)*0.7);}
+}
+
+/* ─── Quiz wrapper ─── */
+.quiz-wrap{
+  position:relative;z-index:10;
+  max-width:440px;margin:0 auto;
+  padding:32px 16px 52px;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ─── Persistent header ─── */
+.quiz-header{text-align:center;margin-bottom:24px;width:100%;}
+.header-alert{
+  font-family:'Outfit',sans-serif;
+  font-size:26px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+  background:linear-gradient(135deg,#C4A44A 0%,#E8D08A 45%,#C4A44A 70%,#9A7A2C 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 16px rgba(196,164,72,.4));
+  margin-bottom:10px;line-height:1;
+}
+.header-title{
+  font-family:'Outfit',sans-serif;
+  font-size:16px;font-weight:700;color:var(--text);
+  line-height:1.45;max-width:300px;margin:0 auto 8px;letter-spacing:-.1px;
+}
+.header-title u{text-decoration-color:rgba(196,164,72,.45);text-underline-offset:3px;}
+.header-title .hl{color:var(--lilac);font-style:italic;}
+.header-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:265px;margin:0 auto;}
+.header-sub .hl{color:var(--lilac);}
+.gold-div{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto;opacity:.45;}
+
+/* ─── Steps container ─── */
+.steps-wrap{width:100%;}
+
+/* ─── Step transitions ─── */
+.step{display:none;}
+.step.active{
+  display:block;
+  animation:stepIn .42s cubic-bezier(0.22,1,0.36,1) both;
+}
+.step.active.back{
+  animation:stepInBack .42s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes stepIn    {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes stepInBack{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── Card ─── */
+.main-card{
+  width:100%;
+  background:var(--card-bg);
+  backdrop-filter:blur(24px) saturate(1.3);
+  -webkit-backdrop-filter:blur(24px) saturate(1.3);
+  border:1px solid var(--card-border);
+  border-radius:22px;
+  padding:26px 20px 22px;
+  box-shadow:
+    0 2px 0 rgba(196,164,72,.06) inset,
+    0 28px 90px rgba(0,0,0,.75),
+    0 0 0 1px rgba(255,255,255,.025) inset;
+  position:relative;overflow:hidden;
+}
+.main-card::before{
+  content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,164,72,.38),transparent);
+}
+.card-title{
+  font-family:'Outfit',sans-serif;
+  font-size:18px;font-weight:700;color:var(--text);
+  text-align:center;margin-bottom:20px;letter-spacing:-.1px;line-height:1.35;
+}
+
+/* ─── Signs grid ─── */
+.signs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.sign-card{
+  background:rgba(30,22,12,.75);border:1px solid rgba(172,134,58,.2);
+  border-radius:16px;padding:14px 8px 11px;cursor:pointer;
+  transition:all .28s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  position:relative;overflow:hidden;
+}
+.sign-card::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,164,72,.3),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.sign-card:hover{transform:translateY(-3px) scale(1.03);border-color:rgba(196,164,72,.55);background:rgba(40,30,14,.9);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 20px rgba(196,164,72,.15);}
+.sign-card:hover::before{opacity:1;}
+.sign-card:active{transform:scale(.96);}
+.sign-card.selected{border-color:rgba(196,164,72,.7);background:rgba(45,33,12,.95);box-shadow:0 0 30px rgba(196,164,72,.25),0 8px 40px rgba(0,0,0,.6);transform:scale(1.04);}
+.sign-name{font-size:12px;font-weight:600;color:var(--text);text-align:center;letter-spacing:.3px;}
+
+/* ─── CTA label ─── */
+.cta-label{font-family:'Outfit',sans-serif;text-align:center;margin-bottom:20px;font-size:12px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold-light);opacity:.8;animation:gpulse 3s ease-in-out infinite;}
+@keyframes gpulse{0%,100%{opacity:.65}50%{opacity:1}}
+
+/* ─── Option button (text only) ─── */
+.opt-btn{
+  background:var(--opt-bg);border:1px solid var(--opt-border);border-radius:14px;
+  padding:13px 8px;font-size:15px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:all .26s cubic-bezier(0.22,1,0.36,1);
+  text-align:center;width:100%;position:relative;overflow:hidden;
+  font-family:'Poppins',sans-serif;
+}
+.opt-btn::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(196,164,72,.25),transparent);opacity:0;transition:opacity .3s;}
+.opt-btn:hover{background:var(--opt-bg-h);border-color:var(--opt-border-h);transform:translateY(-2px) scale(1.02);box-shadow:0 6px 24px rgba(0,0,0,.4),0 0 16px rgba(196,164,72,.12);}
+.opt-btn:hover::before{opacity:1;}
+.opt-btn:active{transform:scale(.96);}
+.opt-btn.selected{background:rgba(42,30,12,.98);border-color:rgba(196,164,72,.65);box-shadow:0 0 22px rgba(196,164,72,.22),0 6px 28px rgba(0,0,0,.5);}
+
+/* ─── Grid helpers ─── */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+
+/* ─── Option card (icon + label) ─── */
+.opt-card{
+  background:var(--opt-bg);border:1px solid var(--opt-border);
+  border-radius:18px;padding:18px 10px 14px;cursor:pointer;
+  transition:all .28s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;overflow:hidden;
+}
+.opt-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(196,164,72,.28),transparent);opacity:0;transition:opacity .3s;}
+.opt-card:hover{background:var(--opt-bg-h);border-color:var(--opt-border-h);transform:translateY(-3px) scale(1.03);box-shadow:0 8px 30px rgba(0,0,0,.45),0 0 18px rgba(196,164,72,.12);}
+.opt-card:hover::before{opacity:1;}
+.opt-card:active{transform:scale(.96);}
+.opt-card.selected{background:rgba(42,30,12,.98);border-color:rgba(196,164,72,.65);box-shadow:0 0 26px rgba(196,164,72,.2),0 8px 36px rgba(0,0,0,.55);transform:scale(1.03);}
+.opt-label{font-size:12px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;letter-spacing:.2px;}
+
+/* ─── Month title ─── */
+.month-title{color:var(--gold-light);font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:18px;margin-bottom:10px;text-align:center;opacity:.85;}
+
+/* ─── Gender cards ─── */
+.gender-wrap{display:flex;gap:14px;}
+.gender-card{
+  background:var(--opt-bg);border:1px solid var(--opt-border);
+  border-radius:20px;padding:28px 16px 20px;cursor:pointer;flex:1;
+  transition:all .28s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  position:relative;overflow:hidden;
+}
+.gender-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(196,164,72,.28),transparent);opacity:0;transition:opacity .3s;}
+.gender-card:hover{background:var(--opt-bg-h);border-color:var(--opt-border-h);transform:translateY(-4px) scale(1.03);box-shadow:0 10px 36px rgba(0,0,0,.5),0 0 20px rgba(196,164,72,.12);}
+.gender-card:hover::before{opacity:1;}
+.gender-card:active{transform:scale(.96);}
+.gender-card.selected{background:rgba(42,30,12,.98);border-color:rgba(196,164,72,.65);box-shadow:0 0 28px rgba(196,164,72,.22),0 10px 40px rgba(0,0,0,.55);transform:scale(1.03);}
+.gender-label{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--text);letter-spacing:.2px;}
+.radio-ring{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(196,164,72,.4);display:flex;align-items:center;justify-content:center;transition:border-color .2s;}
+.gender-card.selected .radio-ring{border-color:var(--gold);}
+.radio-ring::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .2s;}
+.gender-card.selected .radio-ring::after{opacity:1;}
+
+/* ─── Back button ─── */
+.back-btn{
+  display:block;margin:18px auto 0;background:transparent;
+  border:1px solid rgba(172,134,58,.3);border-radius:50px;padding:10px 36px;
+  font-size:14px;font-weight:500;color:var(--text-dim);letter-spacing:.5px;
+  cursor:pointer;transition:all .22s ease;font-family:'Poppins',sans-serif;
+}
+.back-btn:hover{border-color:rgba(196,164,72,.5);color:var(--gold-light);background:rgba(196,164,72,.06);}
+
+/* ─── CTA button (gold) ─── */
+.cta-btn{
+  width:100%;margin-top:18px;
+  background:linear-gradient(135deg,#C4A44A 0%,#E8D08A 50%,#C4A44A 100%);
+  border:none;border-radius:50px;padding:17px 20px;
+  font-size:16px;font-weight:700;color:#0e0a04;cursor:pointer;letter-spacing:.5px;
+  transition:all .22s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:0 4px 24px rgba(196,164,72,.35),0 1px 0 rgba(255,255,255,.15) inset;
+  position:relative;overflow:hidden;font-family:'Outfit',sans-serif;
+}
+.cta-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-100%);transition:transform .5s ease;}
+.cta-btn:hover{transform:scale(1.02);box-shadow:0 6px 32px rgba(196,164,72,.5);}
+.cta-btn:hover::after{transform:translateX(120%);}
+.cta-btn:active{transform:scale(.97);}
+
+/* ─── Input ─── */
+.prem-input{
+  width:100%;background:rgba(24,18,10,.85);
+  border:1px solid rgba(172,134,58,.28);border-radius:14px;
+  padding:15px 18px;font-size:15px;font-weight:500;color:var(--text);
+  outline:none;transition:all .24s ease;font-family:'Poppins',sans-serif;
+}
+.prem-input::placeholder{color:var(--text-dimmer);font-weight:400;font-size:14px;}
+.prem-input:focus{border-color:rgba(196,164,72,.6);box-shadow:0 0 0 3px rgba(196,164,72,.12),0 0 20px rgba(196,164,72,.15);background:rgba(30,22,10,.95);}
+
+/* ─── Error ─── */
+.err{font-size:12px;color:#c87070;margin-top:6px;display:none;padding-left:4px;}
+
+/* ─── Loading step ─── */
+.load-wrap{
+  min-height:80vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  position:relative;
+}
+.load-orb{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(196,164,72,.07) 0%,transparent 70%);filter:blur(40px);animation:orb 4s ease-in-out infinite;}
+@keyframes orb{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+.load-title{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--text);letter-spacing:1px;margin-bottom:40px;position:relative;}
+.bar-track{width:280px;height:6px;background:rgba(196,164,72,.1);border-radius:50px;overflow:hidden;box-shadow:0 0 0 1px rgba(196,164,72,.12);}
+.bar-fill{height:100%;width:0%;border-radius:50px;background:linear-gradient(90deg,#9A7A2C 0%,#C4A44A 50%,#E8D08A 100%);transition:width .1s linear;position:relative;overflow:hidden;}
+.bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:bshim 1.4s infinite;}
+@keyframes bshim{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+.load-pct{margin-top:16px;font-size:12px;font-weight:500;letter-spacing:2px;color:var(--text-dim);position:relative;}
+.load-msg{margin-top:28px;font-size:13px;color:var(--text-dimmer);font-style:italic;position:relative;transition:opacity .4s;}
+
+/* ─── Shake ─── */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.shake{animation:shake .3s ease;}
+
+/* ─── Step 8 sub ─── */
+.name-sub{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:20px;}
+
+/* ─── Icon PNG — harmonização gold luxury ─── */
+.icon-img{
+  display:block;
+  object-fit:contain;
+  flex-shrink:0;
+  filter:
+    brightness(1.06) saturate(1.15) contrast(1.05)
+    drop-shadow(0 0 8px rgba(196,164,72,0.5));
+  transition:filter .3s ease;
+}
+
+/* Tamanhos uniformes — ícone domina o card */
+.sign-card .icon-img         { width:104px; height:104px; }
+.gender-card .icon-img       { width:146px; height:146px; }
+#step6 .opt-card .icon-img   { width:152px; height:152px; }
+#step7 .opt-card .icon-img   { width:90px;  height:90px;  }
+
+.sign-card:hover .icon-img,.sign-card.selected .icon-img{
+  filter:
+    brightness(1.15) saturate(1.28) contrast(1.08)
+    drop-shadow(0 0 14px rgba(196,164,72,0.85))
+    drop-shadow(0 0 4px rgba(196,164,72,0.55));
+}
+.opt-card:hover .icon-img,.opt-card.selected .icon-img{
+  filter:
+    brightness(1.14) saturate(1.22) contrast(1.08)
+    drop-shadow(0 0 12px rgba(196,164,72,0.8))
+    drop-shadow(0 0 3px rgba(196,164,72,0.5));
+}
+.gender-card:hover .icon-img,.gender-card.selected .icon-img{
+  filter:
+    brightness(1.16) saturate(1.25) contrast(1.1)
+    drop-shadow(0 0 18px rgba(196,164,72,0.88))
+    drop-shadow(0 0 5px rgba(196,164,72,0.6));
+}
+
+/* ─── Card proportion tweaks — premium sizing ─── */
+.signs-grid{gap:8px;}
+.sign-card{padding:16px 6px 13px;gap:9px;border-radius:14px;}
+.sign-name{font-size:11px;font-weight:700;letter-spacing:.3px;}
+
+.opt-card{padding:22px 10px 18px;gap:11px;border-radius:16px;}
+.opt-label{font-size:11px;font-weight:700;letter-spacing:.2px;line-height:1.25;}
+
+.gender-card{padding:32px 14px 24px;gap:14px;}
+.gender-label{font-size:15px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-layer" id="bgLayer"></div>
+
+<!-- ╔══════════════════════════════════════╗
+     ║  PERSISTENT AUDIO — never destroyed ║
+     ╚══════════════════════════════════════╝ -->
+<audio id="ambientAudio" loop preload="auto" style="display:none;">
+  <source src="assets/audio-loop.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Quiz wrapper -->
+<div class="quiz-wrap">
+
+  <!-- Persistent header (hidden only on loading step) -->
+  <header class="quiz-header" id="quizHeader">
+    <div class="header-alert">Alerta de Maio</div>
+    <p class="header-title">
+      3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
+      <span class="hl">O Seu é Um Deles?</span>
+    </p>
+    <div class="gold-div"></div>
+    <p class="header-sub">
+      Teste rápido de 30 segundos revela o que está bloqueando sua energia <span class="hl">(e como liberar)</span>.
+    </p>
+  </header>
+
+  <div class="steps-wrap">
+
+    <!-- ══════════════════════════════════
+         STEP 1 — SIGNO
+    ═══════════════════════════════════ -->
+    <div class="step active" id="step1">
+      <div class="main-card">
+        <p class="cta-label">↓ Clique no seu signo ↓</p>
+        <div class="signs-grid">
+
+          <div class="sign-card" onclick="selectSign('Áries',this)">
+            <img class="icon-img" src="Briefing/Referencias /ARIES.png" width="104" height="104"  alt="Áries">
+            <span class="sign-name">Áries</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Touro',this)">
+            <img class="icon-img" src="Briefing/Referencias /touro.png" width="104" height="104"  alt="Touro">
+            <span class="sign-name">Touro</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Gêmeos',this)">
+            <img class="icon-img" src="Briefing/Referencias /Gemeos.png" width="104" height="104"  alt="Gêmeos">
+            <span class="sign-name">Gêmeos</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Câncer',this)">
+            <img class="icon-img" src="Briefing/Referencias /cancer.png" width="104" height="104"  alt="Câncer">
+            <span class="sign-name">Câncer</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Leão',this)">
+            <img class="icon-img" src="Briefing/Referencias /Leao.png" width="104" height="104"  alt="Leão">
+            <span class="sign-name">Leão</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Virgem',this)">
+            <img class="icon-img" src="Briefing/Referencias /Virgem.png" width="104" height="104"  alt="Virgem">
+            <span class="sign-name">Virgem</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Libra',this)">
+            <img class="icon-img" src="Briefing/Referencias /libra.png" width="104" height="104"  alt="Libra">
+            <span class="sign-name">Libra</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Escorpião',this)">
+            <img class="icon-img" src="Briefing/Referencias /escorpião.png" width="104" height="104"  alt="Escorpião">
+            <span class="sign-name">Escorpião</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Sagitário',this)">
+            <img class="icon-img" src="Briefing/Referencias /sagitario.png" width="104" height="104"  alt="Sagitário">
+            <span class="sign-name">Sagitário</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Capricórnio',this)">
+            <img class="icon-img" src="Briefing/Referencias /capricornio.png" width="104" height="104"  alt="Capricórnio">
+            <span class="sign-name">Capricórnio</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Aquário',this)">
+            <img class="icon-img" src="Briefing/Referencias /aquario.png" width="104" height="104"  alt="Aquário">
+            <span class="sign-name">Aquário</span>
+          </div>
+
+          <div class="sign-card" onclick="selectSign('Peixes',this)">
+            <img class="icon-img" src="Briefing/Referencias /peixes.png" width="104" height="104"  alt="Peixes">
+            <span class="sign-name">Peixes</span>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /step1 -->
+
+    <!-- ══════════════════════════════════
+         STEP 2 — DIA DE NASCIMENTO
+    ═══════════════════════════════════ -->
+    <div class="step" id="step2">
+      <div class="main-card">
+        <h2 class="card-title">Qual seu dia de nascimento?</h2>
+        <div id="daysContainer"></div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 3 — DÉCADA
+    ═══════════════════════════════════ -->
+    <div class="step" id="step3">
+      <div class="main-card">
+        <h2 class="card-title">Em qual década você nasceu?</h2>
+        <div class="grid-3" id="decadeGrid"></div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 4 — ANO
+    ═══════════════════════════════════ -->
+    <div class="step" id="step4">
+      <div class="main-card">
+        <h2 class="card-title">Em que ano você nasceu?</h2>
+        <div class="grid-3" id="yearsGrid"></div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 5 — SEXO
+    ═══════════════════════════════════ -->
+    <div class="step" id="step5">
+      <div class="main-card">
+        <h2 class="card-title">Qual seu sexo?</h2>
+        <div class="gender-wrap">
+          <div class="gender-card" id="cardM" onclick="selectGender('Masculino')">
+            <img class="icon-img" src="Briefing/Referencias /masculino.png" width="146" height="146" alt="Masculino">
+            <span class="gender-label">Masculino</span>
+            <div class="radio-ring"></div>
+          </div>
+          <div class="gender-card" id="cardF" onclick="selectGender('Feminino')">
+            <img class="icon-img" src="Briefing/Referencias /feminino.png" width="146" height="146" alt="Feminino">
+            <span class="gender-label">Feminino</span>
+            <div class="radio-ring"></div>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 6 — ESTADO CIVIL
+    ═══════════════════════════════════ -->
+    <div class="step" id="step6">
+      <div class="main-card">
+        <h2 class="card-title">Qual seu Estado civil?</h2>
+        <div class="grid-2">
+          <div class="opt-card" onclick="selectMarital('Casado(a)',this)">
+            <img class="icon-img" src="Briefing/Referencias /casados.png" width="152" height="152" alt="Casado(a)">
+            <span class="opt-label">Casado(a)</span>
+          </div>
+          <div class="opt-card" onclick="selectMarital('Relacionamento',this)">
+            <img class="icon-img" src="Briefing/Referencias /relacionamento.png" width="152" height="152" alt="Relacionamento">
+            <span class="opt-label">Relacionamento</span>
+          </div>
+          <div class="opt-card" onclick="selectMarital('Noivo(a)',this)">
+            <img class="icon-img" src="Briefing/Referencias /noivado.png" width="152" height="152" alt="Noivo(a)">
+            <span class="opt-label">Noivo(a)</span>
+          </div>
+          <div class="opt-card" onclick="selectMarital('Sozinho(a)',this)">
+            <img class="icon-img" src="Briefing/Referencias /sozinho.png" width="152" height="152" alt="Sozinho(a)">
+            <span class="opt-label">Sozinho(a)</span>
+          </div>
+          <div class="opt-card" onclick="selectMarital('Separado(a)',this)">
+            <img class="icon-img" src="Briefing/Referencias /separado.png" width="152" height="152" alt="Separado(a)">
+            <span class="opt-label">Separado(a)</span>
+          </div>
+          <div class="opt-card" onclick="selectMarital('Viúvo(a)',this)">
+            <img class="icon-img" src="Briefing/Referencias /viuvo.png" width="152" height="152" alt="Viúvo(a)">
+            <span class="opt-label">Viúvo(a)</span>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 7 — DESAFIO
+    ═══════════════════════════════════ -->
+    <div class="step" id="step7">
+      <div class="main-card">
+        <h2 class="card-title">Qual maior desafio da sua vida no momento?</h2>
+        <div class="grid-3">
+          <div class="opt-card" onclick="selectChallenge('Minha vida amorosa',this)">
+            <img class="icon-img" src="Briefing/Referencias /vida-amorosa.png" width="90" height="90" alt="Minha vida amorosa">
+            <span class="opt-label">Minha vida amorosa</span>
+          </div>
+          <div class="opt-card" onclick="selectChallenge('Minhas finanças',this)">
+            <img class="icon-img" src="Briefing/Referencias /finanças.png" width="90" height="90" alt="Minhas finanças">
+            <span class="opt-label">Minhas finanças</span>
+          </div>
+          <div class="opt-card" onclick="selectChallenge('Minha saúde',this)">
+            <img class="icon-img" src="Briefing/Referencias /saude.png" width="90" height="90" alt="Minha saúde">
+            <span class="opt-label">Minha saúde</span>
+          </div>
+          <div class="opt-card" onclick="selectChallenge('Minha família',this)" style="grid-column:1;">
+            <img class="icon-img" src="Briefing/Referencias /familia.png" width="90" height="90" alt="Minha família">
+            <span class="opt-label">Minha família</span>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 8 — NOME
+    ═══════════════════════════════════ -->
+    <div class="step" id="step8">
+      <div class="main-card">
+        <h2 class="card-title" style="font-size:22px;margin-bottom:6px;">Qual é o seu primeiro nome?</h2>
+        <p class="name-sub">Coloque apenas seu primeiro nome, sem espaços</p>
+        <input type="text" id="nameInput" class="prem-input" placeholder="Seu primeiro nome"
+               autocomplete="given-name" autocorrect="off" autocapitalize="words" spellcheck="false"
+               maxlength="30"/>
+        <p class="err" id="nameErr">Por favor, insira apenas seu primeiro nome (sem espaços).</p>
+        <button class="cta-btn" onclick="submitName()">Clique para continuar</button>
+        <button class="back-btn" onclick="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         STEP 9 — LOADING
+    ═══════════════════════════════════ -->
+    <div class="step" id="step9">
+      <div class="load-wrap">
+        <div class="load-orb"></div>
+        <p class="load-title">Carregando o Teste</p>
+        <div class="bar-track">
+          <div class="bar-fill" id="barFill"></div>
+        </div>
+        <p class="load-pct" id="barPct">0%</p>
+        <p class="load-msg" id="loadMsg">Analisando sua energia astral...</p>
+      </div>
+    </div>
+
+  </div><!-- /steps-wrap -->
+</div><!-- /quiz-wrap -->
+
+<script src="assets/lead-manager.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   AUDIO — single instance, never recreated
+══════════════════════════════════════════════════════════ */
+const _audio  = document.getElementById('ambientAudio');
+const VOL     = 0.28;
+const FI_MS   = 1600;
+const FO_MS   = 1200;
+const STEP_MS = 40;
+let   _ftimer = null;
+
+function _clearFade() { if (_ftimer) { clearInterval(_ftimer); _ftimer = null; } }
+
+function audioFadeIn() {
+  _clearFade();
+  _audio.volume = 0;
+  const inc  = VOL / (FI_MS / STEP_MS);
+  _ftimer = setInterval(() => {
+    const v = Math.min(_audio.volume + inc, VOL);
+    _audio.volume = v;
+    if (v >= VOL) _clearFade();
+  }, STEP_MS);
+}
+
+function audioFadeOut(cb) {
+  _clearFade();
+  if (_audio.paused) { if (cb) cb(); return; }
+  const dec = _audio.volume / (FO_MS / STEP_MS);
+  _ftimer = setInterval(() => {
+    const v = Math.max(_audio.volume - dec, 0);
+    _audio.volume = v;
+    if (v <= 0) {
+      _audio.pause();
+      _clearFade();
+      if (cb) cb();
+    }
+  }, STEP_MS);
+}
+
+let _audioStarted = false;
+function startAudio() {
+  if (_audioStarted) return;
+  _audioStarted = true;
+  const p = _audio.play();
+  if (p && p.catch) p.catch(() => {});
+  audioFadeIn();
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION — no page reloads
+══════════════════════════════════════════════════════════ */
+let curStep    = 1;
+let navigating = false;
+
+function goTo(n, back) {
+  if (navigating) return;
+  navigating = true;
+
+  const cur  = document.getElementById('step' + curStep);
+  const next = document.getElementById('step' + n);
+  const hdr  = document.getElementById('quizHeader');
+
+  cur.classList.remove('active', 'back');
+
+  next.classList.toggle('back', !!back);
+  next.classList.add('active');
+
+  curStep = n;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  hdr.style.display = (n === 9) ? 'none' : '';
+
+  setTimeout(() => {
+    next.classList.remove('back');
+    navigating = false;
+  }, 460);
+}
+
+function goBack() { if (curStep > 1) goTo(curStep - 1, true); }
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+function save(k, v) { localStorage.setItem(k, v); }
+
+/* ══════════════════════════════════════════════════════════
+   STEP 1 — SIGNO
+══════════════════════════════════════════════════════════ */
+// Unlock Web Audio context on first user tap so audio1.html can autoplay
+let _audioContextUnlocked = false;
+function unlockAudioContext() {
+  if (_audioContextUnlocked) return;
+  _audioContextUnlocked = true;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) {
+      const ctx = new Ctx();
+      // 1-frame silent buffer — forces Safari to mark audio as user-unlocked
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+      ctx.resume().catch(() => {});
+    }
+  } catch (_) {}
+  sessionStorage.setItem('__audioUnlocked', '1');
+  window.__audioUnlocked = true;
+  console.log('[AudioUnlock] unlocked');
+}
+document.body.addEventListener('touchstart', unlockAudioContext, { once: true });
+
+function selectSign(name, el) {
+  document.querySelectorAll('.sign-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  save('signo', name);
+  unlockAudioContext();   // unlock before startAudio so gesture is still active
+  startAudio();           // ← first interaction: audio begins, never stops until VSL
+  renderDays(name);
+  goTo(2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 2 — DIA
+══════════════════════════════════════════════════════════ */
+const SIGN_DAYS = {
+  'Áries':       [{m:'Março',    d:r(21,31)},{m:'Abril',     d:r(1,19)}],
+  'Touro':       [{m:'Abril',    d:r(20,30)},{m:'Maio',      d:r(1,20)}],
+  'Gêmeos':      [{m:'Maio',     d:r(21,31)},{m:'Junho',     d:r(1,20)}],
+  'Câncer':      [{m:'Junho',    d:r(21,30)},{m:'Julho',     d:r(1,22)}],
+  'Leão':        [{m:'Julho',    d:r(23,31)},{m:'Agosto',    d:r(1,22)}],
+  'Virgem':      [{m:'Agosto',   d:r(23,31)},{m:'Setembro',  d:r(1,22)}],
+  'Libra':       [{m:'Setembro', d:r(23,30)},{m:'Outubro',   d:r(1,22)}],
+  'Escorpião':   [{m:'Outubro',  d:r(23,31)},{m:'Novembro',  d:r(1,21)}],
+  'Sagitário':   [{m:'Novembro', d:r(22,30)},{m:'Dezembro',  d:r(1,21)}],
+  'Capricórnio': [{m:'Dezembro', d:r(22,31)},{m:'Janeiro',   d:r(1,19)}],
+  'Aquário':     [{m:'Janeiro',  d:r(20,31)},{m:'Fevereiro', d:r(1,18)}],
+  'Peixes':      [{m:'Fevereiro',d:r(19,29)},{m:'Março',     d:r(1,20)}],
+};
+function r(a, b) { const arr=[]; for(let i=a;i<=b;i++) arr.push(i); return arr; }
+
+function renderDays(signo) {
+  const cont = document.getElementById('daysContainer');
+  cont.innerHTML = '';
+  (SIGN_DAYS[signo] || SIGN_DAYS['Virgem']).forEach(sec => {
+    const t = document.createElement('p'); t.className='month-title'; t.textContent=sec.m;
+    cont.appendChild(t);
+    const g = document.createElement('div');
+    g.style.cssText='display:grid;grid-template-columns:repeat(6,1fr);gap:7px;';
+    sec.d.forEach(day => {
+      const b = document.createElement('button'); b.className='opt-btn';
+      b.style.cssText='padding:11px 4px;font-size:14px;border-radius:12px;';
+      b.textContent = String(day).padStart(2,'0');
+      b.onclick = () => {
+        cont.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        save('dia', String(day).padStart(2,'0')+' de '+sec.m);
+        goTo(3);
+      };
+      g.appendChild(b);
+    });
+    cont.appendChild(g);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 3 — DÉCADA
+══════════════════════════════════════════════════════════ */
+(function buildDecades() {
+  const grid = document.getElementById('decadeGrid');
+  ['1910','1920','1930','1940','1950','1960','1970','1980','1990','2000','2010'].forEach(d => {
+    const b = document.createElement('button'); b.className='opt-btn'; b.textContent=d;
+    b.onclick = () => {
+      grid.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      save('decada', d);
+      renderYears(parseInt(d));
+      goTo(4);
+    };
+    grid.appendChild(b);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════
+   STEP 4 — ANO
+══════════════════════════════════════════════════════════ */
+function renderYears(decade) {
+  const grid = document.getElementById('yearsGrid');
+  grid.innerHTML = '';
+  for (let y = decade; y <= decade + 9; y++) {
+    const b = document.createElement('button'); b.className='opt-btn'; b.textContent=y;
+    b.onclick = () => {
+      grid.querySelectorAll('.opt-btn').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      save('ano', y);
+      goTo(5);
+    };
+    grid.appendChild(b);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 5 — SEXO
+══════════════════════════════════════════════════════════ */
+function selectGender(v) {
+  document.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById(v==='Masculino'?'cardM':'cardF').classList.add('selected');
+  save('sexo', v);
+  setTimeout(() => goTo(6), 260);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 6 — ESTADO CIVIL
+══════════════════════════════════════════════════════════ */
+function selectMarital(v, el) {
+  document.querySelectorAll('#step6 .opt-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  save('estadoCivil', v);
+  goTo(7);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 7 — DESAFIO
+══════════════════════════════════════════════════════════ */
+function selectChallenge(v, el) {
+  document.querySelectorAll('#step7 .opt-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  save('desafioAtual', v);
+  goTo(8);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 8 — NOME
+══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('nameInput');
+  if (inp) {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitName();
+      if (e.key === ' ') e.preventDefault(); // block spaces
+    });
+    inp.addEventListener('input', () => {
+      // Remove any spaces that sneak in (paste, autocomplete)
+      const pos = inp.selectionStart;
+      const cleaned = inp.value.replace(/\s/g, '');
+      if (cleaned !== inp.value) {
+        inp.value = cleaned;
+        inp.setSelectionRange(pos - 1, pos - 1);
+      }
+    });
+  }
+});
+
+function submitName() {
+  const inp = document.getElementById('nameInput');
+  const err = document.getElementById('nameErr');
+  const rawName = inp.value;
+  // Trim and reject if contains spaces (first name only)
+  const v = rawName.trim();
+
+  if (!v || /\s/.test(v)) {
+    err.style.display = 'block';
+    inp.classList.add('shake');
+    inp.style.borderColor = 'rgba(200,100,100,.6)';
+    setTimeout(() => { inp.classList.remove('shake'); inp.style.borderColor=''; }, 400);
+    return;
+  }
+  err.style.display = 'none';
+  save('primeiroNome', v);
+  goTo(9);
+  startLoading();
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 9 — LOADING → redirect to vsl.html
+══════════════════════════════════════════════════════════ */
+const LOAD_MSGS = [
+  'Analisando sua energia astral...',
+  'Mapeando seu campo vibracional...',
+  'Consultando os registros cósmicos...',
+  'Calculando influências planetárias...',
+  'Sua leitura está sendo preparada...',
+];
+
+/* ── Pré-geração antecipada do audio1 ────────────────────────────────────────
+   Dispara logo que o quiz termina — enquanto a animação de loading roda (3.2s).
+   Resultado salvo em sessionStorage('audio1_url') para uso imediato em audio1.html.
+   ─────────────────────────────────────────────────────────────────────────── */
+function _preGenerateAudio1() {
+  try {
+    const API_BASE = (window.ASTRA_API_URL || '').replace(/\/$/, '') ||
+      (location.protocol === 'file:' ? 'http://localhost:8000' :
+       (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+         ? 'http://' + location.hostname + ':8000' : ''));
+
+    // Garante que o lead é construído das chaves do quiz — nunca do cache
+    localStorage.removeItem('astra_lead');
+    const lead    = LeadManager.getLead();
+    const payload = LeadManager.toApiPayload(lead, 'audio1');
+
+    console.log('[PREGEN] Iniciando pré-geração do audio1…', payload);
+    const t0 = Date.now();
+
+    fetch(API_BASE + '/api/audio/generate', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    })
+    .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
+    .then(data => {
+      if (data.success && data.audioUrl) {
+        sessionStorage.setItem('audio1_url', data.audioUrl);
+        console.log('[PREGEN] audio1 URL salva (' + (Date.now() - t0) + 'ms):', data.audioUrl);
+      }
+    })
+    .catch(err => console.warn('[PREGEN] falhou:', err));
+  } catch(e) {
+    console.warn('[PREGEN] erro ao iniciar:', e.message);
+  }
+}
+
+function startLoading() {
+  _preGenerateAudio1();
+
+  const fill    = document.getElementById('barFill');
+  const pctEl   = document.getElementById('barPct');
+  const msgEl   = document.getElementById('loadMsg');
+  let step = 0;
+  let mIdx = 0;
+  const totalSteps = 3200 / 40;
+
+  // rotate messages
+  const msgTimer = setInterval(() => {
+    mIdx = (mIdx + 1) % LOAD_MSGS.length;
+    msgEl.style.opacity = '0';
+    setTimeout(() => { msgEl.textContent = LOAD_MSGS[mIdx]; msgEl.style.opacity = '1'; }, 280);
+  }, 1100);
+
+  const timer = setInterval(() => {
+    step++;
+    const t = step / totalSteps;
+    const p = Math.min(easeInOut(t) * 100, 100);
+    fill.style.width = p + '%';
+    pctEl.textContent = Math.floor(p) + '%';
+
+    if (p >= 100) {
+      clearInterval(timer);
+      clearInterval(msgTimer);
+      // Fade out audio THEN redirect — seamless transition
+      setTimeout(() => {
+        audioFadeOut(() => {
+          localStorage.removeItem('audioStarted');
+          localStorage.removeItem('astra_lead'); // force fresh build from quiz keys
+          window.location.href = 'audio1.html';
+        });
+      }, 300);
+    }
+  }, 40);
+}
+
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+/* ══════════════════════════════════════════════════════════
+   STARS + NEBULAS
+══════════════════════════════════════════════════════════ */
+(function buildBackground() {
+  const bg = document.getElementById('bgLayer');
+
+  /* ── Estrelas — paleta cósmica cool ── */
+  const starColors = [
+    'rgba(210,225,255,V)',  /* branco-azulado — estrelas principais */
+    'rgba(225,220,255,V)',  /* branco-lilás */
+    'rgba(190,210,255,V)',  /* azul celeste */
+    'rgba(255,255,255,V)',  /* branco puro — estrelas brilhantes */
+    'rgba(200,185,255,V)',  /* violeta suave */
+    'rgba(170,200,255,V)',  /* azul gelado */
+    'rgba(240,235,255,V)',  /* lilás claro */
+  ];
+  for (let i = 0; i < 130; i++) {
+    const s  = document.createElement('div'); s.className = 'star';
+    const sz = Math.random() < 0.08 ? (Math.random()*1.4+1.8) : (Math.random()*1.4+0.3);
+    const c  = starColors[i % starColors.length].replace('V', (0.25+Math.random()*0.6).toFixed(2));
+    const op = (0.3+Math.random()*0.65).toFixed(2);
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${2.5+Math.random()*6}s;--delay:-${Math.random()*7}s;--op:${op};`;
+    bg.appendChild(s);
+  }
+
+  /* ── Nebulosas flutuantes ── */
+  const nebulas = [
+    { w:320, h:220, l:5,  t:15, bg:'radial-gradient(ellipse,rgba(80,50,180,0.18),transparent 70%)',  dur:22, delay:0,   op:0.9 },
+    { w:280, h:200, l:65, t:5,  bg:'radial-gradient(ellipse,rgba(50,90,200,0.14),transparent 70%)',  dur:28, delay:-8,  op:0.8 },
+    { w:350, h:250, l:75, t:55, bg:'radial-gradient(ellipse,rgba(70,40,160,0.13),transparent 70%)',  dur:25, delay:-12, op:0.7 },
+    { w:250, h:180, l:20, t:65, bg:'radial-gradient(ellipse,rgba(40,70,190,0.11),transparent 70%)',  dur:32, delay:-5,  op:0.6 },
+    { w:200, h:160, l:45, t:40, bg:'radial-gradient(ellipse,rgba(110,70,200,0.10),transparent 70%)', dur:19, delay:-16, op:0.5 },
+  ];
+  nebulas.forEach(n => {
+    const el = document.createElement('div'); el.className = 'nebula';
+    el.style.cssText = `width:${n.w}px;height:${n.h}px;left:${n.l}%;top:${n.t}%;background:${n.bg};--dur:${n.dur}s;--delay:-${n.delay}s;--op:${n.op * 0.13};`;
+    bg.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>

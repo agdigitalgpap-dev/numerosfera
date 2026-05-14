@@ -1,0 +1,27 @@
+# Ambiente Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Variáveis de ambiente (NUNCA commitar)
+.env
+.env.*
+!.env.example
+
+# Cache de áudios gerados (MP3s dos leads)
+cache/audio1/
+cache/audio2/
+
+# Jupyter / macOS
+.ipynb_checkpoints/
+.DS_Store
+**/.DS_Store
+
+# VSCode
+.vscode/
+
+# Logs
+*.log

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ano — Quiz Astrológico</title>
+<link rel="stylesheet" href="../assets/shared.css">
+<script src="../assets/audio.js"></script>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+<div class="page">
+
+  <header class="header anim-1">
+    <div class="header-alert">Alerta de Maio</div>
+    <p class="header-title">
+      3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
+      <span class="hl">O Seu é Um Deles?</span>
+    </p>
+    <div class="gold-divider"></div>
+    <p class="header-sub">
+      Teste rápido de 30 segundos revela o que está bloqueando sua energia <span class="hl">(e como liberar)</span>.
+    </p>
+  </header>
+
+  <div class="main-card anim-2">
+    <h2 class="card-title">Em que ano você nasceu?</h2>
+    <div class="grid-3" id="yearsGrid"></div>
+    <button class="back-btn" onclick="history.back()">Voltar</button>
+  </div>
+
+</div>
+<script>
+const bg=document.getElementById('bgLayer');
+const wc=['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.8+0.4;const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;bg.appendChild(s);}
+
+const decade=parseInt(localStorage.getItem('decada')||'1990');
+const grid=document.getElementById('yearsGrid');
+for(let y=decade;y<=decade+9;y++){
+  const btn=document.createElement('button');btn.className='opt-btn';btn.textContent=y;
+  btn.onclick=()=>{document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');localStorage.setItem('ano',y);setTimeout(()=>{window.location.href='page5.html';},300);};
+  grid.appendChild(btn);
+}
+</script>
+</body>
+</html>
