@@ -492,12 +492,6 @@ _playTriggered = true;
         _clearProgressTimer();
         console.log(_tag() + ' Loop de progresso iniciado');
         _progressTimer = setInterval(() => {
-          if (_audio && _audio.ended) {
-           clearInterval(_progressTimer);
-           _progressTimer = null;
-          console.log('[AUDIO1] progress timer cleared');
-          return;
-        }
           // Safari/iOS: auto-resume AudioContext suspenso durante playback
           if (_webAudioOk && _audioCtx && _audioCtx.state === 'suspended') {
             _audioCtx.resume().catch(() => {});

@@ -684,6 +684,13 @@
 
     console.log('[audio2] loadAndPlay START');
 
+    if (window.__audio2Started) {
+      console.warn('[audio2] BLOQUEADO DUPLICADO');
+      return;
+    }
+
+    window.__audio2Started = true;
+
     audioPlayer2.loadAndPlay('audio2', lead, {
       onReady() {
         if (_readyFired) { console.warn('[audio2] onReady — já disparado, ignorado'); return; }

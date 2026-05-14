@@ -18,7 +18,7 @@ reconhecimento,
 amor,
 carinho.
 
-bate nesse vidro e:
+bate nesse vidro e acontece isso:
 
 ou não passa,
 ou chega tão fraca que mal ajuda.
