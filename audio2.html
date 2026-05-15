@@ -724,6 +724,9 @@
       onProgress,
       onUnlock() {},
       onEnd() {
+        if (_audioEnded) return;
+        _audioEnded = true;
+
         _showBtnContinuar();
       },
       onError(err) {

@@ -572,6 +572,9 @@
         document.getElementById('t-prog-fill').style.width = (pct * 100).toFixed(1) + '%';
       },
       onEnd() {
+        if (_audioEnded) return;
+        _audioEnded = true;
+
         stopEqualizer();
       },
       onError(err) {
