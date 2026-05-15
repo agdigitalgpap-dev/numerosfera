@@ -8,7 +8,7 @@ as dores diminuíram pela metade.
 Cláudio:
 insônia crônica.
 
-1 semana após o ritual:
+uma semana após o ritual:
 voltou a dormir normalmente.
 
 Rosana:
