@@ -189,7 +189,7 @@ def _elevenlabs_sync_with_timestamps(texto: str) -> tuple[bytes, list]:
         voice_settings=voice_settings,
     )
 
-    audio_bytes = base64.b64decode(response.audio_base64)
+    audio_bytes = base64.b64decode(response.audio_base_64)
     al = response.alignment
     words = _chars_to_words(
         al.characters,
