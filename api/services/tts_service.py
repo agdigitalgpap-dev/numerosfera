@@ -201,33 +201,11 @@ def _elevenlabs_sync_with_timestamps(texto: str) -> tuple[bytes, list]:
 
 
 async def _gerar_elevenlabs_com_timestamps(texto: str) -> tuple[bytes, list]:
-    """ElevenLabs com chunking automático + timestamps acumulados por offset."""
-    segmentos = _split_text(texto)
-    n = len(segmentos)
-    logger.info("[TTS+TS] %d segmento(s)  (total %d chars)", n, len(texto))
-
-    partes: list[bytes] = []
-    all_words: list[dict] = []
-    time_offset = 0.0
-
-    for i, seg in enumerate(segmentos):
-        logger.info("[TTS+TS] Segmento %d/%d (%d chars)", i + 1, n, len(seg))
-        mp3, words = await asyncio.to_thread(_elevenlabs_sync_with_timestamps, seg)
-        partes.append(mp3)
-
-        for w in words:
-            all_words.append({
-                "w": w["w"],
-                "s": round(w["s"] + time_offset, 3),
-                "e": round(w["e"] + time_offset, 3),
-            })
-
-        if words:
-            time_offset += words[-1]["e"]
-
-    audio = _concat_mp3_chunks(partes)
-    audio = await asyncio.to_thread(_loudnorm, audio)
-    return audio, all_words
+    """ElevenLabs com chamada única — sem chunking para minimizar latência."""
+    logger.info("[TTS+TS] Chamada única  (%d chars)", len(texto))
+    mp3, words = await asyncio.to_thread(_elevenlabs_sync_with_timestamps, texto)
+    audio = await asyncio.to_thread(_loudnorm, mp3)
+    return audio, words
 
 
 def _elevenlabs_sync(texto: str) -> bytes:
