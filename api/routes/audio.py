@@ -44,6 +44,7 @@ async def generate(req: AudioRequest):
 
     if cache_service.exists(req.tipo, cache_key):
         logger.info("Cache HIT: %s/%s", req.tipo, cache_key)
+        timestamps = cache_service.load_timestamps(req.tipo, cache_key)
         return AudioResponse(
             success=True,
             audio_url=cache_service.public_url(req.tipo, cache_key),
@@ -51,14 +52,15 @@ async def generate(req: AudioRequest):
             generation_time=0.0,
             provider="cache",
             script_length=len(roteiro),
+            timestamps=timestamps,
         )
 
-    # 3. Gera via TTS
+    # 3. Gera via TTS com timestamps
     logger.info("Cache MISS: gerando áudio para '%s' (%s)", req.nome_formatado, req.tipo)
     inicio = time.perf_counter()
 
     try:
-        audio_bytes, provider = await tts_service.gerar(roteiro, sexo=req.sexo)
+        audio_bytes, provider, timestamps = await tts_service.gerar_com_timestamps(roteiro, sexo=req.sexo)
     except RuntimeError as exc:
         logger.error("TTS falhou: %s", exc)
         raise HTTPException(status_code=503, detail=f"Serviço de voz indisponível: {exc}")
@@ -67,6 +69,8 @@ async def generate(req: AudioRequest):
 
     # 4. Salva no cache
     cache_service.save(req.tipo, cache_key, audio_bytes)
+    if timestamps:
+        cache_service.save_timestamps(req.tipo, cache_key, timestamps)
 
     return AudioResponse(
         success=True,
@@ -75,6 +79,7 @@ async def generate(req: AudioRequest):
         generation_time=elapsed,
         provider=provider,
         script_length=len(roteiro),
+        timestamps=timestamps,
     )
 
 

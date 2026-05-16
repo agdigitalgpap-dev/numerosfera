@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico Mobile</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #eee; padding: 20px; font-size: 13px; }
+    .ok  { color: #4f4; }
+    .err { color: #f44; }
+    .warn{ color: #fa0; }
+    pre  { background: #222; padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+    h2   { color: #adf; margin-top: 24px; }
+    button { padding: 12px 24px; font-size: 15px; background: #2a5; color: #fff; border: none; border-radius: 8px; margin: 8px 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<h2>Diagnóstico Mobile</h2>
+
+<div id="info"></div>
+
+<h2>1. Info da página</h2>
+<pre id="page-info"></pre>
+
+<h2>2. Teste API /status</h2>
+<pre id="api-status">aguardando...</pre>
+
+<h2>3. Teste geração de áudio</h2>
+<button onclick="testarGeracao()">Testar /api/audio/generate</button>
+<pre id="api-gen">não testado ainda</pre>
+
+<h2>4. Teste carregar MP3</h2>
+<pre id="mp3-test">não testado ainda</pre>
+
+<h2>5. Teste autoplay</h2>
+<button onclick="testarAutoplay()">Testar autoplay</button>
+<pre id="autoplay-test">não testado ainda</pre>
+
+<script>
+  const API_BASE = (location.port === '5500' || location.port === '3000')
+    ? location.protocol + '//' + location.hostname + ':8000'
+    : '';
+
+  // Info da página
+  document.getElementById('page-info').textContent = [
+    'URL:       ' + location.href,
+    'hostname:  ' + location.hostname,
+    'port:      ' + location.port,
+    'API_BASE:  ' + (API_BASE || '(vazio — ERRO!)'),
+  ].join('\n');
+
+  // Teste 1: /status
+  (async () => {
+    const el = document.getElementById('api-status');
+    try {
+      const r = await fetch(API_BASE + '/api/audio/status');
+      const d = await r.json();
+      el.textContent = 'STATUS ' + r.status + '\n' + JSON.stringify(d, null, 2);
+      el.className = 'ok';
+    } catch(e) {
+      el.textContent = 'ERRO: ' + e.message;
+      el.className = 'err';
+    }
+  })();
+
+  // Teste 2: geração de áudio
+  async function testarGeracao() {
+    const el = document.getElementById('api-gen');
+    el.textContent = 'chamando API...';
+    el.className = 'warn';
+    try {
+      const payload = {
+        nome: 'TESTE', sexo: 'feminino', signo: 'Áries',
+        dia: 1, decada: '1980', ano_nasc: 1985,
+        estado_civil: 'solteiro', desafio: 'relacionamentos',
+        tipo: 'audio1'
+      };
+      const r = await fetch(API_BASE + '/api/audio/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const d = await r.json();
+      el.textContent = 'STATUS ' + r.status + '\n' + JSON.stringify(d, null, 2);
+      el.className = r.ok ? 'ok' : 'err';
+
+      if (d.audioUrl) testarMp3(API_BASE + d.audioUrl);
+    } catch(e) {
+      el.textContent = 'ERRO: ' + e.message;
+      el.className = 'err';
+    }
+  }
+
+  // Teste 3: carregar MP3
+  function testarMp3(url) {
+    const el = document.getElementById('mp3-test');
+    el.textContent = 'carregando: ' + url;
+    el.className = 'warn';
+
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+
+    audio.addEventListener('canplaythrough', () => {
+      el.textContent = 'MP3 carregado OK\nduração: ' + audio.duration + 's\nURL: ' + url;
+      el.className = 'ok';
+    });
+    audio.addEventListener('error', () => {
+      const code = audio.error ? audio.error.code : '?';
+      el.textContent = 'ERRO MediaError ' + code + '\nURL: ' + url;
+      el.className = 'err';
+    });
+    audio.src = url;
+    audio.load();
+
+    setTimeout(() => {
+      if (el.className === 'warn') {
+        el.textContent += '\n[3s] canplaythrough não disparou — possível bloqueio de autoplay';
+        el.className = 'warn';
+      }
+    }, 3000);
+  }
+
+  // Teste 4: autoplay
+  function testarAutoplay() {
+    const el = document.getElementById('autoplay-test');
+    const audio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+    audio.play()
+      .then(() => { el.textContent = 'Autoplay PERMITIDO'; el.className = 'ok'; })
+      .catch(e => { el.textContent = 'Autoplay BLOQUEADO: ' + e.name + '\n(normal em mobile — precisa de toque do usuário)'; el.className = 'warn'; });
+  }
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@ Estratégia:
 """
 
 import hashlib
+import json
 import logging
 import os
 import time
@@ -57,6 +58,29 @@ def save(audio_tipo: str, key: str, audio_bytes: bytes) -> Path:
     size_kb = len(audio_bytes) / 1024
     logger.info("Cache salvo: %s (%.1f KB)", path.name, size_kb)
     return path
+
+
+def _timestamps_path(audio_tipo: str, key: str) -> Path:
+    return _cache_dir(audio_tipo) / f"{key}.json"
+
+
+def save_timestamps(audio_tipo: str, key: str, timestamps: list) -> None:
+    path = _timestamps_path(audio_tipo, key)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(timestamps, fh, ensure_ascii=False)
+    logger.info("Timestamps salvos: %s (%d palavras)", path.name, len(timestamps))
+
+
+def load_timestamps(audio_tipo: str, key: str) -> list | None:
+    path = _timestamps_path(audio_tipo, key)
+    if not path.exists():
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception as exc:
+        logger.warning("Erro ao carregar timestamps %s: %s", path.name, exc)
+        return None
 
 
 def public_url(audio_tipo: str, key: str) -> str:

@@ -878,9 +878,12 @@ const LOAD_MSGS = [
 function _preGenerateAudio1() {
   try {
     const API_BASE = (window.ASTRA_API_URL || '').replace(/\/$/, '') ||
-      (location.protocol === 'file:' ? 'http://localhost:8000' :
-       (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-         ? 'http://' + location.hostname + ':8000' : ''));
+      (location.protocol === 'file:'
+        ? 'http://localhost:8000'
+        : (location.port === '5500' || location.port === '3000' ||
+           location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+            ? 'http://' + location.hostname + ':8000'
+            : ''));
 
     // Garante que o lead é construído das chaves do quiz — nunca do cache
     localStorage.removeItem('astra_lead');
@@ -899,6 +902,9 @@ function _preGenerateAudio1() {
     .then(data => {
       if (data.success && data.audioUrl) {
         sessionStorage.setItem('audio1_url', data.audioUrl);
+        if (data.timestamps && Array.isArray(data.timestamps)) {
+          sessionStorage.setItem('audio1_timestamps', JSON.stringify(data.timestamps));
+        }
         console.log('[PREGEN] audio1 URL salva (' + (Date.now() - t0) + 'ms):', data.audioUrl);
       }
     })

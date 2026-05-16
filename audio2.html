@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Revelação Profunda · ASTRANUMERICA</title>
+  <title>Revelação Profunda · NUMEROSFERA</title>
   <link rel="stylesheet" href="assets/shared.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -23,7 +23,7 @@
     /* ── Card ── */
     .reveal-card {
       width: 100%;
-      max-width: 440px;
+      max-width: 960px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 24px;
@@ -359,6 +359,62 @@
     }
     .retry-btn:hover { background:rgba(200,180,224,0.08); }
 
+
+    /* ── Video Space ─────────────────────────────────────────────────────── */
+    .video-space {
+      width: 100%;
+      height: 520px;
+      border: 1px solid rgba(200,180,224,0.4);
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      overflow: hidden;
+      padding: 28px 20px;
+      box-sizing: border-box;
+    }
+    .video-space .deep-orb-wrap { margin-bottom: 0; }
+    .video-space #state-loading,
+    .video-space #state-player,
+    .video-space #state-error,
+    .video-space #state-autoplay { width: 100%; }
+
+    /* ── Subtitle Space ──────────────────────────────────────────────────── */
+    .subtitle-space {
+      width: 100%;
+      min-height: 140px;
+      background: rgba(6,10,34,0.92);
+      border: 1px solid rgba(200,180,224,0.32);
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    .subtitle-text {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      color: rgba(255,255,255,0.82);
+      text-align: center;
+      line-height: 1.75;
+      margin: 0;
+      max-width: 820px;
+      min-height: 1.75em;
+      transition: opacity 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .video-space    { height: 420px; padding: 20px 16px; }
+      .subtitle-space { min-height: 120px; padding: 18px 16px; }
+      .subtitle-text  { font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
@@ -377,15 +433,6 @@
       </div>
     </div>
 
-    <!-- Orb profundo -->
-    <div class="deep-orb-wrap">
-      <div class="lilac-ring r1"></div>
-      <div class="lilac-ring r2"></div>
-      <div class="deep-orb">
-        <img id="signo-icon" src="" alt="" style="width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(196,164,72,0.55));">
-      </div>
-    </div>
-
     <!-- Título -->
     <h1 class="reveal-title">
       Aprofundando a leitura<br>
@@ -395,59 +442,73 @@
       ✦ Mapa de <span id="lead-signo">—</span> ✦
     </p>
 
-    <div class="divider-lilac"></div>
+    <!-- VIDEO SPACE — container central para vídeo futuramente -->
+    <div class="video-space">
 
-    <!-- Estado: Loading -->
-    <div id="state-loading">
-      <div class="gen-loader">
-        <div class="gen-ring"></div>
-        <div class="gen-ring gen-ring--2"></div>
-        <div class="gen-spark"></div>
-      </div>
-      <div class="gen-bar-wrap">
-        <div class="gen-bar-track">
-          <div class="gen-bar-fill" id="gen-bar-fill"></div>
-        </div>
-        <span class="gen-bar-pct" id="gen-bar-pct">0%</span>
-      </div>
-      <p class="gen-phrase" id="gen-phrase">Aprofundando sua análise...</p>
-      <p class="gen-hint">Revelação profunda em preparação</p>
-    </div>
-
-    <!-- Estado: Player -->
-    <div id="state-player">
-      <div class="wave-wrap" id="wave">
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-        <div class="wave-bar"></div><div class="wave-bar"></div>
-      </div>
-
-      <div class="prog-wrap" style="margin-bottom:10px;">
-        <div class="prog-track">
-          <div class="prog-fill" id="prog-fill"></div>
+      <!-- Orb profundo — centralizado -->
+      <div class="deep-orb-wrap">
+        <div class="lilac-ring r1"></div>
+        <div class="lilac-ring r2"></div>
+        <div class="deep-orb">
+          <img id="signo-icon" src="" alt="" style="width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(196,164,72,0.55));">
         </div>
       </div>
 
-      <button id="btn-continuar-vsl" onclick="window.location.href='vsl.html'">
-        Acessar minha revelação completa →
-      </button>
+      <!-- Estado: Loading -->
+      <div id="state-loading">
+        <div class="gen-loader">
+          <div class="gen-ring"></div>
+          <div class="gen-ring gen-ring--2"></div>
+          <div class="gen-spark"></div>
+        </div>
+        <div class="gen-bar-wrap">
+          <div class="gen-bar-track">
+            <div class="gen-bar-fill" id="gen-bar-fill"></div>
+          </div>
+          <span class="gen-bar-pct" id="gen-bar-pct">0%</span>
+        </div>
+        <p class="gen-phrase" id="gen-phrase">Aprofundando sua análise...</p>
+        <p class="gen-hint">Revelação profunda em preparação</p>
+      </div>
 
-    </div>
+      <!-- Estado: Player -->
+      <div id="state-player">
+        <div class="wave-wrap" id="wave">
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div>
+        </div>
+        <div class="prog-wrap" style="margin-bottom:10px;">
+          <div class="prog-track">
+            <div class="prog-fill" id="prog-fill"></div>
+          </div>
+        </div>
+        <button id="btn-continuar-vsl" onclick="window.location.href='vsl.html'">
+          Acessar minha revelação completa →
+        </button>
+      </div>
 
-    <!-- Estado: Erro -->
-    <div id="state-error">
-      <div class="error-icon">⚠️</div>
-      <p class="error-msg">Não foi possível carregar a revelação.<br>Verifique sua conexão e tente novamente.</p>
-      <button class="retry-btn" onclick="retryInit()">Tentar novamente</button>
-    </div>
+      <!-- Estado: Erro -->
+      <div id="state-error">
+        <div class="error-icon">⚠️</div>
+        <p class="error-msg">Não foi possível carregar a revelação.<br>Verifique sua conexão e tente novamente.</p>
+        <button class="retry-btn" onclick="retryInit()">Tentar novamente</button>
+      </div>
 
-    <!-- Estado: Autoplay bloqueado -->
-    <div id="state-autoplay">
-      <p class="autoplay-msg">Toque para iniciar sua revelação</p>
-      <button id="btn-iniciar-2" class="start-btn">&#9654; Iniciar revelação</button>
+      <!-- Estado: Autoplay bloqueado -->
+      <div id="state-autoplay">
+        <p class="autoplay-msg">Toque para iniciar sua revelação</p>
+        <button id="btn-iniciar-2" class="start-btn">&#9654; Iniciar revelação</button>
+      </div>
+
+    </div><!-- /video-space -->
+
+    <!-- SUBTITLE SPACE — legenda/transcrição do áudio -->
+    <div class="subtitle-space" id="subtitle-box">
+      <p class="subtitle-text" id="subtitle-text">—</p>
     </div>
 
 
@@ -464,6 +525,12 @@
 </div>
 
 <script src="assets/lead-manager.js"></script>
+<script>
+  // Detecta Live Server (porta 5500/3000) e aponta API para porta 8000 do mesmo host
+  if (location.port === '5500' || location.port === '3000') {
+    window.ASTRA_API_URL = location.protocol + '//' + location.hostname + ':8000';
+  }
+</script>
 <script src="assets/audio-player.js"></script>
 <script>
   // Garante que não há resquício do player da página anterior
@@ -636,9 +703,50 @@
     }
   }
 
+  // ── Legenda sincronizada ───────────────────────────────────────────────────
+  let _phrases2   = [];
+  let _phraseIdx2 = -1;
+
+  function _buildPhrases2(words) {
+    _phrases2   = [];
+    _phraseIdx2 = -1;
+    if (!words || !words.length) return;
+    const GAP = 0.35, MAX_DUR = 4.5, MAX_WORDS = 9;
+    const phrases = [];
+    let cur = [], curStart = 0;
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      if (!cur.length) {
+        cur.push(w); curStart = w.s;
+      } else {
+        const gap = w.s - words[i - 1].e;
+        const dur = w.e - curStart;
+        if (gap > GAP || dur > MAX_DUR || cur.length >= MAX_WORDS) {
+          phrases.push({ text: cur.map(x => x.w).join(' '), s: curStart, e: words[i - 1].e });
+          cur = [w]; curStart = w.s;
+        } else {
+          cur.push(w);
+        }
+      }
+    }
+    if (cur.length) phrases.push({ text: cur.map(x => x.w).join(' '), s: curStart, e: cur[cur.length - 1].e });
+    _phrases2 = phrases;
+    console.log('[SUBTITLE2] ' + phrases.length + ' frases construídas');
+  }
+
   // ── Progresso ─────────────────────────────────────────────────────────────
   function onProgress(pct, cur, dur) {
     document.getElementById('prog-fill').style.width = (pct * 100).toFixed(1) + '%';
+    if (_phrases2.length) {
+      let idx = -1;
+      for (let i = 0; i < _phrases2.length; i++) {
+        if (cur >= _phrases2[i].s && cur <= _phrases2[i].e + 0.15) { idx = i; break; }
+      }
+      if (idx !== -1 && idx !== _phraseIdx2) {
+        _phraseIdx2 = idx;
+        document.getElementById('subtitle-text').textContent = _phrases2[idx].text;
+      }
+    }
   }
 
   // ── _initDone — bloqueio anti-loop ────────────────────────────────────────
@@ -670,7 +778,7 @@
 
     document.getElementById('lead-nome').textContent  = LeadManager.getNomeFormatado(lead);
     document.getElementById('lead-signo').textContent = LeadManager.getSignoDisplay(lead);
-    document.title = 'Revelação de ' + LeadManager.getNomeFormatado(lead) + ' · ASTRANUMERICA';
+    document.title = 'Revelação de ' + LeadManager.getNomeFormatado(lead) + ' · NUMEROSFERA';
 
     const icon    = document.getElementById('signo-icon');
     const iconSrc = LeadManager.getSignoIcon(lead);
@@ -692,10 +800,11 @@
     window.__audio2Started = true;
 
     audioPlayer2.loadAndPlay('audio2', lead, {
-      onReady() {
+      onReady(duration, timestamps) {
         if (_readyFired) { console.warn('[audio2] onReady — já disparado, ignorado'); return; }
         _readyFired = true;
         console.log('[AUDIO2 READY]');
+        _buildPhrases2(timestamps);
         finishLoading(() => {
           showState('player');
           startEqualizer2();
@@ -741,7 +850,8 @@
           console.warn('[audio2] Arquivo não encontrado (MediaError 4) — limpando pregen e repetindo via API');
           audioPlayer2.reset();
           setTimeout(() => {
-            _initDone = false;
+            _initDone              = false;
+            window.__audio2Started = false;
             init();
           }, 300);
           return;
@@ -763,9 +873,10 @@
   }
 
   function retryInit() {
-    audioPlayer2.reset();   // limpa _loading, _started, timers e epoch
-    _initDone     = false;
-    _readyFired   = false;
+    audioPlayer2.reset();   // limpa _loading, _started, timers e época
+    _initDone              = false;
+    _readyFired            = false;
+    window.__audio2Started = false;
     init();
   }
 

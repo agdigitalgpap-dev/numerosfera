@@ -138,6 +138,98 @@ def _loudnorm(audio_bytes: bytes) -> bytes:
 
 # ── ElevenLabs ────────────────────────────────────────────────────────────────
 
+def _chars_to_words(
+    chars: list[str],
+    starts: list[float],
+    ends: list[float],
+) -> list[dict]:
+    """Agrupa timestamps de caracteres em timestamps de palavras."""
+    words: list[dict] = []
+    w_buf: list[str] = []
+    w_start = 0.0
+    w_end = 0.0
+
+    for ch, s, e in zip(chars, starts, ends):
+        if ch in (" ", "\n", "\t", "\r"):
+            if w_buf:
+                words.append({"w": "".join(w_buf), "s": round(w_start, 3), "e": round(w_end, 3)})
+                w_buf = []
+        else:
+            if not w_buf:
+                w_start = s
+            w_buf.append(ch)
+            w_end = e
+
+    if w_buf:
+        words.append({"w": "".join(w_buf), "s": round(w_start, 3), "e": round(w_end, 3)})
+
+    return words
+
+
+def _elevenlabs_sync_with_timestamps(texto: str) -> tuple[bytes, list]:
+    """Gera um segmento com timestamps de palavras (síncrono — roda em thread pool)."""
+    import base64
+    from elevenlabs.client import ElevenLabs
+    from elevenlabs import VoiceSettings
+
+    voice_settings = VoiceSettings(
+        stability=settings.elevenlabs_stability,
+        similarity_boost=settings.elevenlabs_similarity_boost,
+        style=settings.elevenlabs_style,
+        use_speaker_boost=settings.elevenlabs_speaker_boost,
+        speed=settings.elevenlabs_speed,
+    )
+
+    client = ElevenLabs(api_key=settings.elevenlabs_api_key)
+    response = client.text_to_speech.convert_with_timestamps(
+        voice_id=settings.elevenlabs_voice_id,
+        text=texto,
+        model_id=settings.elevenlabs_model,
+        output_format=settings.elevenlabs_output_format,
+        voice_settings=voice_settings,
+    )
+
+    audio_bytes = base64.b64decode(response.audio_base64)
+    al = response.alignment
+    words = _chars_to_words(
+        al.characters,
+        al.character_start_times_seconds,
+        al.character_end_times_seconds,
+    )
+    logger.info("[TTS+TS] %d palavras / %d chars", len(words), len(texto))
+    return audio_bytes, words
+
+
+async def _gerar_elevenlabs_com_timestamps(texto: str) -> tuple[bytes, list]:
+    """ElevenLabs com chunking automático + timestamps acumulados por offset."""
+    segmentos = _split_text(texto)
+    n = len(segmentos)
+    logger.info("[TTS+TS] %d segmento(s)  (total %d chars)", n, len(texto))
+
+    partes: list[bytes] = []
+    all_words: list[dict] = []
+    time_offset = 0.0
+
+    for i, seg in enumerate(segmentos):
+        logger.info("[TTS+TS] Segmento %d/%d (%d chars)", i + 1, n, len(seg))
+        mp3, words = await asyncio.to_thread(_elevenlabs_sync_with_timestamps, seg)
+        partes.append(mp3)
+
+        for w in words:
+            all_words.append({
+                "w": w["w"],
+                "s": round(w["s"] + time_offset, 3),
+                "e": round(w["e"] + time_offset, 3),
+            })
+
+        if words:
+            time_offset += words[-1]["e"]
+
+    audio = _concat_mp3_chunks(partes)
+    audio = await asyncio.to_thread(_loudnorm, audio)
+    return audio, all_words
+
+
 def _elevenlabs_sync(texto: str) -> bytes:
     """Gera um único segmento de áudio (síncrono — roda em thread pool)."""
     from elevenlabs.client import ElevenLabs
@@ -265,6 +357,45 @@ async def gerar(
         if fallback == "elevenlabs" and settings.elevenlabs_api_key:
             audio = await _gerar_elevenlabs(texto)
             return audio, "elevenlabs"
+
+        raise RuntimeError(
+            f"Todos os provedores TTS falharam. Último erro: {exc}"
+        ) from exc
+
+
+async def gerar_com_timestamps(
+    texto: str,
+    sexo: str = "feminino",
+    provider: Provider | None = None,
+) -> tuple[bytes, Provider, list | None]:
+    """
+    Como gerar(), mas retorna também timestamps de palavras (ElevenLabs apenas).
+    Retorna (audio_bytes, provider_usado, timestamps_ou_none).
+    """
+    provedor = provider or settings.tts_provider
+
+    try:
+        if provedor == "elevenlabs":
+            if not settings.elevenlabs_api_key:
+                raise RuntimeError("ELEVENLABS_API_KEY não configurada")
+            audio, timestamps = await _gerar_elevenlabs_com_timestamps(texto)
+            return audio, "elevenlabs", timestamps
+
+        # Outros provedores — sem timestamps
+        audio_bytes, used = await gerar(texto, sexo, provider)
+        return audio_bytes, used, None
+
+    except Exception as exc:
+        fallback = "openai" if provedor == "elevenlabs" else "elevenlabs"
+        logger.warning("[TTS+TS] %s falhou: %s — fallback %s", provedor, exc, fallback)
+
+        if fallback == "openai" and settings.openai_api_key:
+            audio = await _gerar_openai(texto, sexo)
+            return audio, "openai", None
+
+        if fallback == "elevenlabs" and settings.elevenlabs_api_key:
+            audio, timestamps = await _gerar_elevenlabs_com_timestamps(texto)
+            return audio, "elevenlabs", timestamps
 
         raise RuntimeError(
             f"Todos os provedores TTS falharam. Último erro: {exc}"

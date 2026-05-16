@@ -1,5 +1,5 @@
 /**
- * ASTRA — Audio Manager
+ * NUMEROSFERA — Audio Manager
  * Persistent ambient audio across all quiz pages.
  * Starts on first user interaction, fades out when VSL begins.
  */

@@ -1,5 +1,5 @@
 """
-ASTRANUMERICA — Audio Personalization API
+NUMEROSFERA — Audio Personalization API
 FastAPI app principal.
 
 Endpoints:
@@ -31,7 +31,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     datefmt="%H:%M:%S",
 )
-logger = logging.getLogger("astranumerica")
+logger = logging.getLogger("numerosfera")
 
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
@@ -59,24 +59,17 @@ async def lifespan(_app: FastAPI):
 # ── App ───────────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="ASTRANUMERICA Audio API",
+    title="NUMEROSFERA Audio API",
     version="1.0.0",
     description="Geração dinâmica de áudios personalizados com cache inteligente.",
     lifespan=lifespan,
 )
 
-# CORS — permite chamadas do frontend local e de produção
+# CORS — libera todas as origens para desenvolvimento local (mobile, Wi-Fi, etc.)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "null",                     # file:// (abrir HTML direto no browser)
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -97,7 +90,7 @@ app.mount(
 @app.get("/")
 async def root():
     return {
-        "app": "ASTRANUMERICA Audio API",
+        "app": "NUMEROSFERA Audio API",
         "version": "1.0.0",
         "docs": "/docs",
         "status": "/api/audio/status",

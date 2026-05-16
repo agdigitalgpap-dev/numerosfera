@@ -154,5 +154,6 @@ class AudioResponse(BaseModel):
     generation_time: float = Field(0.0, alias="generationTime")
     provider: str = ""
     script_length: int = Field(0, alias="scriptLength")
+    timestamps: list | None = Field(None)
 
     model_config = {"populate_by_name": True}

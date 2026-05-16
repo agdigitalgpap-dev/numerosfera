@@ -21,7 +21,9 @@
   const API_BASE = (() => {
     if (global.ASTRA_API_URL) return global.ASTRA_API_URL.replace(/\/$/, '');
     if (location.protocol === 'file:') return 'http://localhost:8000';
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    // Dev: Live Server (5500/3000) ou localhost → API na porta 8000 do mesmo host
+    if (location.port === '5500' || location.port === '3000' ||
+        location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       return 'http://' + location.hostname + ':8000';
     }
     return '';
@@ -64,6 +66,9 @@
     let _gainNode     = null;   // fixo em 1.0 — não controla volume
     let _source       = null;
     let _webAudioOk   = false;
+
+    // Timestamps de palavras retornados pela API
+    let _timestamps   = null;
 
     // Guards de ciclo de vida
     let _started      = false;
@@ -235,7 +240,7 @@
 
       if (_audio.readyState >= 4) {
         console.log(_tag() + ' readyState >= 4 — reproduzindo imediatamente');
-        if (cb.onReady) cb.onReady(_audio.duration);
+        if (cb.onReady) cb.onReady(_audio.duration, _timestamps);
         await _tryPlay(cb);
         return;
       }
@@ -252,7 +257,7 @@
         if (_canplayCalled || !_audio || _epoch !== myEpoch) return;
         _canplayCalled = true;
         console.warn(_tag() + ' [iOS FALLBACK] canplaythrough não disparou em 3s — forçando');
-        if (cb.onReady) cb.onReady(0);
+        if (cb.onReady) cb.onReady(0, _timestamps);
         await _tryPlay(cb);
       }, 3000);
 
@@ -264,7 +269,7 @@
         _canplayCalled = true;
         clearTimeout(_iosTimer);
         console.log(_tag() + ' [' + (_lastTipo || 'audio').toUpperCase() + ' READY]  duração:', _audio.duration, 's');
-        if (cb.onReady) cb.onReady(_audio.duration);
+        if (cb.onReady) cb.onReady(_audio.duration, _timestamps);
         await _tryPlay(cb);
       }, { once: true });
 
@@ -375,6 +380,9 @@ _playTriggered = true;
             pregenUrl.endsWith('.mp3');
           if (_validPregen) {
             sessionStorage.removeItem(_pregenKey);
+            const _pregenTsKey = tipo + '_timestamps';
+            try { _timestamps = JSON.parse(sessionStorage.getItem(_pregenTsKey) || 'null'); } catch(_) { _timestamps = null; }
+            sessionStorage.removeItem(_pregenTsKey);
             _generating = false;
             _currentUrl = API_BASE + pregenUrl;
             console.log('[PREGEN] URL completa (' + tipo + '):', _currentUrl);
@@ -423,6 +431,7 @@ _playTriggered = true;
 
           if (!data.success) throw new Error(data.detail || 'API error');
 
+          _timestamps = (data.timestamps && Array.isArray(data.timestamps)) ? data.timestamps : null;
           audioUrl = API_BASE + data.audioUrl;
           console.log(_tag() + ' Audio URL:', audioUrl);
 
