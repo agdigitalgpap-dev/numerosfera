@@ -78,18 +78,18 @@
   };
 
   const SIGNO_ICON = {
-    aries:      'Briefing/Referencias /ARIES.png',
-    touro:      'Briefing/Referencias /touro.png',
-    gemeos:     'Briefing/Referencias /Gemeos.png',
-    cancer:     'Briefing/Referencias /cancer.png',
-    leao:       'Briefing/Referencias /Leao.png',
-    virgem:     'Briefing/Referencias /Virgem.png',
-    libra:      'Briefing/Referencias /libra.png',
-    escorpiao:  'Briefing/Referencias /escorpião.png',
-    sagitario:  'Briefing/Referencias /sagitario.png',
-    capricornio:'Briefing/Referencias /capricornio.png',
-    aquario:    'Briefing/Referencias /aquario.png',
-    peixes:     'Briefing/Referencias /peixes.png',
+    aries:      'assets/img/aries.png',
+    touro:      'assets/img/touro.png',
+    gemeos:     'assets/img/gemeos.png',
+    cancer:     'assets/img/cancer.png',
+    leao:       'assets/img/leao.png',
+    virgem:     'assets/img/virgem.png',
+    libra:      'assets/img/libra.png',
+    escorpiao:  'assets/img/escorpiao.png',
+    sagitario:  'assets/img/sagitario.png',
+    capricornio:'assets/img/capricornio.png',
+    aquario:    'assets/img/aquario.png',
+    peixes:     'assets/img/peixes.png',
   };
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -199,7 +199,7 @@
     },
 
     getSignoIcon(lead) {
-      return lead.signoIcon || SIGNO_ICON[lead.signo] || '';
+      return SIGNO_ICON[lead.signo] || lead.signoIcon || '';
     },
 
     getDorDisplay(lead) {

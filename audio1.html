@@ -737,10 +737,9 @@
 
 <script src="assets/lead-manager.js"></script>
 <script>
-  // Detecta Live Server (porta 5500/3000) e aponta API para porta 8000 do mesmo host
-  if (location.port === '5500' || location.port === '3000') {
-    window.ASTRA_API_URL = location.protocol + '//' + location.hostname + ':8000';
-  }
+  window.ASTRA_API_URL = (location.port === '5500' || location.port === '3000')
+    ? location.protocol + '//' + location.hostname + ':8000'
+    : 'https://web-production-6988c1.up.railway.app';
 </script>
 <script src="assets/audio-player.js"></script>
 <script>

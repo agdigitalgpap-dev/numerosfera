@@ -21,12 +21,11 @@
   const API_BASE = (() => {
     if (global.ASTRA_API_URL) return global.ASTRA_API_URL.replace(/\/$/, '');
     if (location.protocol === 'file:') return 'http://localhost:8000';
-    // Dev: Live Server (5500/3000) ou localhost → API na porta 8000 do mesmo host
     if (location.port === '5500' || location.port === '3000' ||
         location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       return 'http://' + location.hostname + ':8000';
     }
-    return '';
+    return 'https://web-production-6988c1.up.railway.app';
   })();
 
   const UNLOCK_AT       = 0.85;
