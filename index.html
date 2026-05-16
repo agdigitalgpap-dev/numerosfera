@@ -337,7 +337,7 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 
   <!-- Persistent header (hidden only on loading step) -->
   <header class="quiz-header" id="quizHeader">
-    <div class="header-alert">Alerta de Maio</div>
+    <div class="header-alert" id="headerAlert">Alerta de Maio</div>
     <p class="header-title">
       3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
       <span class="hl">O Seu é Um Deles?</span>
@@ -576,6 +576,18 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 </div><!-- /quiz-wrap -->
 
 <script src="assets/lead-manager.js"></script>
+<script>
+/* ── Alerta dinâmico: "15 de Maio" ── */
+(function() {
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const now = new Date();
+  const dia = now.getDate();
+  const mes = meses[now.getMonth()];
+  const el = document.getElementById('headerAlert');
+  if (el) el.textContent = `Alerta de ${dia} de ${mes}`;
+})();
+</script>
 <script>
 /* ══════════════════════════════════════════════════════════
    AUDIO — single instance, never recreated

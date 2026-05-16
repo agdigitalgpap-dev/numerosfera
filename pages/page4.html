@@ -12,7 +12,7 @@
 <div class="page">
 
   <header class="header anim-1">
-    <div class="header-alert">Alerta de Maio</div>
+    <div class="header-alert" id="headerAlert">Alerta de Maio</div>
     <p class="header-title">
       3 Signos Estão Perdendo <u>Dinheiro e Amor</u> Para Outras Pessoas —
       <span class="hl">O Seu é Um Deles?</span>
@@ -42,6 +42,13 @@ for(let y=decade;y<=decade+9;y++){
   btn.onclick=()=>{document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');localStorage.setItem('ano',y);setTimeout(()=>{window.location.href='page5.html';},300);};
   grid.appendChild(btn);
 }
+</script>
+<script>
+(function(){
+  var m=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  var n=new Date(),el=document.getElementById("headerAlert");
+  if(el) el.textContent="Alerta de "+n.getDate()+" de "+m[n.getMonth()];
+})();
 </script>
 </body>
 </html>

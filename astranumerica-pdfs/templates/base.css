@@ -1,0 +1,443 @@
+/* ===========================
+   ASTRA NUMERICA — BASE CSS
+   Aesthetic: Grimório de Luxo
+   Dark gold manuscript · art-deco hermético
+=========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Raleway:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Cores */
+  --ink:        #06060F;
+  --navy:       #090915;
+  --navy-card:  #0E0E20;
+  --navy-line:  #13132A;
+  --gold:       #B8922A;
+  --gold-mid:   #D4A84B;
+  --gold-hi:    #EEC96A;
+  --gold-pale:  #F5E199;
+  --gold-dim:   #5C4415;
+  --cream:      #EDE5D0;
+  --cream-dim:  #B8AE99;
+  --rust:       #7A3020;
+  --violet:     #3A1F6A;
+
+  /* Tipografia */
+  --f-display: 'Cinzel Decorative', serif;
+  --f-title:   'Cinzel', serif;
+  --f-body:    'EB Garamond', serif;
+  --f-label:   'Raleway', sans-serif;
+
+  /* Layout */
+  --page-w: 794px;
+  --page-h: 1123px;
+  --pad:    58px;
+  --pad-sm: 40px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page { size: A4; margin: 0; }
+
+html, body {
+  background: var(--ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── PÁGINA BASE ─────────────────────────── */
+.page {
+  width: var(--page-w);
+  height: var(--page-h);
+  max-height: var(--page-h);
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Textura de fundo sutil */
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 90%, rgba(184,146,42,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 90% 10%, rgba(58,31,106,0.10) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-inner {
+  position: relative;
+  z-index: 1;
+  padding: var(--pad);
+  height: var(--page-h);
+  max-height: var(--page-h);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── MOLDURA ART-DECO ─────────────────────── */
+.frame {
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.frame::before, .frame::after,
+.frame .frame-b, .frame .frame-r {
+  content: '';
+  position: absolute;
+  background: var(--gold-dim);
+}
+
+/* Linhas da moldura dupla */
+.frame::before {
+  top: 0; left: 0; right: 0; height: 1px;
+  box-shadow: 0 3px 0 rgba(184,146,42,0.15);
+}
+.frame::after {
+  bottom: 0; left: 0; right: 0; height: 1px;
+  box-shadow: 0 -3px 0 rgba(184,146,42,0.15);
+}
+.frame .frame-b { top: 0; bottom: 0; left: 0; width: 1px; box-shadow: 3px 0 0 rgba(184,146,42,0.15); }
+.frame .frame-r { top: 0; bottom: 0; right: 0; width: 1px; box-shadow: -3px 0 0 rgba(184,146,42,0.15); }
+
+/* Ornamentos dos cantos */
+.frame .corner {
+  position: absolute;
+  width: 22px; height: 22px;
+  border-color: var(--gold);
+  border-style: solid;
+  border-width: 0;
+}
+.frame .corner.tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.frame .corner.tr { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.frame .corner.bl { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+.frame .corner.br { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* ── CAPA ─────────────────────────────────── */
+.cover-page {
+  background: var(--ink);
+}
+.cover-img {
+  width: 100%;
+  height: var(--page-h);
+  object-fit: cover;
+  display: block;
+}
+
+/* ── TIPOGRAFIA ───────────────────────────── */
+h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 22pt;
+  color: var(--gold-hi);
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+  text-shadow: 0 0 40px rgba(212,168,75,0.25);
+}
+
+h2 {
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 14pt;
+  color: var(--gold-mid);
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--gold-dim);
+}
+
+h3 {
+  font-family: var(--f-title);
+  font-weight: 500;
+  font-size: 11.5pt;
+  color: var(--gold-pale);
+  margin-top: 22px;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+h4 {
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 8pt;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+p {
+  font-family: var(--f-body);
+  font-size: 12.5pt;
+  line-height: 1.78;
+  color: var(--cream);
+  margin-bottom: 13px;
+}
+
+strong { color: var(--gold-pale); font-weight: 600; }
+em { color: var(--cream-dim); font-style: italic; }
+
+/* ── LISTAS ───────────────────────────────── */
+ul, ol {
+  padding-left: 0;
+  margin-bottom: 16px;
+  list-style: none;
+}
+
+li {
+  font-family: var(--f-body);
+  font-size: 12pt;
+  line-height: 1.7;
+  color: var(--cream);
+  margin-bottom: 7px;
+  padding-left: 20px;
+  position: relative;
+}
+
+li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--gold-dim);
+  font-size: 7pt;
+  top: 5px;
+}
+
+/* ── DIVISOR ──────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0;
+  opacity: 0.7;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+.divider-sym {
+  font-family: var(--f-title);
+  color: var(--gold);
+  font-size: 11pt;
+  letter-spacing: 4px;
+}
+
+/* ── SECTION HEADER ───────────────────────── */
+.sec-label {
+  font-family: var(--f-label);
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 5px;
+}
+
+.sec-title {
+  font-family: var(--f-display);
+  font-size: 19pt;
+  color: var(--gold-hi);
+  line-height: 1.2;
+  text-shadow: 0 0 30px rgba(212,168,75,0.2);
+  margin-bottom: 4px;
+}
+
+.sec-sub {
+  font-family: var(--f-label);
+  font-size: 9pt;
+  font-weight: 400;
+  color: var(--cream-dim);
+  letter-spacing: 0.06em;
+  margin-bottom: 24px;
+}
+
+.sec-hero {
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(184,146,42,0.25);
+}
+
+/* Linha decorativa sob o título de seção */
+.sec-hero::after {
+  display: none;
+}
+
+/* ── CALLOUT / BLOCO DESTACADO ────────────── */
+.callout {
+  background: linear-gradient(135deg, rgba(184,146,42,0.08), rgba(58,31,106,0.08));
+  border-left: 2px solid var(--gold);
+  padding: 16px 20px;
+  margin: 18px 0;
+  border-radius: 0 3px 3px 0;
+  position: relative;
+}
+
+.callout::before {
+  content: '✦';
+  position: absolute;
+  top: -8px;
+  left: -5px;
+  color: var(--gold);
+  font-size: 9pt;
+  background: var(--navy);
+  padding: 0 3px;
+}
+
+.callout p:last-child { margin-bottom: 0; }
+
+/* ── PILLAR / CARD ────────────────────────── */
+.pillar {
+  background: var(--navy-card);
+  border: 1px solid rgba(184,146,42,0.18);
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin: 12px 0;
+}
+
+.pillar-title {
+  font-family: var(--f-title);
+  font-size: 10.5pt;
+  color: var(--gold-mid);
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.04em;
+}
+
+.pillar-num {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5pt;
+  color: var(--gold);
+  flex-shrink: 0;
+  font-family: var(--f-label);
+}
+
+.pillar p {
+  font-size: 11.5pt;
+  margin-bottom: 0;
+  color: var(--cream-dim);
+}
+
+/* ── ABERTURA / CARTA ─────────────────────── */
+.letter-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 22px;
+  position: relative;
+}
+
+.letter-header::after {
+  content: '✦ ✦ ✦';
+  display: block;
+  margin-top: 14px;
+  color: var(--gold-dim);
+  font-size: 9pt;
+  letter-spacing: 8px;
+}
+
+.letter-name {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 28pt;
+  color: var(--gold-hi);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 40px rgba(212,168,75,0.3);
+  margin-bottom: 4px;
+}
+
+.letter-sub {
+  font-family: var(--f-label);
+  font-size: 8.5pt;
+  color: var(--cream-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ── RODAPÉ ───────────────────────────────── */
+.page-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(184,146,42,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--f-label);
+  font-size: 7.5pt;
+  font-weight: 400;
+  color: var(--gold-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── IMAGEM ───────────────────────────────── */
+.img-block {
+  width: 100%;
+  margin: 20px 0;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(184,146,42,0.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+.img-block img { width: 100%; display: block; }
+
+/* ── BADGE DE BÔNUS ───────────────────────── */
+.bonus-badge {
+  display: inline-block;
+  background: rgba(184,146,42,0.12);
+  border: 1px solid var(--gold-dim);
+  border-radius: 2px;
+  padding: 3px 12px;
+  font-family: var(--f-label);
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.bonus-value {
+  font-family: var(--f-label);
+  font-size: 9pt;
+  color: var(--cream-dim);
+  margin-bottom: 22px;
+  letter-spacing: 0.04em;
+}
+.bonus-value span { text-decoration: line-through; opacity: 0.5; }
+
+/* ── FOLHA DE ROSTO ───────────────────────── */
+.title-page-box {
+  border: 1px solid rgba(184,146,42,0.3);
+  border-radius: 4px;
+  padding: 24px 36px;
+  background: rgba(184,146,42,0.04);
+  text-align: center;
+}
+
+/* ── PRINT ────────────────────────────────── */
+@media print {
+  .page { page-break-after: always; break-after: page; }
+}
