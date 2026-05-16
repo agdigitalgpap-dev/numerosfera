@@ -988,15 +988,10 @@ function startLoading() {
       clearInterval(timer);
       clearInterval(msgTimer);
 
-      setTimeout(() => {
-        // Se o pregen já terminou, navega direto
-        if (sessionStorage.getItem('audio1_url')) {
-          goToAudio1();
-        } else {
-          // Senão aguarda até o pregen terminar
-          waitForPregen();
-        }
-      }, 300);
+      // Navega imediatamente — audio1.html tem sua própria tela de loading
+      // Se o pregen terminou, sessionStorage já tem a URL e audio1.html a usa
+      // Se não terminou, audio1.html faz a chamada à API com seu próprio loading
+      setTimeout(goToAudio1, 300);
     }
   }, 40);
 }
