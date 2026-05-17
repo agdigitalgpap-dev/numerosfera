@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · NUMEROSFERA</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#080604;color:#f2ede4;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:24px 16px 48px;}
+    h1{font-size:20px;font-weight:700;color:#C4A44A;letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:4px;}
+    .subtitle{text-align:center;font-size:12px;color:rgba(242,237,228,0.4);margin-bottom:32px;letter-spacing:1px;}
+    .login{max-width:380px;margin:80px auto 0;background:rgba(18,13,8,0.9);border:1px solid rgba(196,164,72,0.2);border-radius:16px;padding:32px 24px;text-align:center;}
+    .login h2{color:#C4A44A;margin-bottom:20px;font-size:16px;}
+    .login input{width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(196,164,72,0.3);border-radius:8px;color:#f2ede4;font-size:14px;margin-bottom:12px;outline:none;}
+    .login input:focus{border-color:#C4A44A;}
+    .btn{width:100%;padding:12px;border:none;border-radius:8px;background:linear-gradient(135deg,#9A7A2C,#C4A44A);color:#000;font-weight:700;font-size:14px;cursor:pointer;}
+    .err{color:#f87171;font-size:12px;margin-top:8px;display:none;}
+    .dash{display:none;max-width:900px;margin:0 auto;}
+    .row{display:grid;gap:16px;margin-bottom:20px;}
+    .row-4{grid-template-columns:repeat(4,1fr);}
+    .row-2{grid-template-columns:repeat(2,1fr);}
+    @media(max-width:640px){.row-4{grid-template-columns:repeat(2,1fr);}  .row-2{grid-template-columns:1fr;}}
+    .card{background:rgba(18,13,8,0.9);border:1px solid rgba(196,164,72,0.18);border-radius:14px;padding:20px;}
+    .card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(242,237,228,0.45);margin-bottom:12px;}
+    .stat-val{font-size:36px;font-weight:900;color:#C4A44A;line-height:1;}
+    .stat-sub{font-size:11px;color:rgba(242,237,228,0.4);margin-top:4px;}
+    /* Funil */
+    .funnel-row{display:flex;flex-direction:column;gap:8px;}
+    .funnel-step{display:flex;align-items:center;gap:10px;}
+    .funnel-label{font-size:12px;color:rgba(242,237,228,0.65);width:160px;flex-shrink:0;}
+    .funnel-bar-bg{flex:1;height:18px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+    .funnel-bar{height:100%;background:linear-gradient(90deg,#9A7A2C,#C4A44A);border-radius:4px;transition:width 0.6s ease;}
+    .funnel-count{font-size:12px;font-weight:700;color:#D4B86E;width:40px;text-align:right;flex-shrink:0;}
+    /* Conversão */
+    .conv-list{display:flex;flex-direction:column;gap:6px;}
+    .conv-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .conv-item:last-child{border-bottom:none;}
+    .conv-pct{font-weight:700;color:#4ade80;}
+    .conv-pct.low{color:#f87171;}
+    .conv-pct.mid{color:#facc15;}
+    /* Leads recentes */
+    .leads-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .leads-table th{text-align:left;color:rgba(242,237,228,0.4);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .leads-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(242,237,228,0.8);}
+    .leads-table tr:last-child td{border-bottom:none;}
+    .badge-tipo{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(196,164,72,0.15);color:#C4A44A;font-weight:600;}
+    /* Gráfico diário */
+    .bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .bar-col-fill{width:100%;background:linear-gradient(to top,#9A7A2C,#C4A44A);border-radius:3px 3px 0 0;min-height:2px;transition:height 0.5s ease;}
+    .bar-col-label{font-size:9px;color:rgba(242,237,228,0.35);}
+    /* Meta */
+    .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+    .meta-title{font-size:12px;color:rgba(242,237,228,0.4);}
+    .refresh-btn{font-size:11px;padding:6px 14px;border:1px solid rgba(196,164,72,0.3);border-radius:20px;background:none;color:#C4A44A;cursor:pointer;}
+    .refresh-btn:hover{background:rgba(196,164,72,0.1);}
+    .loading-msg{text-align:center;padding:40px;color:rgba(242,237,228,0.4);font-size:13px;}
+  </style>
+</head>
+<body>
+
+<h1>✦ NUMEROSFERA ✦</h1>
+<div class="subtitle">Dashboard de Analytics</div>
+
+<!-- LOGIN -->
+<div class="login" id="login-box">
+  <h2>Acesso Restrito</h2>
+  <input type="password" id="admin-key-input" placeholder="Admin key" onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="btn" onclick="doLogin()">Entrar</button>
+  <div class="err" id="login-err">Chave incorreta ou erro de conexão.</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dashboard">
+  <div class="meta">
+    <span class="meta-title" id="meta-ts">—</span>
+    <button class="refresh-btn" onclick="loadStats()">↻ Atualizar</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row row-4" id="kpi-row">
+    <div class="card"><div class="card-title">Quiz abertos</div><div class="stat-val" id="kpi-quiz">—</div><div class="stat-sub">total</div></div>
+    <div class="card"><div class="card-title">Áudio 1</div><div class="stat-val" id="kpi-a1">—</div><div class="stat-sub">sessões únicas</div></div>
+    <div class="card"><div class="card-title">E-mails</div><div class="stat-val" id="kpi-email">—</div><div class="stat-sub">capturados</div></div>
+    <div class="card"><div class="card-title">Áudio 2</div><div class="stat-val" id="kpi-a2">—</div><div class="stat-sub">sessões únicas</div></div>
+  </div>
+
+  <!-- Funil + Conversão -->
+  <div class="row row-2">
+    <div class="card">
+      <div class="card-title">Funil — últimos 7 dias</div>
+      <div class="funnel-row" id="funnel-rows"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Conversão entre etapas — 7 dias</div>
+      <div class="conv-list" id="conv-list"></div>
+    </div>
+  </div>
+
+  <!-- Gráfico diário -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title">Quiz abertos por dia — últimos 14 dias</div>
+    <div class="bar-chart" id="daily-chart"></div>
+  </div>
+
+  <!-- Leads recentes -->
+  <div class="card">
+    <div class="card-title">Leads recentes</div>
+    <div style="overflow-x:auto;">
+      <table class="leads-table">
+        <thead><tr><th>Nome</th><th>Área</th><th>Última etapa</th><th>Quando</th></tr></thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://web-production-6988c1.up.railway.app';
+let _adminKey  = '';
+
+const STEP_LABELS = {
+  quiz_start:    'Quiz aberto',
+  quiz_complete: 'Quiz completo',
+  palm_start:    'Palma aberta',
+  palm_capture:  'Palma capturada',
+  audio1_start:  'Áudio 1',
+  email_captured:'E-mail capturado',
+  audio2_start:  'Áudio 2',
+};
+
+function doLogin() {
+  const k = document.getElementById('admin-key-input').value.trim();
+  if (!k) return;
+  _adminKey = k;
+  loadStats();
+}
+
+async function loadStats() {
+  document.getElementById('login-err').style.display = 'none';
+  try {
+    const res = await fetch(API_BASE + '/api/analytics/stats', {
+      headers: { 'x-admin-key': _adminKey }
+    });
+    if (res.status === 403) {
+      document.getElementById('login-err').style.display = 'block';
+      return;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    renderDash(data);
+    document.getElementById('login-box').style.display  = 'none';
+    document.getElementById('dashboard').style.display  = 'block';
+  } catch(e) {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-err').textContent   = 'Erro: ' + e.message;
+  }
+}
+
+function renderDash(data) {
+  document.getElementById('meta-ts').textContent =
+    'Atualizado em ' + new Date().toLocaleTimeString('pt-BR') + ' · ' + data.total_events + ' eventos totais';
+
+  // KPIs (all time)
+  const fa = data.funnel_all || [];
+  function _count(step) {
+    const found = fa.find(s => s.step === step);
+    return found ? found.count : 0;
+  }
+  document.getElementById('kpi-quiz').textContent  = _count('quiz_start');
+  document.getElementById('kpi-a1').textContent    = _count('audio1_start');
+  document.getElementById('kpi-email').textContent = _count('email_captured');
+  document.getElementById('kpi-a2').textContent    = _count('audio2_start');
+
+  // Funil 7d
+  const f7 = data.funnel_7d || [];
+  const maxCount = Math.max(...f7.map(s => s.count), 1);
+  const funnelEl = document.getElementById('funnel-rows');
+  funnelEl.innerHTML = '';
+  f7.forEach(s => {
+    const pct = Math.round(s.count / maxCount * 100);
+    funnelEl.innerHTML += `
+      <div class="funnel-step">
+        <div class="funnel-label">${s.label}</div>
+        <div class="funnel-bar-bg"><div class="funnel-bar" style="width:${pct}%"></div></div>
+        <div class="funnel-count">${s.count}</div>
+      </div>`;
+  });
+
+  // Conversão 7d
+  const convEl = document.getElementById('conv-list');
+  convEl.innerHTML = '';
+  (data.conversion_7d || []).forEach(c => {
+    const cls = c.pct >= 60 ? 'conv-pct' : c.pct >= 30 ? 'conv-pct mid' : 'conv-pct low';
+    convEl.innerHTML += `
+      <div class="conv-item">
+        <span>${(STEP_LABELS[c.from] || c.from)} → ${(STEP_LABELS[c.to] || c.to)}</span>
+        <span class="${cls}">${c.pct}%</span>
+      </div>`;
+  });
+
+  // Gráfico diário
+  const daily   = data.daily_starts || {};
+  const keys    = Object.keys(daily).sort();
+  const vals    = keys.map(k => daily[k]);
+  const maxVal  = Math.max(...vals, 1);
+  const chartEl = document.getElementById('daily-chart');
+  chartEl.innerHTML = '';
+  keys.forEach((k, i) => {
+    const h = Math.round(vals[i] / maxVal * 72);
+    chartEl.innerHTML += `
+      <div class="bar-col">
+        <div class="bar-col-fill" style="height:${h}px" title="${vals[i]} acessos"></div>
+        <div class="bar-col-label">${k}</div>
+      </div>`;
+  });
+
+  // Leads recentes
+  const tbody = document.getElementById('leads-tbody');
+  tbody.innerHTML = '';
+  (data.recent_leads || []).forEach(lead => {
+    const when = new Date(lead.ts).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    tbody.innerHTML += `
+      <tr>
+        <td>${lead.nome || '—'}</td>
+        <td>${lead.tipo ? '<span class="badge-tipo">'+lead.tipo+'</span>' : '—'}</td>
+        <td>${STEP_LABELS[lead.event] || lead.event}</td>
+        <td style="color:rgba(242,237,228,0.4)">${when}</td>
+      </tr>`;
+  });
+  if (!data.recent_leads || data.recent_leads.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:rgba(242,237,228,0.3);padding:20px">Nenhum lead ainda</td></tr>';
+  }
+}
+</script>
+</body>
+</html>

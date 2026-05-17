@@ -9,7 +9,7 @@ Solteira há 8 anos.
 Eduardo:
 solteiro há 6 anos.
 
-1 semana após o ritual:
+uma semana após o ritual:
 conheceu sua atual noiva.
 
 Kelly:

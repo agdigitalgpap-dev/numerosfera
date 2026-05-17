@@ -22,7 +22,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.config import settings
-from api.routes.audio import router as audio_router
+from api.routes.audio     import router as audio_router
+from api.routes.analytics import router as analytics_router
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,7 @@ async def lifespan(_app: FastAPI):
     (settings.cache_dir / "audio1").mkdir(exist_ok=True)
     (settings.cache_dir / "audio2").mkdir(exist_ok=True)
     (settings.cache_dir / "audio_full").mkdir(exist_ok=True)
+    (settings.base_dir / "analytics").mkdir(exist_ok=True)
     logger.info("✓ Pastas de cache prontas : %s", settings.cache_dir)
     logger.info("✓ Blocos em              : %s", settings.blocks_dir)
     logger.info("✓ TTS provider           : %s", settings.tts_provider)
@@ -76,6 +78,7 @@ app.add_middleware(
 
 # Rotas da API
 app.include_router(audio_router)
+app.include_router(analytics_router)
 
 # Serve os MP3s do cache como arquivos estáticos
 app.mount(

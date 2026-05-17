@@ -59,6 +59,24 @@ body {
   50%    { opacity:var(--op,0.55); transform:scale(1.5); }
 }
 
+/* ─── Logo do produto ─── */
+.site-logo {
+  font-family: 'Outfit', 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  padding: 20px 0 0;
+  width: 100%;
+  opacity: 0.9;
+}
+.site-logo-star { opacity: 0.6; font-size: 10px; }
+
 /* ─── Page layout ─── */
 .page {
   position: relative; z-index: 10;

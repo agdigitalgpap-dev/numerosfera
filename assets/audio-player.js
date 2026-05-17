@@ -83,6 +83,10 @@
     let _destroyed    = false;
     let _epoch        = 0;    // incrementado em reset() — invalida timers de _checkReadyAndPlay pendentes
 
+    // Retry automático em falha de API
+    let _retryCount   = 0;
+    const _MAX_RETRIES = 2;
+
     // ── Helpers privados ──────────────────────────────────────────────────
 
     function _tag() { return _lastTipo ? '[' + _lastTipo.toUpperCase() + ']' : '[AudioPlayer]'; }
@@ -483,14 +487,26 @@
           _loading    = false;
           if (err.name === 'AbortError') {
             console.log('[' + tipo.toUpperCase() + ' ABORT]');
+            _retryCount = 0;
             if (cb.onError) cb.onError(new Error('Tempo esgotado ao gerar o áudio. Tente novamente.'));
             return;
           }
-          console.error(_tag() + ' Geração falhou:', err.message);
+          if (_retryCount < _MAX_RETRIES) {
+            _retryCount++;
+            console.warn(_tag() + ' Falha (' + err.message + ') — retry ' + _retryCount + '/' + _MAX_RETRIES + ' em 5s');
+            if (cb.onRetry) cb.onRetry(_retryCount, _MAX_RETRIES);
+            await new Promise(r => setTimeout(r, 5000));
+            if (_destroyed) return;
+            global.__audioPlayerLock = null;
+            return player.loadAndPlay(tipo, frozenLead, cb);
+          }
+          _retryCount = 0;
+          console.error(_tag() + ' Geração falhou após ' + _MAX_RETRIES + ' tentativas:', err.message);
           if (cb.onError) cb.onError(err);
           return;
         }
 
+        _retryCount = 0;
         _fetchAbort = null;
         _generating = false;
         _currentUrl = audioUrl;

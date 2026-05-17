@@ -335,6 +335,8 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 <!-- Quiz wrapper -->
 <div class="quiz-wrap">
 
+  <div class="site-logo"><span class="site-logo-star">✦</span> NUMEROSFERA <span class="site-logo-star">✦</span></div>
+
   <!-- Persistent header (hidden only on loading step) -->
   <header class="quiz-header" id="quizHeader">
     <div class="header-alert" id="headerAlert">Alerta de Maio</div>
@@ -579,9 +581,13 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 <script>
   const API_BASE = 'https://web-production-6988c1.up.railway.app';
   window.ASTRA_API_URL = API_BASE;
+  // ↓ Substitua pelos seus IDs reais quando tiver
+  window.ASTRA_GA4_ID   = 'G-XXXXXXXXXX';
+  window.ASTRA_PIXEL_ID = '000000000000000';
   // Warm-up: acorda o Railway antes do usuário terminar o quiz
   fetch(API_BASE + '/api/audio/status').catch(() => {});
 </script>
+<script src="assets/analytics.js"></script>
 <script>
 /* ── Alerta dinâmico: "15 de Maio" ── */
 (function() {
@@ -828,6 +834,9 @@ function selectChallenge(v, el) {
    STEP 8 — NOME
 ══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  // Evento: usuário abriu o quiz
+  if (window.AstraAnalytics) AstraAnalytics.track('quiz_start');
+
   const inp = document.getElementById('nameInput');
   if (inp) {
     inp.addEventListener('keydown', e => {
@@ -939,6 +948,14 @@ function startLoading() {
   // Redireciona SEMPRE — não depende da pré-geração ter terminado.
   // Safety net de 1500ms garante o redirect mesmo se audioFadeOut travar no iOS.
   function goToAudio1() {
+    // Evento: quiz completo (lead capturado, indo para palma)
+    if (window.AstraAnalytics) {
+      try {
+        const _l = LeadManager.getLead();
+        AstraAnalytics.track('quiz_complete', { nome: LeadManager.getNomeFormatado(_l), tipo: _l.tipo });
+      } catch(_) {}
+    }
+
     let _redirected = false;
     function _doRedirect() {
       if (_redirected) return;

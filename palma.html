@@ -57,12 +57,23 @@
     }
     #video-feed {
       width:100%; height:100%; object-fit:cover; display:block;
-      transform:scaleX(-1);
     }
-    /* Canvas de landmarks — por cima do vídeo, mesmo espelho */
     #lm-canvas {
       position:absolute; top:0; left:0; width:100%; height:100%;
-      pointer-events:none; transform:scaleX(-1);
+      pointer-events:none;
+    }
+    /* Countdown grande centralizado */
+    #cam-countdown {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%) scale(1);
+      font-family:'Outfit',sans-serif; font-size:96px; font-weight:900;
+      color:var(--gold); line-height:1; display:none; pointer-events:none;
+      text-shadow:0 0 40px rgba(196,164,72,0.9), 0 0 80px rgba(196,164,72,0.5);
+      animation:countdown-pop 0.25s ease-out;
+    }
+    @keyframes countdown-pop {
+      from { transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+      to   { transform:translate(-50%,-50%) scale(1);   opacity:1; }
     }
     /* Status central + barra de progresso de scan */
     .cam-overlay {
@@ -145,6 +156,7 @@
 </head>
 <body>
 <div class="page">
+  <div class="site-logo"><span class="site-logo-star">✦</span> NUMEROSFERA <span class="site-logo-star">✦</span></div>
   <div class="badge"><div class="badge-dot"></div>LEITURA DE PALMA</div>
   <h1 class="titulo">Preciso de mais uma coisa<br>para completar sua leitura</h1>
   <p class="subtitulo">As linhas da sua mão revelam o que o mapa astral confirma</p>
@@ -170,6 +182,8 @@
         <video id="video-feed" autoplay playsinline muted></video>
         <canvas id="lm-canvas"></canvas>
         <canvas id="snap" style="display:none"></canvas>
+        <!-- Countdown de captura -->
+        <div id="cam-countdown">3</div>
         <!-- Loader enquanto MediaPipe carrega -->
         <div class="mp-loader" id="mp-loader">
           <div class="mp-spin"></div>
@@ -211,6 +225,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <script src="assets/lead-manager.js"></script>
 <script>
+  window.ASTRA_GA4_ID   = 'G-XXXXXXXXXX';
+  window.ASTRA_PIXEL_ID = '000000000000000';
+</script>
+<script src="assets/analytics.js"></script>
+<script>
   const API_BASE = 'https://web-production-6988c1.up.railway.app';
   window.ASTRA_API_URL = API_BASE;
 
@@ -236,6 +255,9 @@
     } catch(e) {}
   })();
 
+  // Evento: palma aberta
+  if (window.AstraAnalytics) AstraAnalytics.track('palm_start');
+
   // ── Nome do lead ──────────────────────────────────────────────────────────
   try {
     const lead = LeadManager.getLead();
@@ -243,11 +265,17 @@
   } catch(e) {}
 
   // ── Estado da câmera ──────────────────────────────────────────────────────
-  let _stream      = null;
-  let _handsModel  = null;
-  let _captured    = false;
-  let _scanFrames  = 0;       // frames consecutivos com palma aberta válida
-  let _scanRafId   = null;
+  let _stream           = null;
+  let _handsModel       = null;
+  let _video            = null;     // referência ao <video> para o countdown usar
+  let _captured         = false;
+  let _scanFrames       = 0;        // frames consecutivos com palma aberta válida
+  let _scanRafId        = null;
+  let _latestLandmarks  = null;     // últimos landmarks válidos (usados na captura)
+  let _countdown        = null;     // setInterval id durante o countdown
+  let _countdownSecs    = 0;
+
+  const COUNTDOWN_SECS = 3;
 
   const SCAN_FRAMES_NEEDED = 45; // ~1.5s a 30fps
   const CONNECTIONS = [
@@ -318,6 +346,53 @@
     }
   }
 
+  // Exibe/atualiza o número do countdown no centro da câmera
+  function updateCountdownUI(secs) {
+    const el  = document.getElementById('cam-countdown');
+    const msg = document.getElementById('cam-msg');
+    const bar = document.getElementById('scan-bar');
+    if (secs === null) {
+      el.style.display = 'none';
+      return;
+    }
+    el.textContent = secs;
+    el.style.display = 'block';
+    // Reinicia a animação de "pop" a cada número
+    el.style.animation = 'none';
+    void el.offsetHeight; // force reflow
+    el.style.animation = '';
+    bar.style.width = '100%';
+    bar.classList.add('success');
+    msg.className = 'cam-msg success';
+    msg.textContent = 'Segure firme — capturando em ' + secs + 's…';
+  }
+
+  function startCountdown() {
+    if (_countdown !== null) return;
+    _countdownSecs = COUNTDOWN_SECS;
+    updateCountdownUI(_countdownSecs);
+    _countdown = setInterval(() => {
+      _countdownSecs--;
+      if (_countdownSecs <= 0) {
+        clearInterval(_countdown);
+        _countdown = null;
+        _captured  = true;
+        cancelAnimationFrame(_scanRafId);
+        captureAndProceed(_video, _latestLandmarks);
+      } else {
+        updateCountdownUI(_countdownSecs);
+      }
+    }, 1000);
+  }
+
+  function cancelCountdown() {
+    if (_countdown === null) return;
+    clearInterval(_countdown);
+    _countdown     = null;
+    _countdownSecs = 0;
+    updateCountdownUI(null);
+  }
+
   // Atualiza barra de progresso e mensagem
   function updateScanUI(frames, valid) {
     const pct = Math.min(100, (frames / SCAN_FRAMES_NEEDED) * 100);
@@ -371,7 +446,8 @@
       }
     }
 
-    const video = document.getElementById('video-feed');
+    _video = document.getElementById('video-feed');
+    const video = _video;
     video.srcObject = _stream;
     await new Promise(r => { video.onloadedmetadata = r; });
     await video.play().catch(() => {});
@@ -419,16 +495,21 @@
 
       if (valid) {
         _scanFrames++;
-        updateScanUI(_scanFrames, true);
+        _latestLandmarks = lm;
 
         if (_scanFrames >= SCAN_FRAMES_NEEDED) {
-          // Auto-captura!
-          _captured = true;
-          cancelAnimationFrame(_scanRafId);
-          captureAndProceed(video, lm);
+          // Barra cheia — inicia countdown se ainda não iniciado
+          if (_countdown === null) {
+            if (window.AstraAnalytics) AstraAnalytics.track('palm_capture');
+            startCountdown();
+          }
+          // Mantém barra a 100% durante contagem (updateCountdownUI cuida disso)
+        } else {
+          updateScanUI(_scanFrames, true);
         }
       } else {
         _scanFrames = Math.max(0, _scanFrames - 2);
+        cancelCountdown(); // mão saiu do frame — cancela contagem
         updateScanUI(_scanFrames, false);
       }
     });
@@ -438,21 +519,20 @@
     _handsModel = hands;
   }
 
-  // ── Captura automática ────────────────────────────────────────────────────
+  // ── Captura ───────────────────────────────────────────────────────────────
   function captureAndProceed(video, landmarks) {
-    // Para câmera
     if (_stream) _stream.getTracks().forEach(t => t.stop());
+    cancelAnimationFrame(_scanRafId);
 
     const snap = document.getElementById('snap');
     snap.width  = video.videoWidth  || 640;
     snap.height = video.videoHeight || 480;
     const ctx = snap.getContext('2d');
-    ctx.save();
-    ctx.scale(-1, 1); // desfaz espelho
-    ctx.drawImage(video, -snap.width, 0, snap.width, snap.height);
 
-    // Desenha landmarks dourados sobre a foto capturada
-    ctx.setTransform(1,0,0,1,0,0); // reseta transformação
+    // Desenha frame sem espelho (câmera traseira já tem orientação correta)
+    ctx.drawImage(video, 0, 0, snap.width, snap.height);
+
+    // Landmarks dourados sobre a foto
     const w = snap.width, h = snap.height;
     ctx.strokeStyle = 'rgba(196,164,72,0.8)';
     ctx.lineWidth   = 2;
@@ -460,19 +540,18 @@
     ctx.shadowBlur  = 8;
     for (const [a, b] of CONNECTIONS) {
       ctx.beginPath();
-      ctx.moveTo((1 - landmarks[a].x) * w, landmarks[a].y * h); // flip x back
-      ctx.lineTo((1 - landmarks[b].x) * w, landmarks[b].y * h);
+      ctx.moveTo(landmarks[a].x * w, landmarks[a].y * h);
+      ctx.lineTo(landmarks[b].x * w, landmarks[b].y * h);
       ctx.stroke();
     }
     for (let i = 0; i < landmarks.length; i++) {
-      const x = (1 - landmarks[i].x) * w;
+      const x = landmarks[i].x * w;
       const y = landmarks[i].y * h;
       ctx.beginPath();
       ctx.arc(x, y, TIPS.includes(i) ? 5 : 3, 0, Math.PI * 2);
       ctx.fillStyle = '#C4A44A';
       ctx.fill();
     }
-    ctx.restore();
 
     const dataUrl = snap.toDataURL('image/jpeg', 0.85);
     document.getElementById('thumb-img').src = dataUrl;
