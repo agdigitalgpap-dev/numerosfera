@@ -121,6 +121,9 @@
     // ── WebAudio (apenas para analyser — volume via audio.volume) ─────────
 
     function _initWebAudio() {
+      // iOS: usar apenas áudio nativo — WebAudio causa silêncio persistente via
+      // MediaElementSource criado com contexto suspenso; equalizador desativado.
+      if (_isIOS) return false;
       if (_audioCtx) return _webAudioOk;
       try {
         const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -162,10 +165,11 @@
     function _connectAudioToWebAudio() {
       if (!_audio || !_webAudioOk || !_audioCtx || !_gainNode) return;
       if (_source) return;
+      // Nunca criar MediaElementSource com contexto suspenso — no iOS isso silencia
+      // o elemento permanentemente na sessão (o som é roteado pelo grafo suspenso
+      // sem saída). Só prosseguir quando state === 'running' é garantido.
+      if (_audioCtx.state !== 'running') return;
       try {
-        if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
-        // crossOrigin='anonymous' é definido antes do src na criação do elemento —
-        // permite createMediaElementSource em origens diferentes (Live Server vs API)
         _source = _audioCtx.createMediaElementSource(_audio);
         _source.connect(_gainNode);
         console.log(_tag() + ' WebAudio conectado (source → gainNode → destination + analyser)');
@@ -504,27 +508,48 @@
        * Inicia reprodução via gesto do usuário (fallback autoplay bloqueado).
        * DEVE ser chamado diretamente no handler de click/touch (Safari iOS).
        *
-       * Ordem crítica para iOS:
-       *   1. await audioCtx.resume()  — ctx deve estar 'running' ANTES de conectar
-       *   2. _connectAudioToWebAudio() — MediaElementSource roteia som pelo grafo ativo
-       *   3. _fadeIn() / _audio.play() — som flui corretamente
+       * iOS: usa apenas <audio> nativo — sem WebAudio.
+       *   createMediaElementSource com contexto suspenso silencia o elemento
+       *   permanentemente na sessão (bug iOS). Equalizador visual desativado.
        *
-       * Se resume() vier depois de createMediaElementSource(), o áudio "toca" mas
-       * fica preso no grafo suspenso — sem saída de som (bug iOS clássico).
+       * Desktop: WebAudio completo (resume → connect → play).
        */
       async manualPlay() {
         if (!_audio) {
           console.warn(_tag() + ' manualPlay() — nenhum Audio element existe');
           return;
         }
-        console.log('[MANUAL PLAY]' + (_isIOS ? ' (iOS — gesto do usuário)' : ''));
         _started       = true;
         _playTriggered = false;
 
+        // ── iOS: áudio nativo puro ──────────────────────────────────────────
+        if (_isIOS) {
+          console.log('[MANUAL PLAY] (iOS — native audio, sem WebAudio)');
+          _fadeIn();
+          try {
+            const p = _audio.play();
+            if (p === undefined) {
+              console.warn(_tag() + ' manualPlay iOS: play() sem Promise (iOS antigo)');
+              if (_savedCb) player._startProgressLoop(_savedCb);
+              return;
+            }
+            await p;
+            console.log('[MANUAL PLAY SUCCESS] (iOS — native audio)');
+            if (_savedCb) player._startProgressLoop(_savedCb);
+          } catch(err) {
+            _started       = false;
+            _playTriggered = false;
+            console.error(_tag() + ' manualPlay iOS falhou:', err.name, err.message);
+            if (_savedCb && _savedCb.onError) _savedCb.onError(err);
+          }
+          return;
+        }
+
+        // ── Desktop: WebAudio completo ──────────────────────────────────────
+        console.log('[MANUAL PLAY]');
         _initWebAudio();
 
         // 1. Resume AudioContext PRIMEIRO — await garante state === 'running' antes de conectar.
-        //    Sem await, o connect() acontece com ctx ainda suspended → sem som no iOS.
         if (_webAudioOk && _audioCtx && _audioCtx.state !== 'running') {
           try {
             await _audioCtx.resume();
@@ -537,25 +562,22 @@
         // 2. Conecta source ao WebAudio SÓ APÓS resume (grafo ativo, som não fica preso)
         _connectAudioToWebAudio();
 
-        // 3. Fade in (volume via audio.volume — gainNode fixo em 1.0)
+        // 3. Fade in + play
         _fadeIn();
-
-        // 4. Play
         try {
-          const playPromise = _audio.play();
-          if (playPromise === undefined) {
-            // iOS muito antigo (< iOS 10): sem Promise
-            console.warn(_tag() + ' manualPlay: play() retornou undefined (iOS antigo)');
+          const p = _audio.play();
+          if (p === undefined) {
+            console.warn(_tag() + ' manualPlay: play() sem Promise (browser antigo)');
             if (_savedCb) player._startProgressLoop(_savedCb);
             return;
           }
-          await playPromise;
-          console.log('[MANUAL PLAY SUCCESS]' + (_isIOS ? ' (iOS)' : ''));
+          await p;
+          console.log('[MANUAL PLAY SUCCESS]');
           if (_savedCb) player._startProgressLoop(_savedCb);
         } catch(err) {
           _started       = false;
           _playTriggered = false;
-          console.error(_tag() + ' manualPlay falhou:', err.name, err.message, _isIOS ? '(iOS)' : '');
+          console.error(_tag() + ' manualPlay falhou:', err.name, err.message);
           if (_savedCb && _savedCb.onError) _savedCb.onError(err);
         }
       },
