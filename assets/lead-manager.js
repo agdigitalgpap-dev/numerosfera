@@ -98,6 +98,18 @@
     return (str || '').toLowerCase().trim();
   }
 
+  // crypto.randomUUID() só existe no Safari 15.4+ (iOS 15.4+, março 2022).
+  // Em iPhones mais antigos é undefined e lança TypeError — usa fallback.
+  function generateId() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
+
   function calcFaixaEtaria(anoNasc, sexo) {
     const idade = new Date().getFullYear() - anoNasc;
     if (idade < 30) return 'jovem';
@@ -138,7 +150,7 @@
       faixaEtaria: calcFaixaEtaria(anoNasc, sexoSlug),
       anoNascimento: anoNasc,
       email:       '',
-      sessionId:   crypto.randomUUID(),
+      sessionId:   generateId(),
       savedAt:     new Date().toISOString(),
     };
   }
@@ -169,9 +181,10 @@
 
     /**
      * Salva o objeto lead completo.
+     * Silencia QuotaExceededError / SecurityError do Safari em modo privado.
      */
     saveLead(data) {
-      localStorage.setItem(KEY, JSON.stringify(data));
+      try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(_) {}
       return data;
     },
 
@@ -181,7 +194,7 @@
     updateLead(updates) {
       const current = this.getLead() || {};
       const updated = Object.assign({}, current, updates);
-      localStorage.setItem(KEY, JSON.stringify(updated));
+      try { localStorage.setItem(KEY, JSON.stringify(updated)); } catch(_) {}
       return updated;
     },
 
@@ -189,7 +202,7 @@
      * Remove o lead do storage (após conversão ou reset).
      */
     clearLead() {
-      localStorage.removeItem(KEY);
+      try { localStorage.removeItem(KEY); } catch(_) {}
     },
 
     // ── Helpers de display ─────────────────────────────────────────────────

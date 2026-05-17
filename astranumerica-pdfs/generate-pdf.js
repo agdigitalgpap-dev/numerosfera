@@ -1,5 +1,5 @@
 /**
- * ASTRA NUMERICA — Gerador de PDFs Personalizados
+ * NUMEROSFERA — Gerador de PDFs Personalizados
  *
  * Uso:
  *   node generate-pdf.js --nome "Maria" --signo "Escorpião" --sexo "feminino" --dor "financas"
@@ -63,6 +63,28 @@ function fillVars(html, { nome, signo, dor }) {
 
 function css() { return fs.readFileSync(path.join(BASE_DIR, 'templates/base.css'), 'utf8'); }
 
+const _logoRaw = (() => {
+  try { return fs.readFileSync(path.join(BASE_DIR, 'templates/logo-numerosfera.svg'), 'utf8'); }
+  catch { return ''; }
+})();
+
+function logoSvg(size = 80) {
+  if (!_logoRaw) return '';
+  return `<div style="width:${size}px;height:${size * 1.16}px;display:inline-block;">${_logoRaw}</div>`;
+}
+
+// Logo stamp inside .page-inner (below footer, margin-top:auto pushes to bottom)
+function logoStampInner() {
+  if (!_logoRaw) return '';
+  return `<div style="text-align:center;padding-top:10px;"><div style="display:inline-block;width:28px;height:32px;opacity:0.45;">${_logoRaw}</div><div style="font-family:'Raleway',sans-serif;font-size:5pt;color:#5C4415;letter-spacing:0.3em;text-transform:uppercase;margin-top:2px;">NUMEROSFERA</div></div>`;
+}
+
+// Logo stamp absolutely positioned at bottom of .page (for covers, section openers, image pages)
+function logoStampAbs() {
+  if (!_logoRaw) return '';
+  return `<div style="position:absolute;bottom:22px;left:0;right:0;text-align:center;z-index:4;pointer-events:none;"><div style="display:inline-block;width:28px;height:32px;opacity:0.5;">${_logoRaw}</div><div style="font-family:'Raleway',sans-serif;font-size:5pt;color:#5C4415;letter-spacing:0.3em;text-transform:uppercase;margin-top:2px;">NUMEROSFERA</div></div>`;
+}
+
 // ── Componentes ──────────────────────────────────────────────
 function frame() {
   return `<div class="frame">
@@ -75,7 +97,10 @@ function frame() {
 function pageDiv(content, footerHtml = '') {
   return `<div class="page">${frame()}<div class="page-inner">
     ${content}
-    ${footerHtml ? `<div class="page-footer">${footerHtml}</div>` : ''}
+    <div style="margin-top:auto;">
+      ${footerHtml ? `<div class="page-footer">${footerHtml}</div>` : ''}
+      ${logoStampInner()}
+    </div>
   </div></div>`;
 }
 
@@ -91,10 +116,9 @@ function secHeader(label, title, sub = '') {
   </div>`;
 }
 
-// Rodapé sem marca — nome do produto será definido pelo usuário
 function ft(pg, signo, dor) {
   const dl = { financas: 'Prosperidade', amor: 'Amor', saude: 'Saúde' }[dor] || '';
-  return `<span>Mapa Hermético · ${signo}${dl ? ' · ' + dl : ''}</span><span>${pg}</span>`;
+  return `<span>NUMEROSFERA · Mapa Hermético · ${signo}${dl ? ' · ' + dl : ''}</span><span>${pg}</span>`;
 }
 
 // ── Divisor de seção FULL-PAGE ────────────────────────────────
@@ -105,9 +129,10 @@ function sectionOpener(num, roman, title, sub, bg = '') {
   return `<div class="page" style="background:var(--navy);">
     ${frame()}
     ${bgLayer}
+    ${logoStampAbs()}
     <div class="page-inner" style="justify-content:center;align-items:center;text-align:center;position:relative;z-index:1;">
-      <div class="sec-label" style="letter-spacing:0.4em;margin-bottom:14px;">Parte ${roman}</div>
-      <div style="font-family:var(--f-title);font-size:9pt;color:var(--gold-dim);letter-spacing:0.25em;margin-bottom:28px;text-transform:uppercase;">— Seção ${num} —</div>
+      <div class="sec-label" style="letter-spacing:0.4em;margin-bottom:14px;color:var(--gold-mid);text-shadow:0 0 18px rgba(212,168,75,0.35);">Parte ${roman}</div>
+      <div style="font-family:var(--f-title);font-size:9.5pt;color:var(--gold);letter-spacing:0.3em;margin-bottom:28px;text-transform:uppercase;text-shadow:0 0 14px rgba(184,146,42,0.4);">— Seção ${num} —</div>
       <div style="font-family:var(--f-display);font-size:28pt;color:var(--gold-hi);line-height:1.2;text-shadow:0 0 60px rgba(212,168,75,0.35);margin-bottom:18px;max-width:500px;">${title}</div>
       ${sub ? `<div style="font-family:var(--f-label);font-size:10pt;color:var(--cream-dim);letter-spacing:0.08em;max-width:360px;line-height:1.6;">${sub}</div>` : ''}
       <div style="margin-top:56px;color:var(--gold-dim);letter-spacing:8px;font-size:11pt;">✦ ✦ ✦</div>
@@ -120,8 +145,9 @@ function imgPage(src, caption = '') {
   if (!src) return '';
   return `<div class="page" style="background:var(--ink);">
     ${frame()}
+    ${logoStampAbs()}
     <img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;opacity:0.9;">
-    ${caption ? `<div style="position:absolute;bottom:32px;left:0;right:0;text-align:center;font-family:var(--f-label);font-size:8pt;letter-spacing:0.2em;color:var(--gold-dim);text-transform:uppercase;z-index:2;">${caption}</div>` : ''}
+    ${caption ? `<div style="position:absolute;bottom:82px;left:0;right:0;text-align:center;font-family:var(--f-label);font-size:8pt;letter-spacing:0.2em;color:var(--gold-dim);text-transform:uppercase;z-index:2;">${caption}</div>` : ''}
   </div>`;
 }
 
@@ -266,14 +292,15 @@ async function buildMapaHermetico(args) {
 <style>${css()}</style></head><body>
 
 <!-- P.01 — CAPA -->
-<div class="page cover-page"><img class="cover-img" src="${iCapa}" alt="Mapa Hermético"></div>
+<div class="page cover-page"><img class="cover-img" src="${iCapa}" alt="Mapa Hermético">${logoStampAbs()}</div>
 
 <!-- P.02 — FOLHA DE ROSTO -->
 ${pageDiv(`
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div style="margin-bottom:20px;">${logoSvg(90)}</div>
     <div class="sec-label" style="margin-bottom:16px;letter-spacing:0.3em;">Documento Confidencial e Personalizado</div>
     <h1 style="font-size:28pt;margin-bottom:8px;line-height:1.2;">MAPA<br>HERMÉTICO</h1>
-    <div style="font-family:var(--f-label);color:var(--cream-dim);letter-spacing:0.14em;font-size:8.5pt;margin-bottom:40px;text-transform:uppercase;">Relatório Pessoal · Astrologia Hermética</div>
+    <div style="font-family:var(--f-label);color:var(--cream-dim);letter-spacing:0.14em;font-size:8.5pt;margin-bottom:40px;text-transform:uppercase;">NUMEROSFERA · Astrologia Hermética</div>
     <div class="title-page-box" style="margin-bottom:28px;min-width:300px;">
       <div class="sec-label" style="margin-bottom:8px;letter-spacing:0.2em;">Preparado exclusivamente para</div>
       <div class="letter-name" style="font-size:24pt;">${nome}</div>
@@ -356,7 +383,69 @@ ${sectionOpener(10, 'X', 'Ritual de Manutenção e Fechamento', 'A seção mais 
 ${splitPages(secHeader('Seção 10 · Ritual de Manutenção', 'O que acontece se você não mantiver o campo', 'O protocolo completo para que o campo permaneça em fluxo') + s10, 4, f, 74)}
 
 <!-- P.78 — CONTRA-CAPA -->
-<div class="page cover-page"><img class="cover-img" src="${iContra}" alt="Contra-capa"></div>
+<div class="page cover-page"><img class="cover-img" src="${iContra}" alt="Contra-capa">${logoStampAbs()}</div>
+
+</body></html>`;
+}
+
+// ── COMECE POR AQUI ──────────────────────────────────────────
+async function buildBoasVindas(args) {
+  const { nome, signo, dor } = args;
+  const content = fillVars(mdToHtml(readMd(path.join(BASE_DIR, '00_boas-vindas/copy/boas-vindas.md'))), { nome, signo, dor });
+
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<style>${css()}
+  /* Estilo de depoimento */
+  .testimonial {
+    border-left: 2px solid var(--gold-dim);
+    padding: 14px 20px;
+    margin: 18px 0;
+    background: rgba(184,146,42,0.04);
+    border-radius: 0 4px 4px 0;
+  }
+  .testimonial p { font-style: italic; font-size: 11.5pt; color: var(--cream-dim); margin-bottom: 8px; }
+  .testimonial strong { color: var(--gold-mid); font-style: normal; font-size: 10pt; display: block; }
+  .testimonial em { color: var(--gold-dim); font-size: 9pt; font-style: normal; display: block; margin-top: 2px; }
+</style></head><body>
+
+<!-- P.01 — CAPA -->
+<div class="page" style="background:var(--ink);position:relative;">
+  ${frame()}
+  ${logoStampAbs()}
+  <!-- Gradiente de fundo -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%, rgba(58,31,106,0.35) 0%, transparent 70%),radial-gradient(ellipse 60% 40% at 20% 80%, rgba(184,146,42,0.1) 0%, transparent 60%);z-index:0;pointer-events:none;"></div>
+  <div class="page-inner" style="justify-content:center;align-items:center;text-align:center;position:relative;z-index:1;">
+    <div style="margin-bottom:32px;">${logoSvg(100)}</div>
+    <div style="font-family:var(--f-label);font-size:8pt;color:var(--gold);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:20px;">Material Hermético Personalizado</div>
+    <div style="font-family:var(--f-display);font-size:38pt;color:var(--gold-hi);line-height:1.1;letter-spacing:0.04em;text-shadow:0 0 60px rgba(212,168,75,0.45);margin-bottom:16px;">COMECE<br>POR AQUI</div>
+    <div style="width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 24px;"></div>
+    <div style="font-family:var(--f-title);font-size:11pt;color:var(--cream-dim);letter-spacing:0.1em;max-width:320px;line-height:1.6;">Uma mensagem de<br><span style="color:var(--gold-mid);">Madame Celeste</span><br>antes de tudo</div>
+    <div style="margin-top:56px;color:var(--gold-dim);letter-spacing:8px;font-size:11pt;">✦ ✦ ✦</div>
+  </div>
+</div>
+
+<!-- P.02 — Página de apresentação "Para {nome}" -->
+${pageDiv(`
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div class="letter-header" style="margin-bottom:24px;">
+      <span class="letter-name" style="font-size:24pt;">Para ${nome}</span>
+      <span class="letter-sub">Uma mensagem antes de tudo</span>
+    </div>
+    <div style="margin-bottom:28px;">${logoSvg(56)}</div>
+    <p style="max-width:380px;font-style:italic;color:var(--cream-dim);font-size:12pt;line-height:1.85;margin-bottom:24px;">
+      "O que você tem em mãos foi preparado exclusivamente para você.<br>Leia este documento primeiro — antes de qualquer outro material."
+    </p>
+    <div style="color:var(--gold-dim);letter-spacing:8px;font-size:11pt;margin-bottom:28px;">✦ ✦ ✦</div>
+    <div>
+      <div style="font-family:var(--f-label);font-size:8pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;">Uma mensagem de</div>
+      <div style="font-family:var(--f-display);font-size:16pt;color:var(--gold-hi);margin-top:8px;letter-spacing:0.04em;">Madame Celeste</div>
+      <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px;">Especialista em Astrologia Hermética</div>
+    </div>
+  </div>
+`, `<span>NUMEROSFERA · Comece por Aqui</span><span>02</span>`)}
+
+<!-- P.03–10 — Conteúdo -->
+${splitPages(content, 8, (p) => `<span>NUMEROSFERA · Comece por Aqui · Madame Celeste</span><span>${String(p).padStart(2,'0')}</span>`, 3)}
 
 </body></html>`;
 }
@@ -371,29 +460,33 @@ async function buildBonus1(args) {
   return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
 <style>${css()}</style></head><body>
 
-<!-- Capa com overlay de texto -->
+<!-- Capa com overlay de texto + logo -->
 <div class="page" style="background:var(--ink);position:relative;">
   ${iCapa ? `<img src="${iCapa}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">` : ''}
-  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(6,6,15,0.92) 40%, transparent 80%);z-index:1;"></div>
-  <div style="position:absolute;bottom:60px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(6,6,15,0.95) 45%, rgba(6,6,15,0.3) 80%);z-index:1;"></div>
+  <div style="position:absolute;top:36px;left:0;right:0;text-align:center;z-index:2;">${logoSvg(56)}</div>
+  <div style="position:absolute;bottom:90px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
     <div class="bonus-badge" style="margin-bottom:12px;">Bônus 1</div>
-    <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.1em;">Preparado para ${nome}</div>
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;text-shadow:0 0 40px rgba(212,168,75,0.4);">Leitura de Vidas Passadas</div>
+    <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.12em;">Preparado exclusivamente para ${nome}</div>
   </div>
+  ${logoStampAbs()}
 </div>
 
 ${pageDiv(`
+  <div style="text-align:center;margin-bottom:24px;">${logoSvg(64)}</div>
   <div class="bonus-badge">Bônus 1 — Leitura de Vidas Passadas</div>
   <div class="bonus-value" style="margin-bottom:20px;">Valor real: <span>R$ 597,00</span> — Incluso no seu pacote hermético</div>
-  ${iInterno ? `<div class="img-block" style="margin-bottom:20px;"><img src="${iInterno}" style="max-height:200px;object-fit:cover;width:100%;"></div>` : ''}
+  ${iInterno ? `<div class="img-block" style="margin-bottom:20px;"><img src="${iInterno}" style="max-height:160px;object-fit:cover;width:100%;"></div>` : ''}
   <div class="sec-label" style="margin-bottom:8px;">Relatório da influência de vidas anteriores no seu comportamento</div>
   <p>${nome}, este relatório revela os padrões que atravessaram ciclos de existência e estão ativos na sua vida hoje — sua origem, sua influência e como transformá-los.</p>
   ${divider()}
   <p style="font-size:11pt;color:var(--cream-dim);font-style:italic;">
     "Alguns padrões não têm origem nesta vida. Eles chegaram com você — gravados na memória da alma desde experiências anteriores. Entender a origem é o que torna possível mudá-los."
   </p>
-`, `<span>Bônus 1 · Leitura de Vidas Passadas</span><span>01</span>`)}
+`, `<span>NUMEROSFERA · Bônus 1 · Leitura de Vidas Passadas</span><span>01</span>`)}
 
-${splitPages(content, 6, (p) => `<span>Bônus 1 · Leitura de Vidas Passadas</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
+${splitPages(content, 12, (p) => `<span>NUMEROSFERA · Bônus 1 · Leitura de Vidas Passadas</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
 
 </body></html>`;
 }
@@ -410,28 +503,32 @@ async function buildBonus2(args) {
 
 <div class="page" style="background:var(--ink);position:relative;">
   ${iCapa ? `<img src="${iCapa}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">` : ''}
-  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(6,6,15,0.92) 40%, transparent 80%);z-index:1;"></div>
-  <div style="position:absolute;bottom:60px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(6,6,15,0.95) 45%, rgba(6,6,15,0.3) 80%);z-index:1;"></div>
+  <div style="position:absolute;top:36px;left:0;right:0;text-align:center;z-index:2;">${logoSvg(56)}</div>
+  <div style="position:absolute;bottom:90px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
     <div class="bonus-badge" style="margin-bottom:12px;">Bônus 2</div>
-    <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.1em;">3 rituais de emergência · Para uso imediato</div>
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;text-shadow:0 0 40px rgba(212,168,75,0.4);">Biblioteca Secreta<br>de Emergências</div>
+    <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.12em;">4 rituais de ação imediata</div>
   </div>
+  ${logoStampAbs()}
 </div>
 
 ${pageDiv(`
+  <div style="text-align:center;margin-bottom:24px;">${logoSvg(64)}</div>
   <div class="bonus-badge">Bônus 2 — Biblioteca Secreta de Emergências</div>
   <div class="bonus-value" style="margin-bottom:20px;">Valor real: <span>R$ 397,00</span> — Incluso no seu pacote hermético</div>
-  ${iInterno ? `<div class="img-block" style="margin-bottom:20px;"><img src="${iInterno}" style="max-height:180px;object-fit:cover;width:100%;"></div>` : ''}
-  <div class="sec-label" style="margin-bottom:8px;">3 rituais para situações urgentes — técnicas guardadas a sete chaves</div>
-  <div style="display:flex;gap:12px;margin-top:16px;">
-    ${[['1','Desbloqueio Rápido','Resultado em 24 horas'],['2','Proteção contra Inveja','Escudo imediato'],['3','Atrair Dinheiro Urgente','Para necessidade real']].map(([n,t,s]) => `
-    <div class="pillar" style="flex:1;">
+  ${iInterno ? `<div class="img-block" style="margin-bottom:16px;"><img src="${iInterno}" style="max-height:140px;object-fit:cover;width:100%;"></div>` : ''}
+  <div class="sec-label" style="margin-bottom:8px;">4 rituais para situações urgentes — técnicas guardadas a sete chaves</div>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+    ${[['1','Desbloqueio Rápido','Resultado em 24h'],['2','Proteção e Escudo','Blindagem imediata'],['3','Canal da Abundância','Recurso urgente'],['4','Clareza Imediata','Decisões urgentes']].map(([n,t,s]) => `
+    <div class="pillar" style="flex:1;min-width:140px;">
       <div class="pillar-title"><div class="pillar-num">${n}</div>${t}</div>
       <p>${s}</p>
     </div>`).join('')}
   </div>
-`, `<span>Bônus 2 · Biblioteca de Emergências</span><span>01</span>`)}
+`, `<span>NUMEROSFERA · Bônus 2 · Biblioteca de Emergências</span><span>01</span>`)}
 
-${splitPages(content, 8, (p) => `<span>Bônus 2 · Biblioteca de Emergências</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
+${splitPages(content, 16, (p) => `<span>NUMEROSFERA · Bônus 2 · Biblioteca de Emergências</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
 
 </body></html>`;
 }
@@ -446,10 +543,10 @@ async function buildBonus3(args) {
 
 ${pageDiv(`
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div style="margin-bottom:20px;">${logoSvg(72)}</div>
     <div class="bonus-badge" style="margin-bottom:16px;">Bônus 3</div>
-    <div style="font-size:72pt;margin-bottom:16px;line-height:1;">🎵</div>
     <h1 style="font-size:20pt;margin-bottom:8px;line-height:1.2;">Áudio de Potencialização<br>Hermética</h1>
-    <div class="bonus-value" style="margin-bottom:32px;">Valor real: <span>R$ 297,00</span> — Incluso no seu pacote hermético</div>
+    <div class="bonus-value" style="margin-bottom:28px;">Valor real: <span>R$ 297,00</span> — Incluso no seu pacote hermético</div>
     <div class="title-page-box" style="max-width:380px;">
       <div class="sec-label" style="margin-bottom:10px;">Instrução principal</div>
       <div style="font-family:var(--f-display);font-size:15pt;color:var(--gold-hi);line-height:1.4;">
@@ -460,9 +557,9 @@ ${pageDiv(`
       </p>
     </div>
   </div>
-`, `<span>Bônus 3 · Áudio de Potencialização Hermética</span><span>01</span>`)}
+`, `<span>NUMEROSFERA · Bônus 3 · Áudio de Potencialização Hermética</span><span>01</span>`)}
 
-${splitPages(content, 4, (p) => `<span>Bônus 3 · Áudio de Potencialização</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
+${splitPages(content, 9, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Potencialização</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
 
 </body></html>`;
 }
@@ -496,10 +593,11 @@ async function main() {
   fs.mkdirSync(out, { recursive: true });
   console.log(`\n🔮 Gerando PDFs — ${nome} · ${signo} · ${sexo} · ${dor}\n`);
 
-  if (produto === 'mapa'   || produto === 'todos') await renderPdf(await buildMapaHermetico(args), path.join(out, `mapa-hermetico-${slug}.pdf`));
-  if (produto === 'bonus1' || produto === 'todos') await renderPdf(await buildBonus1(args),        path.join(out, `bonus1-vidas-passadas-${slug}.pdf`));
-  if (produto === 'bonus2' || produto === 'todos') await renderPdf(await buildBonus2(args),        path.join(out, `bonus2-biblioteca-${slug}.pdf`));
-  if (produto === 'bonus3' || produto === 'todos') await renderPdf(await buildBonus3(args),        path.join(out, `bonus3-audio-${slug}.pdf`));
+  if (produto === 'boas-vindas' || produto === 'todos') await renderPdf(await buildBoasVindas(args), path.join(out, `00-comece-por-aqui-${slug}.pdf`));
+  if (produto === 'mapa'        || produto === 'todos') await renderPdf(await buildMapaHermetico(args), path.join(out, `mapa-hermetico-${slug}.pdf`));
+  if (produto === 'bonus1'      || produto === 'todos') await renderPdf(await buildBonus1(args),        path.join(out, `bonus1-vidas-passadas-${slug}.pdf`));
+  if (produto === 'bonus2'      || produto === 'todos') await renderPdf(await buildBonus2(args),        path.join(out, `bonus2-biblioteca-${slug}.pdf`));
+  if (produto === 'bonus3'      || produto === 'todos') await renderPdf(await buildBonus3(args),        path.join(out, `bonus3-audio-${slug}.pdf`));
 
   console.log(`\n✅ Concluído! PDFs em: ${out}\n`);
 }

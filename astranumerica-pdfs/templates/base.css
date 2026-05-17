@@ -1,5 +1,5 @@
 /* ===========================
-   ASTRA NUMERICA — BASE CSS
+   NUMEROSFERA — BASE CSS
    Aesthetic: Grimório de Luxo
    Dark gold manuscript · art-deco hermético
 =========================== */
@@ -74,7 +74,7 @@ html, body {
 .page-inner {
   position: relative;
   z-index: 1;
-  padding: var(--pad);
+  padding: var(--pad) var(--pad) 96px;
   height: var(--page-h);
   max-height: var(--page-h);
   overflow: hidden;

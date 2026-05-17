@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 232" role="img" aria-label="NUMEROSFERA">
+  <defs>
+    <linearGradient id="ng1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E199"/>
+      <stop offset="45%"  stop-color="#EEC96A"/>
+      <stop offset="100%" stop-color="#B8922A"/>
+    </linearGradient>
+    <radialGradient id="ng2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#F5E199"/>
+      <stop offset="100%" stop-color="#D4A84B"/>
+    </radialGradient>
+    <filter id="nglow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="nglowsoft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── ANEL EXTERNO ─────────────────────────────────── -->
+  <circle cx="100" cy="100" r="91" fill="none" stroke="#5C4415" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="88" fill="none" stroke="#3a2b0a" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- 12 marcações zodiacais a cada 30° -->
+  <g transform="translate(100,100)" stroke="#B8922A" stroke-width="1.2" opacity="0.85">
+    <line x1="0" y1="-88" x2="0" y2="-77"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(30)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(60)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(90)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(120)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(150)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(180)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(210)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(240)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(270)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(300)"/>
+    <line x1="0" y1="-88" x2="0" y2="-77" transform="rotate(330)"/>
+  </g>
+
+  <!-- Pontos cardinais (losangos nos 4 pontos) -->
+  <g fill="#D4A84B" opacity="0.7">
+    <polygon points="100,9  103.5,16 100,23 96.5,16"/>
+    <polygon points="191,97 184,100.5 191,104 198,100.5"/>
+    <polygon points="100,191 103.5,184 100,177 96.5,184"/>
+    <polygon points="9,97  16,100.5 9,104 2,100.5"/>
+  </g>
+
+  <!-- ── HEXAGRAMA HERMÉTICO ──────────────────────────── -->
+  <!-- Triângulo ascendente (fogo / acima) -->
+  <polygon points="100,32 158.9,134 41.1,134"
+           fill="none" stroke="url(#ng1)" stroke-width="1.1" opacity="0.65"/>
+  <!-- Triângulo descendente (água / abaixo) -->
+  <polygon points="100,168 158.9,66 41.1,66"
+           fill="none" stroke="url(#ng1)" stroke-width="1.1" opacity="0.65"/>
+
+  <!-- Anel médio -->
+  <circle cx="100" cy="100" r="68" fill="none" stroke="#5C4415" stroke-width="0.75" opacity="0.5"/>
+
+  <!-- ── CÍRCULO INTERNO ──────────────────────────────── -->
+  <circle cx="100" cy="100" r="32" fill="rgba(212,168,75,0.04)" stroke="#D4A84B" stroke-width="1" opacity="0.7"/>
+
+  <!-- Estrela de 8 pontas (centro) -->
+  <g transform="translate(100,100)" stroke="url(#ng1)" stroke-width="1" opacity="0.9" filter="url(#nglow)">
+    <!-- Cruz -->
+    <line x1="0" y1="-18" x2="0" y2="18"/>
+    <line x1="-18" y1="0"  x2="18" y2="0"/>
+    <!-- Diagonais (mais curtas → elegância) -->
+    <line x1="-13" y1="-13" x2="13" y2="13"/>
+    <line x1="13"  y1="-13" x2="-13" y2="13"/>
+  </g>
+
+  <!-- Dot central com glow -->
+  <circle cx="100" cy="100" r="4.5" fill="url(#ng2)" filter="url(#nglow)"/>
+  <circle cx="100" cy="100" r="2"   fill="#F5E199"/>
+
+  <!-- ── TEXTO ────────────────────────────────────────── -->
+  <!-- "NUMEROSFERA" -->
+  <text x="100" y="207"
+        text-anchor="middle"
+        font-family="'Cinzel', 'Palatino Linotype', 'Palatino', Georgia, serif"
+        font-size="15.5"
+        font-weight="600"
+        letter-spacing="5.5"
+        fill="url(#ng1)"
+        filter="url(#nglow)">NUMEROSFERA</text>
+
+  <!-- Tagline -->
+  <text x="100" y="223"
+        text-anchor="middle"
+        font-family="'Raleway', 'Gill Sans', Arial, sans-serif"
+        font-size="6.5"
+        font-weight="400"
+        letter-spacing="3.5"
+        fill="#B8AE99"
+        opacity="0.85">ASTROLOGIA HERMÉTICA</text>
+</svg>

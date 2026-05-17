@@ -577,9 +577,8 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 
 <script src="assets/lead-manager.js"></script>
 <script>
-  window.ASTRA_API_URL = (location.port === '5500' || location.port === '3000')
-    ? location.protocol + '//' + location.hostname + ':8000'
-    : 'https://web-production-6988c1.up.railway.app';
+  const API_BASE = 'https://web-production-6988c1.up.railway.app';
+  window.ASTRA_API_URL = API_BASE;
 </script>
 <script>
 /* ── Alerta dinâmico: "15 de Maio" ── */
@@ -882,13 +881,7 @@ const LOAD_MSGS = [
    ─────────────────────────────────────────────────────────────────────────── */
 function _preGenerateAudio1() {
   try {
-    const API_BASE = (window.ASTRA_API_URL || '').replace(/\/$/, '') ||
-      (location.protocol === 'file:'
-        ? 'http://localhost:8000'
-        : (location.port === '5500' || location.port === '3000' ||
-           location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-            ? 'http://' + location.hostname + ':8000'
-            : ''));
+    const API_BASE = window.ASTRA_API_URL;
 
     // Garante que o lead é construído das chaves do quiz — nunca do cache
     localStorage.removeItem('astra_lead');
@@ -906,11 +899,14 @@ function _preGenerateAudio1() {
     .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
     .then(data => {
       if (data.success && data.audioUrl) {
-        sessionStorage.setItem('audio1_url', data.audioUrl);
+        const fullUrl = data.audioUrl.startsWith('http')
+          ? data.audioUrl
+          : API_BASE + data.audioUrl;
+        sessionStorage.setItem('audio1_url', fullUrl);
         if (data.timestamps && Array.isArray(data.timestamps)) {
           sessionStorage.setItem('audio1_timestamps', JSON.stringify(data.timestamps));
         }
-        console.log('[PREGEN] audio1 URL salva (' + (Date.now() - t0) + 'ms):', data.audioUrl);
+        console.log('[PREGEN] audio1 URL salva (' + (Date.now() - t0) + 'ms):', fullUrl);
       }
     })
     .catch(err => console.warn('[PREGEN] falhou:', err));
@@ -936,38 +932,19 @@ function startLoading() {
     'Alinhando os astros com seu mapa...',
   ];
 
+  // Redireciona SEMPRE — não depende da pré-geração ter terminado.
+  // Safety net de 1500ms garante o redirect mesmo se audioFadeOut travar no iOS.
   function goToAudio1() {
-    audioFadeOut(() => {
+    let _redirected = false;
+    function _doRedirect() {
+      if (_redirected) return;
+      _redirected = true;
       localStorage.removeItem('audioStarted');
       localStorage.removeItem('astra_lead');
       window.location.href = 'audio1.html';
-    });
-  }
-
-  // Após a barra completar, espera o pregen terminar antes de navegar
-  function waitForPregen() {
-    const MAX_WAIT_MS = 120000; // 2 min máximo
-    const started = Date.now();
-    let wIdx = 0;
-
-    const waitTimer = setInterval(() => {
-      // Pregen terminou → navega imediatamente
-      if (sessionStorage.getItem('audio1_url')) {
-        clearInterval(waitTimer);
-        goToAudio1();
-        return;
-      }
-      // Timeout máximo → navega mesmo sem pregen (audio1.html faz a requisição)
-      if (Date.now() - started > MAX_WAIT_MS) {
-        clearInterval(waitTimer);
-        goToAudio1();
-        return;
-      }
-      // Atualiza mensagem enquanto aguarda
-      wIdx = (wIdx + 1) % WAIT_MSGS.length;
-      msgEl.style.opacity = '0';
-      setTimeout(() => { msgEl.textContent = WAIT_MSGS[wIdx]; msgEl.style.opacity = '1'; }, 280);
-    }, 1500);
+    }
+    setTimeout(_doRedirect, 1500); // safety net: força redirect se audioFadeOut não chamar callback
+    audioFadeOut(_doRedirect);
   }
 
   // rotate messages

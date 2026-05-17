@@ -21,7 +21,11 @@
       "Bash(python3 -c ' *)",
       "Bash(python3 -c \"from elevenlabs import VoiceSettings; import inspect; print\\(inspect.signature\\(VoiceSettings.__init__\\)\\)\")",
       "Bash(python3 -c \"from elevenlabs import VoiceSettings; print\\(VoiceSettings.__fields__.keys\\(\\) if hasattr\\(VoiceSettings,'__fields__'\\) else dir\\(VoiceSettings\\)\\)\")",
-      "Bash(claude plugins *)"
+      "Bash(claude plugins *)",
+      "Bash(node generate-pdf.js)",
+      "Bash(node generate-pdf.js --nome \"Gustavo\" --signo \"virgem\" --sexo \"masculino\" --dor \"saude\")",
+      "Bash(curl -s -H \"xi-api-key: sk_8d8d90bca12aa2f8fecfd1f1744d5a985d144bee16388789\" \"https://api.elevenlabs.io/v1/voices\")",
+      "Bash(python3 -c \"import json,sys; voices=json.load\\(sys.stdin\\)['voices']; [print\\(v['voice_id'], v['name']\\) for v in voices]\")"
     ],
     "additionalDirectories": [
       "/Users/teste/Desktop/VS CODE - ASTRA/Briefing/AUDIO/audio-1 "

@@ -526,12 +526,56 @@
 
 <script src="assets/lead-manager.js"></script>
 <script>
-  window.ASTRA_API_URL = (location.port === '5500' || location.port === '3000')
-    ? location.protocol + '//' + location.hostname + ':8000'
-    : 'https://web-production-6988c1.up.railway.app';
+  const API_BASE = 'https://web-production-6988c1.up.railway.app';
+  window.ASTRA_API_URL = API_BASE;
 </script>
 <script src="assets/audio-player.js"></script>
 <script>
+  // ── iOS / Mobile Audio Unlock ─────────────────────────────────────────────
+  (function iOSAudioUnlock() {
+    var ua      = navigator.userAgent || '';
+    var isIOS   = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    var isMobile= isIOS || /Android|Mobi/i.test(ua);
+
+    if (isIOS)    console.log('[MOBILE audio2] iOS detectado — aguardando toque para unlock');
+    else if (isMobile) console.log('[MOBILE audio2] Android/mobile detectado');
+
+    function unlock(e) {
+      if (window.__audioUnlocked) return;
+      window.__audioUnlocked = true;
+      sessionStorage.setItem('__audioUnlocked', '1');
+      console.log('[MOBILE audio2] AudioUnlock disparado via ' + e.type);
+      document.removeEventListener('touchstart', unlock, true);
+      document.removeEventListener('touchend',   unlock, true);
+      document.removeEventListener('click',      unlock, true);
+    }
+    document.addEventListener('touchstart', unlock, { passive: true, capture: true });
+    document.addEventListener('touchend',   unlock, { passive: true, capture: true });
+    document.addEventListener('click',      unlock, true);
+  })();
+
+  // ── Captura erros fatais — garante que loading nunca fica preso ──────────
+  window.addEventListener('unhandledrejection', function(e) {
+    console.error('[FATAL audio2] Promise rejeitada:', e.reason);
+    try {
+      stopLoading();
+      var msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+      document.querySelector('.error-msg').innerHTML =
+        'Erro inesperado. Recarregue a página e tente novamente.<br><small style="color:var(--text-dimmer)">' + msg + '</small>';
+      showState('error');
+    } catch(_) {}
+  });
+  window.onerror = function(msg, src, line, col, err) {
+    console.error('[FATAL audio2] Erro JS:', msg, src + ':' + line);
+    try {
+      stopLoading();
+      document.querySelector('.error-msg').innerHTML =
+        'Erro inesperado. Recarregue a página e tente novamente.';
+      showState('error');
+    } catch(_) {}
+    return true;
+  };
+
   // Garante que não há resquício do player da página anterior
   window.__playerInstance  = null;
   window.__audioPlayerLock = null;
@@ -856,6 +900,7 @@
           return;
         }
 
+        const isTimeout = msg.includes('Tempo esgotado') || msg.includes('AbortError');
         const isOffline = (
           msg.includes('Failed to fetch') ||
           msg.includes('NetworkError') ||
@@ -863,9 +908,15 @@
           msg.includes('ECONNREFUSED') ||
           msg.includes('Load failed')
         );
-        document.querySelector('.error-msg').innerHTML = isOffline
-          ? 'Servidor offline.<br>Inicie a API com <code style="color:var(--lilac)">uvicorn api.main:app --reload</code> e tente novamente.'
-          : 'Erro ao gerar a revelação: <em style="color:var(--lilac)">' + msg + '</em><br>Verifique o console e tente novamente.';
+        let errHtml;
+        if (isTimeout) {
+          errHtml = 'A geração está demorando mais que o esperado.<br>Aguarde alguns segundos e tente novamente.';
+        } else if (isOffline) {
+          errHtml = 'Não foi possível conectar ao servidor.<br>Verifique sua conexão e tente novamente.';
+        } else {
+          errHtml = 'Erro ao preparar sua revelação.<br>Tente novamente em alguns instantes.';
+        }
+        document.querySelector('.error-msg').innerHTML = errHtml;
         showState('error');
       },
     });
@@ -888,7 +939,17 @@
       startEqualizer2();
     });
 
-    init();
+    try {
+      init();
+    } catch(err) {
+      console.error('[FATAL audio2] init() lançou exceção:', err);
+      try {
+        stopLoading();
+        document.querySelector('.error-msg').innerHTML =
+          'Erro ao iniciar. Recarregue a página.<br><small style="color:var(--text-dimmer)">' + err.message + '</small>';
+        showState('error');
+      } catch(_) {}
+    }
   });
 </script>
 </body>

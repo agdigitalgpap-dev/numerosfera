@@ -20,7 +20,7 @@
 
   const API_BASE = (() => {
     if (global.ASTRA_API_URL) return global.ASTRA_API_URL.replace(/\/$/, '');
-    if (location.protocol === 'file:') return 'http://localhost:8000';
+    if (location.protocol === 'file:') return 'https://web-production-6988c1.up.railway.app';
     if (location.port === '5500' || location.port === '3000' ||
         location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       return 'http://' + location.hostname + ':8000';
@@ -28,8 +28,15 @@
     return 'https://web-production-6988c1.up.railway.app';
   })();
 
+  // ── Mobile / iOS detection ──────────────────────────────────────────────────
+  const _ua      = navigator.userAgent || '';
+  const _isIOS   = /iPad|iPhone|iPod/.test(_ua) && !global.MSStream;
+  const _isMobile= _isIOS || /Android|Mobi/i.test(_ua);
+  if (_isIOS)    console.log('[AudioPlayer] iOS detectado — Safari autoplay bloqueado por padrão');
+  else if (_isMobile) console.log('[AudioPlayer] Android/mobile detectado');
+
   const UNLOCK_AT       = 0.85;
-  const REQUEST_TIMEOUT = 180_000;  // 3 min — audio_full pode levar 60-120s para gerar no ElevenLabs
+  const REQUEST_TIMEOUT = _isMobile ? 60_000 : 120_000;  // mobile: 60s; desktop: 2min
   const DEFAULT_VOLUME  = 0.85;
   const FADE_IN_MS      = 500;
   const FADE_OUT_MS     = 300;
@@ -124,8 +131,12 @@
         _analyser.smoothingTimeConstant = 0.82;
         _gainNode = _audioCtx.createGain();
         _gainNode.gain.value = 1.0;   // fixo em 1.0 — volume controlado por audio.volume
+        // Topologia paralela: gainNode → destination (caminho direto de áudio)
+        //                     gainNode → analyser    (side-branch só para visualização)
+        // NÃO usar serial (gainNode → analyser → destination): analyser como intermediário
+        // causa saída silenciosa no iOS quando o ctx retoma com margem de tempo estreita.
+        _gainNode.connect(_audioCtx.destination);
         _gainNode.connect(_analyser);
-        _analyser.connect(_audioCtx.destination);
 
         // Conecta o audio ao analyser somente quando o contexto está running
         // e há um elemento de áudio válido (guarda contra race após reset()).
@@ -157,7 +168,7 @@
         // permite createMediaElementSource em origens diferentes (Live Server vs API)
         _source = _audioCtx.createMediaElementSource(_audio);
         _source.connect(_gainNode);
-        console.log(_tag() + ' WebAudio conectado (analyser)');
+        console.log(_tag() + ' WebAudio conectado (source → gainNode → destination + analyser)');
       } catch(e) {
         console.warn(_tag() + ' createMediaElementSource falhou:', e.message);
         _webAudioOk = false;
@@ -250,15 +261,15 @@
       const myEpoch = _epoch;   // captura época atual — invalida este contexto se reset() for chamado
 
       // iOS/Safari: canplaythrough não dispara sem gesto do usuário.
-      // Após 3s força o caminho de play — _tryPlay rejeita com NotAllowedError
+      // Após 1.5s força o caminho de play — _tryPlay rejeita com NotAllowedError
       // e exibe o overlay de tap para o usuário iniciar manualmente.
       const _iosTimer = setTimeout(async () => {
         if (_canplayCalled || !_audio || _epoch !== myEpoch) return;
         _canplayCalled = true;
-        console.warn(_tag() + ' [iOS FALLBACK] canplaythrough não disparou em 3s — forçando');
+        console.warn(_tag() + ' [iOS FALLBACK] canplaythrough não disparou em 1.5s — forçando' + (_isIOS ? ' (iOS)' : ''));
         if (cb.onReady) cb.onReady(0, _timestamps);
         await _tryPlay(cb);
-      }, 3000);
+      }, 1500);
 
       _audio.addEventListener('canplaythrough', async () => {
         if (_canplayCalled || !_audio || _epoch !== myEpoch) {
@@ -290,25 +301,44 @@
         return;
       }
 
-_playTriggered = true;
+      _playTriggered = true;
       _started = true;
       _loading = false;
 
-      console.log('[' + (_lastTipo || 'AUDIO').toUpperCase() + ' PLAY]');
+      console.log('[' + (_lastTipo || 'AUDIO').toUpperCase() + ' PLAY]' + (_isIOS ? ' (iOS)' : ''));
       _fadeIn();
 
       try {
-        await _audio.play();
+        const playPromise = _audio.play();
+        // play() pode retornar undefined em iOS muito antigo (< iOS 10)
+        if (playPromise === undefined) {
+          // iOS antigo: sem Promise — assume que funcionou (ou não)
+          console.warn(_tag() + ' play() retornou undefined (iOS antigo?) — assumindo bloqueio');
+          _started = false;
+          _loading  = false;
+          _playTriggered = false;
+          if (cb.onAutoplayBlocked) cb.onAutoplayBlocked();
+          return;
+        }
+        await playPromise;
         // Áudio reproduz pelo elemento HTML — WebAudio conecta via statechange quando running
         if (_webAudioOk && _audioCtx && _audioCtx.state === 'suspended') {
           _audioCtx.resume().catch(() => {});
         }
+        console.log(_tag() + ' play() OK' + (_isIOS ? ' (iOS)' : ''));
         player._startProgressLoop(cb);
       } catch (err) {
-        _started = false;
-        _loading  = false;
+        _started       = false;
+        _loading       = false;
+        _playTriggered = false;  // CRÍTICO: permite retry e manualPlay após bloqueio
         if (err.name === 'NotAllowedError') {
-          console.warn('[AUTOPLAY BLOCKED]', _lastTipo || 'audio');
+          console.warn('[AUTOPLAY BLOCKED]', _lastTipo || 'audio', _isIOS ? '(iOS)' : '');
+          if (cb.onAutoplayBlocked) cb.onAutoplayBlocked();
+          return;
+        }
+        if (err.name === 'AbortError') {
+          // iOS às vezes lança AbortError quando interrompido — trata como bloqueio
+          console.warn('[PLAY ABORTED — tratando como autoplay block]', _lastTipo || 'audio');
           if (cb.onAutoplayBlocked) cb.onAutoplayBlocked();
           return;
         }
@@ -365,7 +395,14 @@ _playTriggered = true;
 
         console.log('[' + tipo.toUpperCase() + ' INIT]  nome=' + frozenLead.nome);
 
-        const payload = LeadManager.toApiPayload(frozenLead, tipo);
+        let payload;
+        try {
+          payload = LeadManager.toApiPayload(frozenLead, tipo);
+        } catch(payloadErr) {
+          _generating = false; _loading = false;
+          if (cb.onError) cb.onError(payloadErr);
+          return;
+        }
 
         // ── Verificar URL pré-gerada (sessionStorage) ────────────────────
         const _pregenKey = tipo === 'audio1'      ? 'audio1_url'
@@ -375,7 +412,7 @@ _playTriggered = true;
         if (_pregenKey) {
           const pregenUrl = sessionStorage.getItem(_pregenKey);
           const _validPregen = pregenUrl &&
-            pregenUrl.startsWith('/cache/') &&
+            (pregenUrl.startsWith('/cache/') || pregenUrl.startsWith('http')) &&
             pregenUrl.endsWith('.mp3');
           if (_validPregen) {
             sessionStorage.removeItem(_pregenKey);
@@ -383,12 +420,11 @@ _playTriggered = true;
             try { _timestamps = JSON.parse(sessionStorage.getItem(_pregenTsKey) || 'null'); } catch(_) { _timestamps = null; }
             sessionStorage.removeItem(_pregenTsKey);
             _generating = false;
-            _currentUrl = API_BASE + pregenUrl;
+            _currentUrl = pregenUrl.startsWith('http') ? pregenUrl : API_BASE + pregenUrl;
             console.log('[PREGEN] URL completa (' + tipo + '):', _currentUrl);
 
             _clearAudio();
             _audio = new Audio();
-            _audio.crossOrigin = 'anonymous'; // deve vir ANTES de src para CORS + WebAudio
             _audio.preload     = 'auto';
             _audio.volume      = 0;
             _audio.src         = _currentUrl;
@@ -456,7 +492,6 @@ _playTriggered = true;
 
         _clearAudio();
         _audio = new Audio();
-        _audio.crossOrigin = 'anonymous'; // deve vir ANTES de src para CORS + WebAudio
         _audio.preload     = 'auto';
         _audio.volume      = 0;
         _audio.src         = audioUrl;
@@ -467,33 +502,62 @@ _playTriggered = true;
 
       /**
        * Inicia reprodução via gesto do usuário (fallback autoplay bloqueado).
-       * DEVE ser chamado diretamente no handler de click (Safari iOS).
+       * DEVE ser chamado diretamente no handler de click/touch (Safari iOS).
+       *
+       * Ordem crítica para iOS:
+       *   1. await audioCtx.resume()  — ctx deve estar 'running' ANTES de conectar
+       *   2. _connectAudioToWebAudio() — MediaElementSource roteia som pelo grafo ativo
+       *   3. _fadeIn() / _audio.play() — som flui corretamente
+       *
+       * Se resume() vier depois de createMediaElementSource(), o áudio "toca" mas
+       * fica preso no grafo suspenso — sem saída de som (bug iOS clássico).
        */
-      manualPlay() {
+      async manualPlay() {
         if (!_audio) {
           console.warn(_tag() + ' manualPlay() — nenhum Audio element existe');
-          return Promise.resolve();
+          return;
         }
-        console.log('[MANUAL PLAY]');
-        _started = true;
+        console.log('[MANUAL PLAY]' + (_isIOS ? ' (iOS — gesto do usuário)' : ''));
+        _started       = true;
+        _playTriggered = false;
+
         _initWebAudio();
-        if (_webAudioOk && _audioCtx && _audioCtx.state === 'suspended') {
-          _audioCtx.resume().catch(() => {});
+
+        // 1. Resume AudioContext PRIMEIRO — await garante state === 'running' antes de conectar.
+        //    Sem await, o connect() acontece com ctx ainda suspended → sem som no iOS.
+        if (_webAudioOk && _audioCtx && _audioCtx.state !== 'running') {
+          try {
+            await _audioCtx.resume();
+            console.log(_tag() + ' AudioContext resumed — state:', _audioCtx.state);
+          } catch(resumeErr) {
+            console.warn(_tag() + ' AudioContext resume falhou:', resumeErr.message);
+          }
         }
+
+        // 2. Conecta source ao WebAudio SÓ APÓS resume (grafo ativo, som não fica preso)
         _connectAudioToWebAudio();
+
+        // 3. Fade in (volume via audio.volume — gainNode fixo em 1.0)
         _fadeIn();
-        const p = _audio.play();
-        if (p !== undefined) {
-          return p.then(() => {
-            console.log('[MANUAL PLAY SUCCESS]');
+
+        // 4. Play
+        try {
+          const playPromise = _audio.play();
+          if (playPromise === undefined) {
+            // iOS muito antigo (< iOS 10): sem Promise
+            console.warn(_tag() + ' manualPlay: play() retornou undefined (iOS antigo)');
             if (_savedCb) player._startProgressLoop(_savedCb);
-          }).catch(err => {
-            _started = false;
-            console.error(_tag() + ' manualPlay falhou:', err.name, err.message);
-            if (_savedCb && _savedCb.onError) _savedCb.onError(err);
-          });
+            return;
+          }
+          await playPromise;
+          console.log('[MANUAL PLAY SUCCESS]' + (_isIOS ? ' (iOS)' : ''));
+          if (_savedCb) player._startProgressLoop(_savedCb);
+        } catch(err) {
+          _started       = false;
+          _playTriggered = false;
+          console.error(_tag() + ' manualPlay falhou:', err.name, err.message, _isIOS ? '(iOS)' : '');
+          if (_savedCb && _savedCb.onError) _savedCb.onError(err);
         }
-        return Promise.resolve();
       },
 
       _startProgressLoop(cb) {
@@ -560,9 +624,10 @@ _playTriggered = true;
        */
       reset() {
         this.stop();
-        _started     = false;
-        _savedCb     = null;
-        _userPaused  = false;
+        _started       = false;
+        _playTriggered = false;  // CRÍTICO: sem isso, retry após NotAllowedError fica bloqueado
+        _savedCb       = null;
+        _userPaused    = false;
         _epoch++;           // invalida timers de _checkReadyAndPlay pendentes
         if (global.__audioPlayerLock === this) global.__audioPlayerLock = null;
         if (global.__playerInstance  === this) global.__playerInstance  = null;

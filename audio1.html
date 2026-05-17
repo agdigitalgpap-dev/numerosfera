@@ -737,12 +737,60 @@
 
 <script src="assets/lead-manager.js"></script>
 <script>
-  window.ASTRA_API_URL = (location.port === '5500' || location.port === '3000')
-    ? location.protocol + '//' + location.hostname + ':8000'
-    : 'https://web-production-6988c1.up.railway.app';
+  const API_BASE = 'https://web-production-6988c1.up.railway.app';
+  window.ASTRA_API_URL = API_BASE;
 </script>
 <script src="assets/audio-player.js"></script>
 <script>
+  // ── iOS / Mobile Audio Unlock ─────────────────────────────────────────────
+  // iOS Safari bloqueia qualquer AudioContext e audio.play() até o primeiro
+  // gesto do usuário. Este listener captura o primeiro toque e seta a flag
+  // global que o AudioPlayer usa para saber que já houve interação.
+  (function iOSAudioUnlock() {
+    var ua      = navigator.userAgent || '';
+    var isIOS   = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    var isMobile= isIOS || /Android|Mobi/i.test(ua);
+
+    if (isIOS)    console.log('[MOBILE audio1] iOS detectado — aguardando toque para unlock');
+    else if (isMobile) console.log('[MOBILE audio1] Android/mobile detectado');
+
+    function unlock(e) {
+      if (window.__audioUnlocked) return;
+      window.__audioUnlocked = true;
+      sessionStorage.setItem('__audioUnlocked', '1');
+      console.log('[MOBILE audio1] AudioUnlock disparado via ' + e.type);
+      document.removeEventListener('touchstart', unlock, true);
+      document.removeEventListener('touchend',   unlock, true);
+      document.removeEventListener('click',      unlock, true);
+    }
+    document.addEventListener('touchstart', unlock, { passive: true, capture: true });
+    document.addEventListener('touchend',   unlock, { passive: true, capture: true });
+    document.addEventListener('click',      unlock, true);
+  })();
+
+  // ── Captura erros fatais — garante que loading nunca fica preso ──────────
+  // Qualquer TypeError, ReferenceError ou Promise rejeitada mostra estado de erro.
+  window.addEventListener('unhandledrejection', function(e) {
+    console.error('[FATAL] Promise rejeitada não tratada:', e.reason);
+    try {
+      stopLoading();
+      var msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+      document.querySelector('.error-msg').innerHTML =
+        'Erro inesperado. Recarregue a página e tente novamente.<br><small style="color:var(--text-dimmer)">' + msg + '</small>';
+      showState('error');
+    } catch(_) {}
+  });
+  window.onerror = function(msg, src, line, col, err) {
+    console.error('[FATAL] Erro JS não tratado:', msg, src + ':' + line);
+    try {
+      stopLoading();
+      document.querySelector('.error-msg').innerHTML =
+        'Erro inesperado. Recarregue a página e tente novamente.';
+      showState('error');
+    } catch(_) {}
+    return true;
+  };
+
   // ── Stars ──────────────────────────────────────────────────────────────────
   (function(){
     const colors = ['rgba(255,235,180,V)','rgba(255,215,140,V)','rgba(200,180,120,V)','rgba(242,237,228,V)'];
@@ -807,11 +855,11 @@
     'Gravando sua voz personalizada...',
     'Sintetizando frequências da leitura...',
     'Preparando revelações do seu mapa...',
-    'Quase pronto, aguarde...',
+    'Quase pronto, isso pode levar até 1 min...',
     'Finalizando sua leitura exclusiva...',
   ];
   const GEN_PHASE1_MS  = 28000;   // duração da fase 1
-  const GEN_PHASE2_MS  = 150000;  // fase 2 cobre até 150s (TTS pode demorar 60-120s)
+  const GEN_PHASE2_MS  = 60000;   // fase 2 cobre até 60s (timeout mobile = 60s)
   const GEN_PCT_END1   = 72;      // % ao final da fase 1
   const GEN_PCT_END2   = 97;      // % ao final da fase 2
 
@@ -967,8 +1015,11 @@
     .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
     .then(data => {
       if (data.success && data.audioUrl) {
-        sessionStorage.setItem('audio2_url', data.audioUrl);
-        console.log('[PREGEN2] audio2 URL salva (' + (Date.now() - t0) + 'ms):', data.audioUrl);
+        const fullUrl2 = data.audioUrl.startsWith('http')
+          ? data.audioUrl
+          : API_BASE + data.audioUrl;
+        sessionStorage.setItem('audio2_url', fullUrl2);
+        console.log('[PREGEN2] audio2 URL salva (' + (Date.now() - t0) + 'ms):', fullUrl2);
       }
     })
     .catch(err => console.warn('[PREGEN2] falhou:', err));
@@ -1214,6 +1265,7 @@
         }
 
         // Mensagem clara conforme o tipo de erro
+        const isTimeout = msg.includes('Tempo esgotado') || msg.includes('AbortError');
         const isOffline = (
           msg.includes('Failed to fetch') ||
           msg.includes('NetworkError') ||
@@ -1221,9 +1273,15 @@
           msg.includes('ECONNREFUSED') ||
           msg.includes('Load failed')
         );
-        document.querySelector('.error-msg').innerHTML = isOffline
-          ? 'Servidor offline.<br>Inicie a API com <code style="color:var(--gold-light)">uvicorn api.main:app --reload</code> e tente novamente.'
-          : 'Erro ao gerar o áudio: <em style="color:var(--gold-light)">' + msg + '</em><br>Verifique o console e tente novamente.';
+        let errHtml;
+        if (isTimeout) {
+          errHtml = 'A geração está demorando mais que o esperado.<br>Aguarde alguns segundos e tente novamente.';
+        } else if (isOffline) {
+          errHtml = 'Não foi possível conectar ao servidor.<br>Verifique sua conexão e tente novamente.';
+        } else {
+          errHtml = 'Erro ao preparar sua leitura.<br>Tente novamente em alguns instantes.';
+        }
+        document.querySelector('.error-msg').innerHTML = errHtml;
         showState('error');
       },
     });
@@ -1248,15 +1306,27 @@
     });
 
     const emailInp = document.getElementById('email-input-overlay');
-    emailInp.addEventListener('input', validarEmail);
-    emailInp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const btn = document.getElementById('btn-email-continuar');
-        if (!btn.disabled) submitEmailOverlay();
-      }
-    });
+    if (emailInp) {
+      emailInp.addEventListener('input', validarEmail);
+      emailInp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const btn = document.getElementById('btn-email-continuar');
+          if (!btn.disabled) submitEmailOverlay();
+        }
+      });
+    }
 
-    init();
+    try {
+      init();
+    } catch(err) {
+      console.error('[FATAL] init() lançou exceção:', err);
+      try {
+        stopLoading();
+        document.querySelector('.error-msg').innerHTML =
+          'Erro ao iniciar. Recarregue a página.<br><small style="color:var(--text-dimmer)">' + err.message + '</small>';
+        showState('error');
+      } catch(_) {}
+    }
   });
 </script>
 </body>
