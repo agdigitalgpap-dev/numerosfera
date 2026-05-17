@@ -564,6 +564,45 @@
       transform: translateY(-2px);
     }
     #btn-start-reading:active { transform: scale(0.97); }
+
+    /* ── Overlays de notificação durante o áudio ─────────────────────────── */
+    .notif-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: 14px 20px 28px;
+      background: linear-gradient(to bottom, rgba(8,6,4,0.96) 50%, transparent);
+      pointer-events: none;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .notif-overlay.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .notif-overlay .no-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .notif-overlay .no-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .notif-overlay .no-title .no-nome {
+      color: var(--gold-light);
+    }
     .ap-sub {
       font-family: 'Outfit', sans-serif;
       font-size: 11.5px;
@@ -576,6 +615,7 @@
 
     /* ── Video Space ─────────────────────────────────────────────────────── */
     .video-space {
+      position: relative;
       width: 100%;
       height: 520px;
       border: 1px solid rgba(196,164,72,0.45);
@@ -654,6 +694,18 @@
 
     <!-- VIDEO SPACE — container central para vídeo futuramente -->
     <div class="video-space">
+
+      <!-- Overlay 1: (10s – 70s) -->
+      <div id="notif-overlay-1" class="notif-overlay" aria-hidden="true">
+        <div class="no-label">✦ mensagem importante ✦</div>
+        <div class="no-title"><span class="no-nome" id="notif-nome-1">—</span>, ATENÇÃO</div>
+      </div>
+
+      <!-- Overlay 2: (150s – 210s) -->
+      <div id="notif-overlay-2" class="notif-overlay" aria-hidden="true">
+        <div class="no-label">✦ revelação em andamento ✦</div>
+        <div class="no-title">CAMPO ENERGÉTICO IDENTIFICADO</div>
+      </div>
 
       <!-- Orb do signo — centralizado -->
       <div class="orb-wrap">
@@ -1047,15 +1099,19 @@
   }
 
   // ── Pré-geração do audio2 em background ───────────────────────────────────
- /*  function _preGenerateAudio2(lead) {
+  let _pregen2Started = false;
+  function _preGenerateAudio2(lead) {
+    if (_pregen2Started) return;  // evita chamada dupla (onReady + onAutoplayBlocked)
+    _pregen2Started = true;
     const API_BASE = audioPlayer1.getApiBase();
     const payload  = LeadManager.toApiPayload(lead, 'audio2');
     console.log('[PREGEN2] Iniciando pré-geração do audio2…', payload);
     const t0 = Date.now();
     fetch(API_BASE + '/api/audio/generate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      method:    'POST',
+      headers:   { 'Content-Type': 'application/json' },
+      body:      JSON.stringify(payload),
+      keepalive: true,
     })
     .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
     .then(data => {
@@ -1064,15 +1120,28 @@
           ? data.audioUrl
           : API_BASE + data.audioUrl;
         sessionStorage.setItem('audio2_url', fullUrl2);
+        if (data.timestamps && Array.isArray(data.timestamps)) {
+          sessionStorage.setItem('audio2_timestamps', JSON.stringify(data.timestamps));
+        }
         console.log('[PREGEN2] audio2 URL salva (' + (Date.now() - t0) + 'ms):', fullUrl2);
       }
     })
     .catch(err => console.warn('[PREGEN2] falhou:', err));
-  } */
+  }
+
+  // ── Overlays de notificação ────────────────────────────────────────────────
+  function _initNotifOverlays() {
+    try {
+      const lead = LeadManager.getLead();
+      const nome = LeadManager.getNomeFormatado(lead);
+      if (nome) document.getElementById('notif-nome-1').textContent = nome;
+    } catch(e) {}
+  }
 
   // ── Email Overlay ──────────────────────────────────────────────────────────
-  let _emailOverlayShown = false;
-  let _audioEnded        = false;
+  let _emailOverlayShown  = false;
+  let _audioEnded         = false;
+  let _emailTriggerTime   = null;  // timestamp exato do início do bloco CTA (palavra "acabei")
 
   function showEmailOverlay() {
     console.log('[AUDIO1 EMAIL OPEN — áudio terminou]');
@@ -1162,12 +1231,26 @@
     if (cur.length) phrases.push({ text: cur.map(x => x.w).join(' '), s: curStart, e: cur[cur.length - 1].e });
     _phrases1 = phrases;
     console.log('[SUBTITLE1] ' + phrases.length + ' frases construídas');
+
+    // Detecta início do bloco CTA pela ÚLTIMA ocorrência de "acabei"
+    // ("acabei" aparece também no intro — a última sempre é o bloco CTA)
+    const allAcabei = words.filter(w => w.w && w.w.toLowerCase().replace(/[^a-záéíóúãõâêîôûç]/g, '') === 'acabei');
+    const ctaWord = allAcabei[allAcabei.length - 1];
+    if (ctaWord) {
+      _emailTriggerTime = Math.max(0, ctaWord.s - 0.5);
+      console.log('[EMAIL TRIGGER] CTA detectado em', _emailTriggerTime.toFixed(1) + 's (última "acabei" — bloco CTA)');
+    }
   }
 
   // ── Progresso ──────────────────────────────────────────────────────────────
   function onProgress(pct, cur) {
     document.getElementById('prog-fill').style.width = (pct * 100).toFixed(1) + '%';
-    if (!_emailOverlayShown && cur >= 220) {
+    // Overlay 1: 10s – 70s
+    document.getElementById('notif-overlay-1').classList.toggle('visible', cur >= 10 && cur < 70);
+    // Overlay 2: 150s – 210s
+    document.getElementById('notif-overlay-2').classList.toggle('visible', cur >= 150 && cur < 210);
+    // Email overlay: usa timestamp preciso do CTA se disponível, senão cai no onUnlock (85%)
+    if (_emailTriggerTime && !_emailOverlayShown && cur >= _emailTriggerTime) {
       _emailOverlayShown = true;
       showEmailOverlay();
     }
@@ -1242,8 +1325,8 @@
         _readyFired = true;
         console.log('[AUDIO1 READY]');
         _buildPhrases(timestamps);
-        // Pré-gera audio2 em background enquanto o usuário escuta audio1
-        //_preGenerateAudio2(lead);
+        _initNotifOverlays();
+        _preGenerateAudio2(lead);
         finishLoading(() => {
           showState('player');
           startEqualizer();
@@ -1251,7 +1334,7 @@
       },
       onAutoplayBlocked() {
         console.warn('[audio1] Autoplay bloqueado — exibindo overlay');
-        //_preGenerateAudio2(lead);
+        _preGenerateAudio2(lead);
         if (_readyFired) {
           showAutoplayOverlay();
           return;
@@ -1271,7 +1354,15 @@
         }
       },
       onProgress,
-      onUnlock() { console.log('[AUDIO1 UNLOCK]'); },
+      onUnlock() {
+        // Dispara ao atingir 85% do áudio — corresponde ao início do bloco cta/email-cta.md
+        // Fallback: só dispara se _emailTriggerTime não foi detectado nos timestamps
+        if (!_emailTriggerTime && !_emailOverlayShown) {
+          console.log('[AUDIO1 UNLOCK — fallback 85%, sem timestamp CTA]');
+          _emailOverlayShown = true;
+          showEmailOverlay();
+        }
+      },
       onEnd() {
         _audioEnded = true;
         stopEqualizer();

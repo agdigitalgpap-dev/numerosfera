@@ -443,6 +443,8 @@
         }
 
         // ── Gerar via API ────────────────────────────────────────────────
+        // Chamada direta: se a pré-geração do quiz já cacheou o áudio → resposta imediata.
+        // Se ainda está gerando → o backend aguarda e retorna quando pronto (dedup server-side).
         _fetchAbort = new AbortController();
         const timeoutId = setTimeout(() => {
           if (_fetchAbort) _fetchAbort.abort();

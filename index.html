@@ -579,6 +579,8 @@ html,body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text
 <script>
   const API_BASE = 'https://web-production-6988c1.up.railway.app';
   window.ASTRA_API_URL = API_BASE;
+  // Warm-up: acorda o Railway antes do usuário terminar o quiz
+  fetch(API_BASE + '/api/audio/status').catch(() => {});
 </script>
 <script>
 /* ── Alerta dinâmico: "15 de Maio" ── */
@@ -889,12 +891,14 @@ function _preGenerateAudio1() {
     const payload = LeadManager.toApiPayload(lead, 'audio1');
 
     console.log('[PREGEN] Iniciando pré-geração do audio1…', payload);
+    sessionStorage.setItem('audio1_pregen_ts', Date.now().toString());
     const t0 = Date.now();
 
     fetch(API_BASE + '/api/audio/generate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      method:    'POST',
+      headers:   { 'Content-Type': 'application/json' },
+      body:      JSON.stringify(payload),
+      keepalive: true,  // mantém o request vivo mesmo quando a página navega (iOS fix)
     })
     .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status))
     .then(data => {
@@ -916,7 +920,7 @@ function _preGenerateAudio1() {
 }
 
 function startLoading() {
-  _preGenerateAudio1();
+  // pré-geração movida para palma.html (carrega enquanto o lead usa a câmera)
 
   const fill    = document.getElementById('barFill');
   const pctEl   = document.getElementById('barPct');
@@ -941,7 +945,7 @@ function startLoading() {
       _redirected = true;
       localStorage.removeItem('audioStarted');
       localStorage.removeItem('astra_lead');
-      window.location.href = 'audio1.html';
+      window.location.href = 'palma.html';
     }
     setTimeout(_doRedirect, 1500); // safety net: força redirect se audioFadeOut não chamar callback
     audioFadeOut(_doRedirect);

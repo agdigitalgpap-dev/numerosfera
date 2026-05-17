@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Leitura da Palma · NUMEROSFERA</title>
+  <link rel="stylesheet" href="assets/shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:var(--bg); font-family:'Poppins',sans-serif; overflow:hidden; }
+
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 40px;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(200,180,224,0.3); border-radius: 40px;
+      padding: 5px 14px; font-size: 10px; font-weight: 600;
+      letter-spacing: 2.5px; text-transform: uppercase; color: var(--lilac);
+      margin-bottom: 20px; margin-top: 8px;
+    }
+    .badge-dot { width:5px; height:5px; border-radius:50%; background:var(--lilac); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Título ── */
+    .titulo { font-family:'Outfit',sans-serif; font-size:22px; font-weight:700; color:var(--gold-light); text-align:center; line-height:1.35; margin-bottom:6px; }
+    .subtitulo { font-size:13px; color:var(--text-dim); text-align:center; margin-bottom:24px; max-width:340px; }
+
+    /* ── Card principal ── */
+    .card {
+      width:100%; max-width:480px;
+      background:var(--card-bg); border:1px solid var(--card-border);
+      border-radius:20px; padding:24px 20px 28px;
+      backdrop-filter:blur(20px);
+      box-shadow: 0 0 60px rgba(196,164,72,0.06), 0 24px 48px rgba(0,0,0,0.5);
+      position:relative; overflow:hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.4;
+    }
+
+    /* ── Tela 0: instrução ── */
+    #screen-intro { text-align:center; }
+    .hand-icon { font-size:64px; margin-bottom:16px; display:block; }
+    .intro-title { font-family:'Outfit',sans-serif; font-size:20px; font-weight:700; color:#fff; margin-bottom:10px; }
+    .intro-body { font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:24px; }
+    .intro-body strong { color:var(--gold-light); }
+    .btn-camera {
+      width:100%; padding:15px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000;
+      font-family:'Outfit',sans-serif; font-size:16px; font-weight:700;
+      cursor:pointer; letter-spacing:0.5px;
+    }
+    .btn-camera:active { transform:scale(0.98); }
+
+    /* ── Tela 1: câmera ── */
+    #screen-camera { display:none; }
+    .camera-wrap {
+      position:relative; width:100%; border-radius:16px; overflow:hidden;
+      background:#000; aspect-ratio:3/4;
+    }
+    #video-feed {
+      width:100%; height:100%; object-fit:cover; display:block;
+      transform: scaleX(-1); /* espelho */
+    }
+    .camera-guide {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      pointer-events:none;
+    }
+    .guide-hand {
+      width:65%; opacity:0.25;
+      filter: invert(1);
+    }
+    .cam-status {
+      position:absolute; bottom:14px; left:0; right:0;
+      text-align:center; font-size:12px; color:rgba(255,255,255,0.7);
+      font-weight:600; letter-spacing:1px; text-transform:uppercase;
+    }
+    #cam-detected {
+      position:absolute; bottom:14px; left:0; right:0;
+      text-align:center; font-size:12px; font-weight:700;
+      letter-spacing:1px; color:#4ade80; display:none;
+    }
+    .btn-capture {
+      width:100%; padding:14px; border:none; border-radius:12px; margin-top:14px;
+      background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000;
+      font-family:'Outfit',sans-serif; font-size:16px; font-weight:700; cursor:pointer;
+      opacity:0.4; transition:opacity 0.3s;
+    }
+    .btn-capture.ready { opacity:1; }
+    .btn-capture:active { transform:scale(0.98); }
+    canvas#snap { display:none; }
+
+    /* ── Tela 2: análise ── */
+    #screen-analysis { display:none; text-align:center; }
+    .thumb-wrap {
+      width:120px; height:120px; border-radius:50%; overflow:hidden;
+      margin:0 auto 20px; border:2px solid var(--gold);
+      box-shadow:0 0 24px rgba(196,164,72,0.35);
+    }
+    #thumb-img { width:100%; height:100%; object-fit:cover; }
+    .analysis-title { font-family:'Outfit',sans-serif; font-size:18px; font-weight:700; color:var(--gold-light); margin-bottom:16px; }
+    .analysis-steps { list-style:none; padding:0; margin:0 0 20px; text-align:left; }
+    .analysis-steps li {
+      display:flex; align-items:center; gap:10px;
+      font-size:13px; color:var(--text-dim); padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+    .step-icon { width:20px; text-align:center; font-size:14px; flex-shrink:0; }
+    .step-done { color:#4ade80; }
+    .step-spin {
+      width:14px; height:14px; border:2px solid rgba(196,164,72,0.3);
+      border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite;
+      flex-shrink:0;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── Tela 3: resultado ── */
+    #screen-result { display:none; text-align:center; }
+    .result-lines { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+    .line-item {
+      background:rgba(255,255,255,0.03); border:1px solid rgba(196,164,72,0.15);
+      border-radius:12px; padding:14px 16px; text-align:left;
+    }
+    .line-name { font-size:11px; font-weight:700; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+    .line-desc { font-size:13px; color:var(--text-dim); line-height:1.5; }
+    .result-cta { font-family:'Outfit',sans-serif; font-size:14px; color:var(--lilac); margin-bottom:20px; line-height:1.5; }
+    .btn-continuar {
+      width:100%; padding:15px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--gold-dark),var(--gold)); color:#000;
+      font-family:'Outfit',sans-serif; font-size:16px; font-weight:700; cursor:pointer;
+    }
+    .btn-continuar:active { transform:scale(0.98); }
+    .audio-ready-msg { font-size:11px; color:#4ade80; margin-top:10px; font-weight:600; letter-spacing:1px; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="badge"><div class="badge-dot"></div>LEITURA DE PALMA</div>
+  <h1 class="titulo">Preciso de mais uma coisa<br>para completar sua leitura</h1>
+  <p class="subtitulo">As linhas da sua mão revelam o que o mapa astral confirma</p>
+
+  <div class="card">
+
+    <!-- Tela 0: instrução -->
+    <div id="screen-intro">
+      <span class="hand-icon">🤲</span>
+      <div class="intro-title">Mostre sua mão direita</div>
+      <p class="intro-body">
+        As linhas da palma carregam marcas únicas da sua energia.<br><br>
+        Vou analisá-las junto com seu mapa astral para <strong>completar a sua leitura</strong>.
+      </p>
+      <button class="btn-camera" onclick="startCamera()">
+        📷 Abrir câmera agora
+      </button>
+    </div>
+
+    <!-- Tela 1: câmera -->
+    <div id="screen-camera">
+      <div class="camera-wrap">
+        <video id="video-feed" autoplay playsinline muted></video>
+        <div class="camera-guide">
+          <!-- guia visual de posicionamento -->
+          <svg viewBox="0 0 100 140" class="guide-hand" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 130 C30 130 15 115 15 95 L15 50 C15 44 20 40 26 40 C28 40 30 41 32 42
+                     L32 25 C32 19 37 15 43 15 C49 15 54 19 54 25 L54 30
+                     C56 28 59 27 62 27 C68 27 73 31 73 37 L73 42
+                     C75 40 78 39 81 39 C87 39 92 43 92 49 L92 90
+                     C92 110 77 130 57 130 Z"
+              stroke="white" stroke-width="3" fill="rgba(255,255,255,0.05)"/>
+          </svg>
+        </div>
+        <div class="cam-status" id="cam-hint">Posicione a mão direita aberta</div>
+        <div id="cam-detected">✓ MÃO DETECTADA</div>
+      </div>
+      <canvas id="snap"></canvas>
+      <button class="btn-capture" id="btn-capture" onclick="capturePhoto()">
+        Capturar foto da mão
+      </button>
+    </div>
+
+    <!-- Tela 2: análise -->
+    <div id="screen-analysis">
+      <div class="thumb-wrap">
+        <img id="thumb-img" src="" alt="palma">
+      </div>
+      <div class="analysis-title">Analisando suas linhas…</div>
+      <ul class="analysis-steps" id="analysis-steps">
+        <li><span class="step-icon step-spin" id="step0"></span> Mapeando linha da vida</li>
+        <li><span class="step-icon" style="color:var(--text-dimmer)" id="icon1">○</span> Identificando linha do coração</li>
+        <li><span class="step-icon" style="color:var(--text-dimmer)" id="icon2">○</span> Lendo linha da mente</li>
+        <li><span class="step-icon" style="color:var(--text-dimmer)" id="icon3">○</span> Cruzando com mapa astral</li>
+        <li><span class="step-icon" style="color:var(--text-dimmer)" id="icon4">○</span> Preparando revelação final</li>
+      </ul>
+    </div>
+
+    <!-- Tela 3: resultado -->
+    <div id="screen-result">
+      <div class="result-lines" id="result-lines"></div>
+      <p class="result-cta" id="result-nome-line">Sua análise completa está pronta, <strong id="result-nome">—</strong>.</p>
+      <button class="btn-continuar" onclick="goToAudio1()">
+        Ouvir minha leitura completa →
+      </button>
+      <div class="audio-ready-msg" id="audio-ready-msg" style="display:none">✓ Áudio personalizado pronto</div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<script src="assets/lead-manager.js"></script>
+<script>
+  const API_BASE = 'https://web-production-6988c1.up.railway.app';
+  window.ASTRA_API_URL = API_BASE;
+
+  // ── Dispara pré-geração do audio1 assim que a página carrega ─────────────
+  (function _startPregen() {
+    try {
+      const lead    = LeadManager.getLead();
+      const payload = LeadManager.toApiPayload(lead, 'audio1');
+      console.log('[PALMA] Iniciando pré-geração do audio1…');
+      const t0 = Date.now();
+      fetch(API_BASE + '/api/audio/generate', {
+        method:    'POST',
+        headers:   { 'Content-Type': 'application/json' },
+        body:      JSON.stringify(payload),
+        keepalive: true,
+      })
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        if (data.success && data.audioUrl) {
+          const url = data.audioUrl.startsWith('http') ? data.audioUrl : API_BASE + data.audioUrl;
+          sessionStorage.setItem('audio1_url', url);
+          if (data.timestamps) sessionStorage.setItem('audio1_timestamps', JSON.stringify(data.timestamps));
+          console.log('[PALMA] audio1 pronto em ' + (Date.now() - t0) + 'ms');
+          document.getElementById('audio-ready-msg').style.display = 'block';
+        }
+      })
+      .catch(err => console.warn('[PALMA] pregen falhou:', err));
+    } catch(e) { console.warn('[PALMA] pregen erro:', e); }
+  })();
+
+  // ── Nome do lead ──────────────────────────────────────────────────────────
+  try {
+    const lead = LeadManager.getLead();
+    const nome = LeadManager.getNomeFormatado(lead);
+    if (nome) document.getElementById('result-nome').textContent = nome;
+  } catch(e) {}
+
+  // ── Câmera ────────────────────────────────────────────────────────────────
+  let _stream = null;
+  let _handReady = false;
+  let _detectionTimer = null;
+
+  async function startCamera() {
+    document.getElementById('screen-intro').style.display = 'none';
+    document.getElementById('screen-camera').style.display = 'block';
+
+    try {
+      _stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } }
+      });
+    } catch(e) {
+      // Fallback: câmera frontal
+      try {
+        _stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      } catch(e2) {
+        // Sem câmera — pula direto para análise simulada
+        skipToAnalysis();
+        return;
+      }
+    }
+
+    const video = document.getElementById('video-feed');
+    video.srcObject = _stream;
+
+    // Simula detecção de mão após 2s (libera botão de captura)
+    _detectionTimer = setTimeout(() => {
+      _handReady = true;
+      document.getElementById('cam-hint').style.display = 'none';
+      document.getElementById('cam-detected').style.display = 'block';
+      document.getElementById('btn-capture').classList.add('ready');
+    }, 2000);
+  }
+
+  function skipToAnalysis() {
+    // Sem câmera disponível — vai direto para análise com imagem placeholder
+    document.getElementById('screen-intro').style.display = 'none';
+    document.getElementById('screen-camera').style.display = 'none';
+    startAnalysis(null);
+  }
+
+  function capturePhoto() {
+    if (!_handReady) return;
+
+    // Para stream da câmera
+    if (_stream) _stream.getTracks().forEach(t => t.stop());
+    clearTimeout(_detectionTimer);
+
+    const video  = document.getElementById('video-feed');
+    const canvas = document.getElementById('snap');
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(-1, 1); // desfaz espelho
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    document.getElementById('thumb-img').src = dataUrl;
+
+    document.getElementById('screen-camera').style.display = 'none';
+    startAnalysis(dataUrl);
+  }
+
+  // ── Análise ───────────────────────────────────────────────────────────────
+  const ANALYSIS_STEPS = [
+    { id: 0, delay: 0    },
+    { id: 1, delay: 2200 },
+    { id: 2, delay: 4800 },
+    { id: 3, delay: 7500 },
+    { id: 4, delay: 10500 },
+  ];
+
+  function startAnalysis(photoDataUrl) {
+    if (!photoDataUrl) {
+      // placeholder quando não há câmera
+      document.getElementById('thumb-img').src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23201810" width="100" height="100"/><text y="55" x="50" text-anchor="middle" font-size="40">🤲</text></svg>';
+    }
+
+    document.getElementById('screen-analysis').style.display = 'block';
+
+    const icons = ['icon1','icon2','icon3','icon4'];
+
+    ANALYSIS_STEPS.forEach(step => {
+      if (step.id === 0) return; // primeiro já aparece como spinner
+      setTimeout(() => {
+        // Conclui passo anterior
+        const prevId = step.id - 1;
+        const prevEl = document.getElementById('step' + prevId) || document.getElementById('icon' + prevId);
+        if (prevEl) {
+          prevEl.className = 'step-icon step-done';
+          prevEl.textContent = '✓';
+        }
+        // Ativa passo atual como spinner (se não for o último)
+        if (step.id < 4) {
+          const curEl = document.getElementById('icon' + step.id);
+          if (curEl) {
+            const spin = document.createElement('span');
+            spin.className = 'step-spin';
+            curEl.replaceWith(spin);
+            spin.id = 'icon' + step.id;
+          }
+        }
+      }, step.delay);
+    });
+
+    // Conclui último passo e mostra resultado
+    setTimeout(() => {
+      const last = document.getElementById('icon4');
+      if (last) { last.className = 'step-icon step-done'; last.textContent = '✓'; }
+      setTimeout(showResult, 600);
+    }, 13000);
+  }
+
+  // ── Resultado ─────────────────────────────────────────────────────────────
+  const PALM_READINGS = [
+    {
+      name: 'LINHA DA VIDA',
+      descs: [
+        'Profunda e contínua. Indica vitalidade forte e capacidade de recuperação acima da média.',
+        'Levemente interrompida no centro — marca de uma transição importante que já passou.',
+        'Curva longa e bem definida. Energia física elevada e resistência emocional notável.',
+      ]
+    },
+    {
+      name: 'LINHA DO CORAÇÃO',
+      descs: [
+        'Termina entre os dedos indicador e médio — equilíbrio entre razão e emoção nas relações.',
+        'Linha longa e curvada. Alta capacidade afetiva, mas tendência a guardar emoções.',
+        'Bem marcada com bifurcação sutil — indica relacionamentos intensos e transformadores.',
+      ]
+    },
+    {
+      name: 'LINHA DA MENTE',
+      descs: [
+        'Reta e profunda. Pensamento analítico, tomada de decisão prática e objetiva.',
+        'Levemente descendente — criatividade acentuada, mente intuitiva e imaginativa.',
+        'Longa com leve curvatura — capacidade de conectar lógica e intuição de forma única.',
+      ]
+    },
+  ];
+
+  function showResult() {
+    document.getElementById('screen-analysis').style.display = 'none';
+    document.getElementById('screen-result').style.display = 'block';
+
+    const container = document.getElementById('result-lines');
+    container.innerHTML = '';
+    PALM_READINGS.forEach(line => {
+      const desc = line.descs[Math.floor(Math.random() * line.descs.length)];
+      const div = document.createElement('div');
+      div.className = 'line-item';
+      div.innerHTML = '<div class="line-name">' + line.name + '</div><div class="line-desc">' + desc + '</div>';
+      container.appendChild(div);
+    });
+  }
+
+  // ── Navegação para audio1 ─────────────────────────────────────────────────
+  function goToAudio1() {
+    window.location.href = 'audio1.html';
+  }
+</script>
+</body>
+</html>

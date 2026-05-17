@@ -204,8 +204,7 @@ async def _gerar_elevenlabs_com_timestamps(texto: str) -> tuple[bytes, list]:
     """ElevenLabs com chamada única — sem chunking para minimizar latência."""
     logger.info("[TTS+TS] Chamada única  (%d chars)", len(texto))
     mp3, words = await asyncio.to_thread(_elevenlabs_sync_with_timestamps, texto)
-    audio = await asyncio.to_thread(_loudnorm, mp3)
-    return audio, words
+    return mp3, words
 
 
 def _elevenlabs_sync(texto: str) -> bytes:
@@ -264,11 +263,7 @@ async def _gerar_elevenlabs(texto: str) -> bytes:
         parte = await asyncio.to_thread(_elevenlabs_sync, seg)
         partes.append(parte)
 
-    audio = _concat_mp3_chunks(partes)
-
-    # Loudnorm opcional (passthrough se ffmpeg não disponível)
-    audio = await asyncio.to_thread(_loudnorm, audio)
-    return audio
+    return _concat_mp3_chunks(partes)
 
 
 # ── OpenAI TTS ────────────────────────────────────────────────────────────────

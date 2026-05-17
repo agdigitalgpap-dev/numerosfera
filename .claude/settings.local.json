@@ -25,7 +25,8 @@
       "Bash(node generate-pdf.js)",
       "Bash(node generate-pdf.js --nome \"Gustavo\" --signo \"virgem\" --sexo \"masculino\" --dor \"saude\")",
       "Bash(curl -s -H \"xi-api-key: sk_8d8d90bca12aa2f8fecfd1f1744d5a985d144bee16388789\" \"https://api.elevenlabs.io/v1/voices\")",
-      "Bash(python3 -c \"import json,sys; voices=json.load\\(sys.stdin\\)['voices']; [print\\(v['voice_id'], v['name']\\) for v in voices]\")"
+      "Bash(python3 -c \"import json,sys; voices=json.load\\(sys.stdin\\)['voices']; [print\\(v['voice_id'], v['name']\\) for v in voices]\")",
+      "Bash(node generate-pdf.js --nome \"Gustavo\" --signo \"Virgem\" --sexo \"masculino\" --dor \"saude\" --produto \"todos\")"
     ],
     "additionalDirectories": [
       "/Users/teste/Desktop/VS CODE - ASTRA/Briefing/AUDIO/audio-1 "

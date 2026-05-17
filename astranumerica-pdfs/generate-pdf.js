@@ -179,20 +179,25 @@ function splitPages(html, n, footerFn, startPg) {
 }
 
 // ── Página de índice ──────────────────────────────────────────
+// Números derivados da estrutura fixa documentada no comentário do buildMapaHermetico.
+// Se o tamanho de uma seção mudar (ex: splitPages N), atualizar aqui também.
+//   04–05 Abertura · 06 Div → 07 S1(6) · 13 Div → 14 S2(7) · 21 Div → 22 S3(9)
+//   31 Div → 32 S4(3) · 35 Div → 36 S5(9) · 45 Img · 46 Div → 47 S6(8)
+//   55 Div → 56 S7(5) · 61 Div → 62 S8(5) · 67 Div → 68 S9(5) · 73 Div → 74 S10(4)
 function indexPage(signo, dor) {
   const dl = { financas: 'Prosperidade', amor: 'Amor', saude: 'Saúde' }[dor] || dor;
   const items = [
     ['I',    '04', 'Carta para você'],
-    ['II',   '06', `Seu Signo Hermético: ${signo}`],
-    ['III',  '13', 'O Bloqueio que Foi Removido'],
-    ['IV',   '21', 'Seus 5 Talentos Ocultos'],
-    ['V',    '31', 'A Técnica dos 7 Minutos'],
-    ['VI',   '35', 'O Código da Prosperidade'],
-    ['VII',  '46', 'Traços e Relacionamentos'],
-    ['VIII', '55', 'Datas de Poder Pessoais'],
-    ['IX',   '61', 'Seu Escudo Natural'],
-    ['X',    '67', 'Sua Visão de Futuro'],
-    ['XI',   '73', 'Ritual de Manutenção e Fechamento'],
+    ['II',   '07', `Seu Signo Hermético: ${signo}`],
+    ['III',  '14', 'O Bloqueio que Foi Removido'],
+    ['IV',   '22', 'Seus 5 Talentos Ocultos'],
+    ['V',    '32', 'A Técnica dos 7 Minutos'],
+    ['VI',   '36', 'O Código da Prosperidade'],
+    ['VII',  '47', 'Traços e Relacionamentos'],
+    ['VIII', '56', 'Datas de Poder Pessoais'],
+    ['IX',   '62', 'Seu Escudo Natural'],
+    ['X',    '68', 'Sua Visão de Futuro'],
+    ['XI',   '74', 'Ritual de Manutenção e Fechamento'],
   ];
   const rows = items.map(([r, pg, t]) => `
     <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid rgba(184,146,42,0.12);">
@@ -383,7 +388,23 @@ ${sectionOpener(10, 'X', 'Ritual de Manutenção e Fechamento', 'A seção mais 
 ${splitPages(secHeader('Seção 10 · Ritual de Manutenção', 'O que acontece se você não mantiver o campo', 'O protocolo completo para que o campo permaneça em fluxo') + s10, 4, f, 74)}
 
 <!-- P.78 — CONTRA-CAPA -->
-<div class="page cover-page"><img class="cover-img" src="${iContra}" alt="Contra-capa">${logoStampAbs()}</div>
+<div class="page cover-page" style="position:relative;background:var(--ink);">
+  ${iContra ? `<img class="cover-img" src="${iContra}" alt="Contra-capa" style="opacity:0.35;">` : ''}
+  <!-- Gradiente escuro para leitura -->
+  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(6,6,15,0.97) 40%, rgba(6,6,15,0.55) 75%, rgba(6,6,15,0.3) 100%);z-index:1;pointer-events:none;"></div>
+  <!-- Conteúdo centralizado -->
+  <div style="position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 70px;">
+    <div style="margin-bottom:28px;">${logoSvg(72)}</div>
+    <div style="font-family:var(--f-label);font-size:7pt;color:var(--gold);letter-spacing:0.4em;text-transform:uppercase;margin-bottom:18px;">NUMEROSFERA</div>
+    <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 32px;"></div>
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);line-height:1.4;letter-spacing:0.03em;text-shadow:0 0 40px rgba(212,168,75,0.4);margin-bottom:28px;">
+      "O que estava bloqueado<br>agora está aberto.<br>O que era seu,<br>começa a chegar."
+    </div>
+    <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:0 auto 28px;"></div>
+    <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Astrologia Hermética Personalizada</div>
+    <div style="font-family:var(--f-title);font-size:10pt;color:var(--gold-mid);letter-spacing:0.12em;">numerosfera.com.br</div>
+  </div>
+</div>
 
 </body></html>`;
 }
@@ -444,8 +465,59 @@ ${pageDiv(`
   </div>
 `, `<span>NUMEROSFERA · Comece por Aqui</span><span>02</span>`)}
 
-<!-- P.03–10 — Conteúdo -->
-${splitPages(content, 8, (p) => `<span>NUMEROSFERA · Comece por Aqui · Madame Celeste</span><span>${String(p).padStart(2,'0')}</span>`, 3)}
+<!-- P.03 — Biografia Madame Celeste -->
+${pageDiv(`
+  <div style="text-align:center;margin-bottom:18px;">
+    <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">Quem está falando com você</div>
+    <div style="font-family:var(--f-display);font-size:24pt;color:var(--gold-hi);letter-spacing:0.05em;line-height:1.2;">Madame Celeste</div>
+    <div style="font-family:var(--f-label);font-size:8pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px;">Especialista em Astrologia Hermética · 23 anos de prática</div>
+    <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto 0;"></div>
+  </div>
+  <div style="color:var(--gold-dim);letter-spacing:6px;font-size:10pt;text-align:center;margin-bottom:16px;">✦ ✦ ✦</div>
+  <p style="font-size:11.5pt;line-height:1.85;color:var(--cream);margin-bottom:13px;">
+    Madame Celeste nasceu no Sul do Brasil, em uma família onde os segredos do céu eram passados de geração em geração. Aos 11 anos, encontrou nos pertences da avó um conjunto de cartas astrológicas cobertas de anotações à mão. Naquele momento, algo despertou — uma capacidade de enxergar padrões invisíveis entre as posições dos astros e os movimentos da vida humana.
+  </p>
+  <p style="font-size:11.5pt;line-height:1.85;color:var(--cream);margin-bottom:13px;">
+    Nos anos seguintes, dedicou-se com obsessão ao estudo da astrologia hermética — a vertente que cruza os mapas astrais com as tradições de sabedoria antiga. Formou-se em três escolas diferentes, estudou com mestres no Brasil e na Europa, e analisou centenas de mapas antes de atender seu primeiro cliente.
+  </p>
+  <p style="font-size:11.5pt;line-height:1.85;color:var(--cream);margin-bottom:18px;">
+    Em 23 anos de prática, já orientou mais de 12.000 pessoas em todo o país. Seu método é reconhecido pela precisão com que identifica bloqueios energéticos no mapa astral — padrões que muitas vezes passam despercebidos por décadas, sabotando silenciosamente o florescimento nos relacionamentos, nas finanças, na saúde e na busca por propósito.
+  </p>
+  <div style="border-left:2px solid var(--gold-dim);padding:13px 18px;background:rgba(184,146,42,0.05);border-radius:0 4px 4px 0;">
+    <p style="font-style:italic;font-size:11.5pt;color:var(--cream-dim);line-height:1.7;margin:0;">
+      "O céu não mente. Ele apenas espera que você aprenda a ouvi-lo. Cada mapa é único — e cada pessoa carrega dentro do seu campo a semente exata do que precisa florescer."
+    </p>
+    <div style="font-family:var(--f-display);font-size:13pt;color:var(--gold-hi);margin-top:8px;">Madame Celeste</div>
+  </div>
+`, `<span>NUMEROSFERA · Comece por Aqui</span><span>03</span>`)}
+
+<!-- P.04–11 — Conteúdo da carta -->
+${splitPages(content, 8, (p) => `<span>NUMEROSFERA · Comece por Aqui · Madame Celeste</span><span>${String(p).padStart(2,'0')}</span>`, 4)}
+
+<!-- P.12 — Próximos Passos -->
+${pageDiv(`
+  <div style="text-align:center;margin-bottom:22px;">
+    <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">O que fazer agora</div>
+    <div style="font-family:var(--f-display);font-size:26pt;color:var(--gold-hi);line-height:1.2;">Seus Próximos<br>Passos</div>
+    <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:16px auto 0;"></div>
+  </div>
+  <div style="color:var(--gold-dim);letter-spacing:6px;font-size:10pt;text-align:center;margin-bottom:24px;">✦ ✦ ✦</div>
+
+  ${[ ['01', 'Leia o Mapa Hermético', 'O documento principal do seu pacote. Ele contém sua análise completa — bloqueios, talentos ocultos, datas de poder e rituais personalizados para o seu signo.'],
+      ['02', 'Aplique a Técnica dos 7 Minutos', 'Dentro do Mapa Hermético você encontra um ritual de 7 minutos que pode ser feito ainda hoje. Não pule. Ele foi calibrado especificamente para o seu campo energético.'],
+      ['03', 'Acesse os Bônus na ordem certa', 'Bônus 1 → Bônus 2 → Bônus 3. Cada material foi pensado para aprofundar o que veio antes. A sequência importa.'],
+      ['04', 'Repita a leitura em 21 dias', 'Seu mapa não é um documento para ler uma vez. Volte a ele em 21 dias — você verá padrões que não viu na primeira leitura.'],
+  ].map(([n, title, desc]) => `
+    <div style="display:flex;gap:16px;margin-bottom:18px;align-items:flex-start;">
+      <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(184,146,42,0.25),rgba(184,146,42,0.08));border:1px solid rgba(184,146,42,0.4);display:flex;align-items:center;justify-content:center;">
+        <span style="font-family:var(--f-label);font-size:8pt;color:var(--gold);letter-spacing:0.05em;">${n}</span>
+      </div>
+      <div style="flex:1;">
+        <div style="font-family:var(--f-title);font-size:11.5pt;color:var(--gold-hi);margin-bottom:4px;">${title}</div>
+        <div style="font-size:10.5pt;color:var(--cream-dim);line-height:1.7;">${desc}</div>
+      </div>
+    </div>`).join('')}
+`, `<span>NUMEROSFERA · Comece por Aqui</span><span>12</span>`)}
 
 </body></html>`;
 }

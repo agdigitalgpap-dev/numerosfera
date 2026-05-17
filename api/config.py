@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # Dorothy  ThT5KcBeYPX3keUQqHPh  — britânica, suave, madura
     # Matilda  XrExE9yKIg1WjnnlVkGX  — acolhedora, maternal
     elevenlabs_voice_id: str = "XB0fDUnXU5powFXDhCwa"  # Charlotte — padrão
-    elevenlabs_model: str = "eleven_turbo_v2_5"
+    elevenlabs_model: str = "eleven_flash_v2_5"
     elevenlabs_stability: float = 0.75
     elevenlabs_similarity_boost: float = 0.75
     elevenlabs_style: float = 0.0

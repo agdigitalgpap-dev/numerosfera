@@ -1,4 +1,4 @@
-# PROJECT_CONTEXT.md — ASTRANUMERICA
+# PROJECT_CONTEXT.md — NUMEROSFERA
 > Gerado em 2026-05-09 · Atualizar sempre que houver mudanças estruturais.
 
 ---

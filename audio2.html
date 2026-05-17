@@ -362,6 +362,7 @@
 
     /* ── Video Space ─────────────────────────────────────────────────────── */
     .video-space {
+      position: relative;
       width: 100%;
       height: 520px;
       border: 1px solid rgba(200,180,224,0.4);
@@ -376,6 +377,45 @@
       overflow: hidden;
       padding: 28px 20px;
       box-sizing: border-box;
+    }
+
+    /* ── Overlays de notificação durante o áudio ─────────────────────────── */
+    .notif-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      padding: 14px 20px 28px;
+      background: linear-gradient(to bottom, rgba(8,6,4,0.96) 50%, transparent);
+      pointer-events: none;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .notif-overlay.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .notif-overlay .no-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .notif-overlay .no-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .notif-overlay .no-title .no-nome {
+      color: var(--gold-light);
     }
     .video-space .deep-orb-wrap { margin-bottom: 0; }
     .video-space #state-loading,
@@ -502,6 +542,24 @@
       <div id="state-autoplay">
         <p class="autoplay-msg">Toque para iniciar sua revelação</p>
         <button id="btn-iniciar-2" class="start-btn">&#9654; Iniciar revelação</button>
+      </div>
+
+      <!-- Overlay 1: 10s–70s -->
+      <div id="notif-overlay2-1" class="notif-overlay" aria-hidden="true">
+        <div class="no-label">✦ revelação importante ✦</div>
+        <div class="no-title">BLOQUEIO IDENTIFICADO</div>
+      </div>
+
+      <!-- Overlay 2: 90s–150s -->
+      <div id="notif-overlay2-2" class="notif-overlay" aria-hidden="true">
+        <div class="no-label">✦ <span class="no-nome" id="notif-nome-2">—</span>, ouça com atenção ✦</div>
+        <div class="no-title">SEU CAMPO SE ABRE AGORA</div>
+      </div>
+
+      <!-- Overlay 3: 180s–240s -->
+      <div id="notif-overlay2-3" class="notif-overlay" aria-hidden="true">
+        <div class="no-label">✦ momento de transformação ✦</div>
+        <div class="no-title">REMOÇÃO EM ANDAMENTO</div>
       </div>
 
     </div><!-- /video-space -->
@@ -777,9 +835,21 @@
     console.log('[SUBTITLE2] ' + phrases.length + ' frases construídas');
   }
 
+  // ── Overlays de notificação ───────────────────────────────────────────────
+  function _initNotifOverlays2() {
+    try {
+      const lead = LeadManager.getLead();
+      const nome = LeadManager.getNomeFormatado(lead);
+      if (nome) document.getElementById('notif-nome-2').textContent = nome;
+    } catch(e) {}
+  }
+
   // ── Progresso ─────────────────────────────────────────────────────────────
   function onProgress(pct, cur, dur) {
     document.getElementById('prog-fill').style.width = (pct * 100).toFixed(1) + '%';
+    document.getElementById('notif-overlay2-1').classList.toggle('visible', cur >= 10 && cur < 70);
+    document.getElementById('notif-overlay2-2').classList.toggle('visible', cur >= 90 && cur < 150);
+    document.getElementById('notif-overlay2-3').classList.toggle('visible', cur >= 180 && cur < 240);
     if (_phrases2.length) {
       let idx = -1;
       for (let i = 0; i < _phrases2.length; i++) {
@@ -822,6 +892,7 @@
     document.getElementById('lead-nome').textContent  = LeadManager.getNomeFormatado(lead);
     document.getElementById('lead-signo').textContent = LeadManager.getSignoDisplay(lead);
     document.title = 'Revelação de ' + LeadManager.getNomeFormatado(lead) + ' · NUMEROSFERA';
+    _initNotifOverlays2();
 
     const icon    = document.getElementById('signo-icon');
     const iconSrc = LeadManager.getSignoIcon(lead);

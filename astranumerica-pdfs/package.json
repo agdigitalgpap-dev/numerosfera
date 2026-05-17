@@ -1,5 +1,5 @@
 {
-  "name": "astranumerica-pdfs",
+  "name": "numerosfera-pdfs",
   "version": "1.0.0",
   "description": "Os PDFs são gerados automaticamente com base nas respostas do quiz do funil.",
   "main": "index.js",

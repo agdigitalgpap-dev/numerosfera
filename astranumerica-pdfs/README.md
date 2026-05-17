@@ -1,4 +1,4 @@
-# ASTRANUMERICA — GERAÇÃO DE PDFs PERSONALIZADOS
+# NUMEROSFERA — GERAÇÃO DE PDFs PERSONALIZADOS
 
 ## COMO FUNCIONA
 Os PDFs são gerados automaticamente com base
@@ -27,7 +27,7 @@ nas respostas do quiz do funil.
 - Urgência e escassez
 
 ## ONDE FICAM OS OUTPUTS
-astranumerica-pdfs/outputs/
+numerosfera-pdfs/outputs/
 
 ## NOMENCLATURA DOS ARQUIVOS GERADOS
 produto-principal_{sexo}_{dor}_{nome}.pdf
