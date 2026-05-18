@@ -1147,9 +1147,12 @@
   let _emailOverlayShown  = false;
   let _audioEnded         = false;
   let _emailTriggerTime   = null;  // timestamp exato do início do bloco CTA (palavra "acabei")
+  let _audioReady         = false; // true quando onReady disparou
+  let _clickedEarly       = false; // true se usuário clicou antes de onReady
 
   function showEmailOverlay() {
     console.log('[AUDIO1 EMAIL OPEN — áudio terminou]');
+    if (window.AstraAnalytics) AstraAnalytics.track('email_shown');
 
     const lead = LeadManager.getLead();
     if (lead) {
@@ -1314,6 +1317,9 @@
       console.log('[audio1] Email já capturado — overlay desativado');
     }
 
+    // Mostra o overlay de clique imediatamente — sem flash de loading
+    showAutoplayOverlay();
+    // Loading roda em background (atrás do overlay) para não travar o player ao jogar
     showState('loading');
     startLoading();
 
@@ -1331,35 +1337,28 @@
       onReady(duration, timestamps) {
         if (_readyFired) { console.warn('[audio1] onReady — já disparado, ignorado'); return; }
         _readyFired = true;
+        _audioReady = true;
         console.log('[AUDIO1 READY]');
         _buildPhrases(timestamps);
         _initNotifOverlays();
         _preGenerateAudio2(lead);
         if (window.AstraAnalytics) AstraAnalytics.track('audio1_start');
-        finishLoading(() => {
-          showState('player');
-          startEqualizer();
-        });
+
+        if (_clickedEarly) {
+          // Usuário clicou antes de o áudio estar pronto — toca agora
+          _clickedEarly = false;
+          hideAutoplayOverlay();
+          audioPlayer1.manualPlay();
+          finishLoading(() => { showState('player'); startEqualizer(); });
+        }
+        // Se não clicou ainda: overlay já está visível, aguarda o clique
       },
       onAutoplayBlocked() {
-        console.warn('[audio1] Autoplay bloqueado — exibindo overlay');
+        // Overlay já está visível desde o init — nada a fazer
         _preGenerateAudio2(lead);
-        if (_readyFired) {
-          showAutoplayOverlay();
-          return;
-        }
-        // Caso raro: autoplay bloqueado antes de onReady
-        _readyFired = true;
-        const inLoading = document.getElementById('state-loading').style.display !== 'none';
-        if (inLoading) {
-          finishLoading(() => {
-            showState('player');
-            showAutoplayOverlay();
-          });
-        } else {
-          stopLoading();
-          showState('player');
-          showAutoplayOverlay();
+        if (!_readyFired) {
+          _readyFired = true;
+          _audioReady = true;
         }
       },
       onProgress,
@@ -1376,6 +1375,7 @@
         _audioEnded = true;
         stopEqualizer();
         console.log('[AUDIO1 COMPLETE]');
+        if (window.AstraAnalytics) AstraAnalytics.track('audio1_complete');
         const lead = LeadManager.getLead();
         if (lead && lead.email) {
           window.location.href = 'audio2.html';
@@ -1442,7 +1442,12 @@
     _initDone              = false;
     _playerInitialized     = false;
     _readyFired            = false;
+    _audioReady            = false;
+    _clickedEarly          = false;
     window.__audio1Started = false;
+    // Reseta o botão caso tenha sido desativado
+    const btn = document.getElementById('btn-start-reading');
+    if (btn) { btn.textContent = 'Iniciar minha leitura →'; btn.disabled = false; }
     init();
   }
 
@@ -1450,9 +1455,19 @@
     // Overlay de autoplay: único botão, listener adicionado UMA vez
     document.getElementById('btn-start-reading').addEventListener('click', function () {
       console.log('[AUDIO PLAY] manual tap audio1');
-      audioPlayer1.manualPlay();   // síncrono — iOS exige play() direto no handler
-      hideAutoplayOverlay();
-      startEqualizer();
+      if (_audioReady) {
+        // Áudio já carregado — toca imediatamente (gesture válido no iOS)
+        audioPlayer1.manualPlay();
+        hideAutoplayOverlay();
+        finishLoading(() => { showState('player'); startEqualizer(); });
+      } else {
+        // Áudio ainda carregando (< 1s) — guarda intenção
+        _clickedEarly = true;
+        this.textContent = 'Aguardando…';
+        this.disabled = true;
+        // Tenta desbloquear AudioContext com o gesto (iOS)
+        try { new Audio().play().catch(() => {}); } catch(_) {}
+      }
     });
 
     const emailInp = document.getElementById('email-input-overlay');

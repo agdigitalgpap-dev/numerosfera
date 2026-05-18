@@ -871,6 +871,8 @@
   let _initDone      = false;   // true após primeiro init() — impede re-entradas
   let _readyFired    = false;   // true após onReady ou onAutoplayBlocked
   let _audioRetried  = false;   // auto-retry único quando o arquivo MP3 retorna 404
+  let _audioReady2   = false;   // true quando o áudio está pronto para tocar
+  let _clickedEarly2 = false;   // true se o usuário clicou antes do áudio estar pronto
 
   // ── Init ──────────────────────────────────────────────────────────────────
   function init() {
@@ -906,6 +908,8 @@
       icon.alt = LeadManager.getSignoDisplay(lead);
     }
 
+    // Mostra overlay imediatamente — áudio carrega em paralelo
+    showAutoplayOverlay2();
     showState('loading');
     startLoading();
 
@@ -921,41 +925,33 @@
     audioPlayer2.loadAndPlay('audio2', lead, {
       onReady(duration, timestamps) {
         if (_readyFired) { console.warn('[audio2] onReady — já disparado, ignorado'); return; }
-        _readyFired = true;
+        _readyFired  = true;
+        _audioReady2 = true;
         console.log('[AUDIO2 READY]');
         _buildPhrases2(timestamps);
         if (window.AstraAnalytics) AstraAnalytics.track('audio2_start');
-        finishLoading(() => {
-          showState('player');
-          startEqualizer2();
-          console.log('[AUDIO2 PLAYBACK]');
-        });
+        if (_clickedEarly2) {
+          _clickedEarly2 = false;
+          audioPlayer2.manualPlay();
+          hideAutoplayOverlay2();
+          finishLoading(() => { showState('player'); startEqualizer2(); });
+        }
+        // Se ainda não clicou: overlay continua visível, aguarda o clique
       },
       onAutoplayBlocked() {
         console.warn('[AUTOPLAY BLOCKED] audio2');
-        if (_readyFired) {
-          showAutoplayOverlay2();
-          return;
-        }
-        _readyFired = true;
-        const inLoading = document.getElementById('state-loading').style.display !== 'none';
-        if (inLoading) {
-          finishLoading(() => {
-            showState('player');
-            showAutoplayOverlay2();
-          });
-        } else {
-          stopLoading();
-          showState('player');
-          showAutoplayOverlay2();
-        }
+        if (_readyFired) return;
+        _readyFired  = true;
+        _audioReady2 = true;
+        // Overlay já está visível desde o init — só garante que continua visível
+        finishLoading(() => { showState('player'); });
       },
       onProgress,
       onUnlock() {},
       onEnd() {
         if (_audioEnded) return;
         _audioEnded = true;
-
+        if (window.AstraAnalytics) AstraAnalytics.track('audio2_complete');
         _showBtnContinuar();
       },
       onRetry(attempt, maxRetries) {
@@ -1008,7 +1004,11 @@
     audioPlayer2.reset();   // limpa _loading, _started, timers e época
     _initDone              = false;
     _readyFired            = false;
+    _audioReady2           = false;
+    _clickedEarly2         = false;
     window.__audio2Started = false;
+    const btn = document.getElementById('btn-start-reading-2');
+    if (btn) { btn.textContent = 'Escute a revelação →'; btn.disabled = false; }
     init();
   }
 
@@ -1016,9 +1016,16 @@
     // Overlay de autoplay: único listener, adicionado uma vez
     document.getElementById('btn-start-reading-2').addEventListener('click', function () {
       console.log('[MANUAL PLAY AUDIO2]');
-      audioPlayer2.manualPlay();   // síncrono — iOS exige play() direto no handler
-      hideAutoplayOverlay2();
-      startEqualizer2();
+      if (_audioReady2) {
+        audioPlayer2.manualPlay();   // síncrono — iOS exige play() direto no handler
+        hideAutoplayOverlay2();
+        finishLoading(() => { showState('player'); startEqualizer2(); });
+      } else {
+        _clickedEarly2 = true;
+        this.textContent = 'Aguardando…';
+        this.disabled = true;
+        try { new Audio().play().catch(() => {}); } catch(_) {}
+      }
     });
 
     try {

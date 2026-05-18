@@ -80,9 +80,9 @@
   <!-- KPIs -->
   <div class="row row-4" id="kpi-row">
     <div class="card"><div class="card-title">Quiz abertos</div><div class="stat-val" id="kpi-quiz">—</div><div class="stat-sub">total</div></div>
-    <div class="card"><div class="card-title">Áudio 1</div><div class="stat-val" id="kpi-a1">—</div><div class="stat-sub">sessões únicas</div></div>
     <div class="card"><div class="card-title">E-mails</div><div class="stat-val" id="kpi-email">—</div><div class="stat-sub">capturados</div></div>
-    <div class="card"><div class="card-title">Áudio 2</div><div class="stat-val" id="kpi-a2">—</div><div class="stat-sub">sessões únicas</div></div>
+    <div class="card"><div class="card-title">VSL abertas</div><div class="stat-val" id="kpi-vsl">—</div><div class="stat-sub">sessões únicas</div></div>
+    <div class="card"><div class="card-title">Compras</div><div class="stat-val" id="kpi-purchase" style="color:#4ade80">—</div><div class="stat-sub">confirmadas</div></div>
   </div>
 
   <!-- Funil + Conversão -->
@@ -120,13 +120,19 @@ const API_BASE = 'https://web-production-6988c1.up.railway.app';
 let _adminKey  = '';
 
 const STEP_LABELS = {
-  quiz_start:    'Quiz aberto',
-  quiz_complete: 'Quiz completo',
-  palm_start:    'Palma aberta',
-  palm_capture:  'Palma capturada',
-  audio1_start:  'Áudio 1',
-  email_captured:'E-mail capturado',
-  audio2_start:  'Áudio 2',
+  quiz_start:       'Quiz aberto',
+  quiz_complete:    'Quiz completo',
+  palm_start:       'Palma aberta',
+  palm_capture:     'Palma capturada',
+  audio1_start:     'Áudio 1 iniciado',
+  audio1_complete:  'Áudio 1 completo',
+  email_shown:      'Overlay e-mail',
+  email_captured:   'E-mail capturado',
+  audio2_start:     'Áudio 2 iniciado',
+  audio2_complete:  'Áudio 2 completo',
+  vsl_start:        'VSL aberta',
+  vsl_cta_click:    'VSL — clicou assistir',
+  purchase_complete:'Compra confirmada',
 };
 
 function doLogin() {
@@ -167,10 +173,10 @@ function renderDash(data) {
     const found = fa.find(s => s.step === step);
     return found ? found.count : 0;
   }
-  document.getElementById('kpi-quiz').textContent  = _count('quiz_start');
-  document.getElementById('kpi-a1').textContent    = _count('audio1_start');
-  document.getElementById('kpi-email').textContent = _count('email_captured');
-  document.getElementById('kpi-a2').textContent    = _count('audio2_start');
+  document.getElementById('kpi-quiz').textContent     = _count('quiz_start');
+  document.getElementById('kpi-email').textContent    = _count('email_captured');
+  document.getElementById('kpi-vsl').textContent      = _count('vsl_start');
+  document.getElementById('kpi-purchase').textContent = _count('purchase_complete');
 
   // Funil 7d
   const f7 = data.funnel_7d || [];

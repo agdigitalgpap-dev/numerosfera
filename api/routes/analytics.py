@@ -28,18 +28,30 @@ _FUNNEL_STEPS = [
     "palm_start",
     "palm_capture",
     "audio1_start",
+    "audio1_complete",
+    "email_shown",
     "email_captured",
     "audio2_start",
+    "audio2_complete",
+    "vsl_start",
+    "vsl_cta_click",
+    "purchase_complete",
 ]
 
 _STEP_LABELS = {
-    "quiz_start":     "Quiz aberto",
-    "quiz_complete":  "Quiz completo",
-    "palm_start":     "Palma aberta",
-    "palm_capture":   "Palma capturada",
-    "audio1_start":   "Áudio 1 iniciado",
-    "email_captured": "E-mail capturado",
-    "audio2_start":   "Áudio 2 iniciado",
+    "quiz_start":       "Quiz aberto",
+    "quiz_complete":    "Quiz completo",
+    "palm_start":       "Palma aberta",
+    "palm_capture":     "Palma capturada",
+    "audio1_start":     "Áudio 1 iniciado",
+    "audio1_complete":  "Áudio 1 completo",
+    "email_shown":      "Overlay e-mail exibido",
+    "email_captured":   "E-mail capturado",
+    "audio2_start":     "Áudio 2 iniciado",
+    "audio2_complete":  "Áudio 2 completo",
+    "vsl_start":        "VSL aberta",
+    "vsl_cta_click":    "VSL — clicou assistir",
+    "purchase_complete": "Compra confirmada",
 }
 
 

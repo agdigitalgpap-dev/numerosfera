@@ -6,6 +6,13 @@
 <title>Resultado — Quiz Astrológico</title>
 <link rel="stylesheet" href="assets/shared.css">
 <script src="assets/audio.js"></script>
+<script src="assets/lead-manager.js"></script>
+<script>
+  window.ASTRA_API_URL  = 'https://web-production-6988c1.up.railway.app';
+  window.ASTRA_GA4_ID   = 'G-XXXXXXXXXX';
+  window.ASTRA_PIXEL_ID = '000000000000000';
+</script>
+<script src="assets/analytics.js"></script>
 <style>
 body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
 
@@ -180,6 +187,9 @@ const bg=document.getElementById('bgLayer');
 const wc=['rgba(255,235,180,VAR)','rgba(255,215,140,VAR)','rgba(220,180,110,VAR)','rgba(255,250,230,VAR)'];
 for(let i=0;i<100;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.8+0.3;const c=wc[Math.floor(Math.random()*wc.length)].replace('VAR',(0.3+Math.random()*0.5).toFixed(2));s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${c};--dur:${3+Math.random()*5}s;--delay:-${Math.random()*6}s;--op:${(0.4+Math.random()*0.5).toFixed(2)};`;bg.appendChild(s);}
 
+// Evento: usuário chegou na VSL
+if (window.AstraAnalytics) AstraAnalytics.track('vsl_start');
+
 const nome=localStorage.getItem('primeiroNome')||'';
 const signo=localStorage.getItem('signo')||'';
 if(nome) document.getElementById('nameDisplay').textContent=nome;
@@ -194,6 +204,8 @@ if(signo){
 }
 
 function startVideo(){
+  // Evento: usuário clicou para iniciar a VSL (engajamento real)
+  if (window.AstraAnalytics) AstraAnalytics.track('vsl_cta_click');
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('vidPlaceholder').style.display='none';
   const v=document.getElementById('mainVideo');
@@ -206,7 +218,11 @@ function startVideo(){
   if(!v.src && !v.querySelector('source')) AudioManager.stop();
 }
 document.getElementById('mainVideo').addEventListener('loadeddata',()=>{document.getElementById('vidPlaceholder').style.display='none';});
-document.getElementById('mainVideo').addEventListener('ended',()=>{window.location.href='pages/page10.html';});
+document.getElementById('mainVideo').addEventListener('ended',()=>{
+  // Adicione aqui: AstraAnalytics.track('purchase_complete', { valor: 97 });
+  // na página de obrigado/confirmação de compra.
+  window.location.href='pages/page10.html';
+});
 </script>
 </body>
 </html>
