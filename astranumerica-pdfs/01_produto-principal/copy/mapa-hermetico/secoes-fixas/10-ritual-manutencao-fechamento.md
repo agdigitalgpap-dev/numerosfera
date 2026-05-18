@@ -13,13 +13,21 @@ Não porque o conteúdo seja o mais elaborado. Porque é onde a maioria das pess
 
 O campo energético, como qualquer sistema, requer manutenção.
 
-O ritual hermético que foi realizado criou uma abertura profunda. Essa abertura é real. Mas campos energéticos operam em um ambiente constante de influências — emoções não processadas, exposições a energias densas, pensamentos de alta frequência negativa, inércia de padrões antigos.
+O ritual hermético que foi realizado criou uma abertura profunda. Essa abertura é real. Mas campos energéticos operam em um ambiente constante de influências — emoções não processadas, exposições a energias densas, pensamentos de alta frequência negativa, inércia de padrões antigos que ainda têm memória no campo.
 
-Sem manutenção, o campo começa a acumular novas obstruções. Não de imediato. Mas gradualmente, ao longo de semanas.
+Sem manutenção, o campo começa a acumular novas obstruções. Não de imediato. Mas gradualmente, ao longo de semanas — e quando o acúmulo chega a um ponto crítico, o estado anterior retorna quase que completamente.
 
-A Técnica dos 7 Minutos foi apresentada para evitar exatamente isso.
+Não porque o trabalho hermético falhou. Porque não foi sustentado.
 
-O que esta seção adiciona é o Ritual de Manutenção Mensal — um protocolo mais profundo, realizado uma vez por mês, que limpa o que a prática diária não alcança.
+A Técnica dos 7 Minutos foi apresentada para evitar exatamente isso — a manutenção diária que mantém o canal em fluxo. O que esta seção adiciona é o Ritual de Manutenção Mensal — um protocolo mais profundo, realizado uma vez por mês, que limpa o que a prática diária não alcança e que realinha o campo com o trabalho original.
+
+## Por que o ritual mensal é diferente da prática diária
+
+A Técnica dos 7 Minutos mantém o fluxo. O Ritual de Manutenção Mensal realiza uma limpeza mais profunda.
+
+A distinção é importante: manter o fluxo evita que obstruções se formem. Mas mesmo com o fluxo mantido, o campo acumula camadas mais sutis ao longo do mês — resíduos de situações emocionalmente intensas, traços de campos densos com os quais teve contato prolongado, memórias do mês que ainda não foram completamente processadas.
+
+O ritual mensal vai a essas camadas. Não apenas mantém — reorganiza. É a diferença entre limpar a superfície todo dia e fazer uma limpeza profunda uma vez por mês. Ambas são necessárias. Nenhuma substitui a outra.
 
 ---
 

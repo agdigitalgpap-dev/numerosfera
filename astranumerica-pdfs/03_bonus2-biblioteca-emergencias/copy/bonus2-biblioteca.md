@@ -24,6 +24,20 @@ Os quatro rituais abaixo são técnicas herméticas de ação imediata. Protocol
 
 Seu campo foi tratado. Estes rituais funcionam para você agora.
 
+## O que diferencia uma emergência energética de uma crise normal
+
+Nem todo momento difícil é uma emergência energética. Saber distinguir evita dois erros opostos: usar rituais de emergência para situações que pedem apenas processamento natural, ou esperar pelo processamento natural quando o campo precisa de intervenção.
+
+**Sinais de crise natural — que pede tempo e presença:**
+
+A situação difícil tem causa externa clara e proporcional. Você sente o peso, mas consegue identificar de onde veio. A dificuldade é processável — dói, mas você sabe que vai passar. Há uma lógica interna, mesmo que dolorosa.
+
+**Sinais de emergência energética — que pede intervenção:**
+
+A intensidade é desproporcional à causa. Você sente que algo foi ativado além do que a situação justifica. Há uma névoa — dificuldade de pensar com clareza que não corresponde ao seu estado habitual. Uma sensação de que algo está bloqueado de fora, não apenas difícil por dentro. Eventos se encadeiam em sequência de contratempos sem causa identificável.
+
+Quando você reconhecer dois ou mais desses sinais, é o momento de usar esta biblioteca — não de esperar que passe sozinho.
+
 ---
 
 ## Como diagnosticar qual ritual você precisa
@@ -121,7 +135,11 @@ O campo foi desobstruído — a manifestação vem em formas que não podemos pr
 - Uma oportunidade que aparece de direção inesperada
 - A decisão que estava bloqueada começa a se mover
 
----
+**O que fazer se não sentir resultado em 24 horas**
+
+Se após 24 horas nenhum sinal aparecer, há duas possibilidades: o bloqueio é mais profundo e tem camadas que um único ritual não remove em uma sessão, ou há uma interferência energética externa que está bloqueando o resultado do desbloqueio.
+
+Nesse caso, realize o Ritual 2 (Proteção) na noite seguinte, e retorne ao Ritual 1 no terceiro dia. A combinação Proteção + Desbloqueio é a mais eficaz para situações com múltiplas camadas.
 
 # RITUAL 2 — PROTEÇÃO E ESCUDO ENERGÉTICO
 ## Limpeza e blindagem imediatas
@@ -182,7 +200,11 @@ Realize apenas a Fase 3. Visualize o escudo por 2 minutos completos. Declare: *"
 - Os pensamentos voltam a parecer seus
 - Uma leveza específica nos ombros e na nuca
 
----
+**Frequência de uso**
+
+O Ritual 2 pode ser realizado com mais frequência do que os outros — porque o campo em estado de exposição constante (ambientes de alta densidade energética, relações com campos muito pesados) se beneficia de limpeza regular.
+
+Nos períodos de exposição intensa, realize o Ritual 2 a cada dois ou três dias. Depois que a exposição diminuir, o Ritual de Manutenção Mensal do Mapa Hermético é suficiente para sustentação.
 
 # RITUAL 3 — CANAL DA ABUNDÂNCIA URGENTE
 ## Para momentos de necessidade financeira imediata
@@ -257,7 +279,11 @@ Nas próximas 48 horas, tome ação em pelo menos dois dos canais que listou.
 - Uma oportunidade que se apresenta de direção não prevista
 - Um movimento em algum dos canais que listou — mesmo que pequeno
 
----
+**Ação após o ritual**
+
+O Ritual 3 é o único dos quatro que exige ação imediata como parte do processo. Nas 48 horas seguintes, entre em contato com pelo menos dois dos canais que listou na Fase 3. Não espere a oportunidade perfeita — dê o primeiro passo em direção aos canais mais prováveis.
+
+O campo abriu a possibilidade. A ação fecha o circuito. Ritual sem ação neste caso é como abrir uma torneira sem ter um copo.
 
 # RITUAL 4 — CLAREZA IMEDIATA
 ## Para decisões urgentes que precisam de resposta clara
@@ -338,17 +364,29 @@ Dia 3: Ritual de sua escolha, conforme o que se moveu
 
 Rituais de emergência tratam crises. O Ritual de Manutenção do seu Mapa Hermético previne que elas se tornem a norma.
 
-Com o campo em manutenção regular, a frequência e intensidade das emergências diminui significativamente ao longo dos meses. O campo em estado de coerência cria resistência natural a desequilíbrios externos.
+Com o campo em manutenção regular, a frequência e intensidade das emergências diminui significativamente ao longo dos meses. O campo em estado de coerência cria resistência natural a desequilíbrios externos — não porque fica impermeável, mas porque se recupera com muito mais velocidade quando perturbado.
 
 **Sinais de que o campo está precisando de atenção antes da emergência:**
 
 - Cansaço sem causa que persiste por mais de 3 dias
-- Sequência de pequenos contratempos
-- Dificuldade de concentração que vai além do normal
+- Sequência de pequenos contratempos sem causa identificável
+- Dificuldade de concentração que vai além do normal para você
 - Uma sensação difusa de que algo está errado, sem conseguir nomear o quê
 - Reativação de padrões antigos que estavam calmos
 
-Ao identificar dois ou mais desses sinais, realize o Ritual de Manutenção do Mapa Hermético — não espere pela emergência.
+Ao identificar dois ou mais desses sinais, realize o Ritual de Manutenção do Mapa Hermético — não espere pela emergência. A intervenção preventiva é sempre mais eficaz e menos custosa do que a intervenção de emergência.
+
+## Registro de uso — acompanhando seu campo
+
+Para quem usa esta biblioteca com regularidade, recomendo manter um registro simples.
+
+Após cada ritual, escreva em papel ou em arquivo digital:
+
+**Data e ritual utilizado.** Qual situação motivou o uso. O que você sentiu durante o ritual. O que aconteceu nas 24 a 48 horas seguintes.
+
+Esse registro tem dois benefícios práticos: ajuda a identificar padrões — se o mesmo tipo de emergência se repete, isso indica algo que pede trabalho mais profundo no campo, não apenas tratamento de crise. E cria uma documentação do que funciona no seu campo específico — porque campos diferentes respondem com intensidades diferentes a cada ritual.
+
+Com o tempo, você vai desenvolver uma intuição precisa sobre qual ritual seu campo precisa antes mesmo de diagnosticar conscientemente. Esse é o sinal de que o trabalho energético se integrou — não como técnica, mas como percepção.
 
 ---
 
