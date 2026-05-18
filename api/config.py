@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     elevenlabs_stability: float = 0.45
     elevenlabs_similarity_boost: float = 0.65
     elevenlabs_style: float = 0.25
-    elevenlabs_speed: float = 0.85
+    elevenlabs_speed: float = 0.95
     elevenlabs_speaker_boost: bool = True
     elevenlabs_output_format: str = "mp3_44100_128"
 
