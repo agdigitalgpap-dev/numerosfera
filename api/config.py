@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     # Matilda  XrExE9yKIg1WjnnlVkGX  — acolhedora, maternal
     elevenlabs_voice_id: str = "XB0fDUnXU5powFXDhCwa"  # Charlotte — padrão
     elevenlabs_model: str = "eleven_flash_v2_5"
-    elevenlabs_stability: float = 0.75
-    elevenlabs_similarity_boost: float = 0.75
-    elevenlabs_style: float = 0.0
+    elevenlabs_stability: float = 0.45
+    elevenlabs_similarity_boost: float = 0.65
+    elevenlabs_style: float = 0.25
     elevenlabs_speed: float = 0.85
     elevenlabs_speaker_boost: bool = True
     elevenlabs_output_format: str = "mp3_44100_128"

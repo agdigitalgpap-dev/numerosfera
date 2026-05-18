@@ -483,7 +483,6 @@
     }
     #autoplay-overlay.visible {
       display: flex;
-      animation: overlay-fadein 0.48s cubic-bezier(0.34,1.15,0.64,1) both;
     }
     .ap-inner {
       display: flex;
@@ -1317,11 +1316,8 @@
       console.log('[audio1] Email já capturado — overlay desativado');
     }
 
-    // Mostra o overlay de clique imediatamente — sem flash de loading
+    // Overlay aparece imediatamente — loading roda invisível em background
     showAutoplayOverlay();
-    // Loading roda em background (atrás do overlay) para não travar o player ao jogar
-    showState('loading');
-    startLoading();
 
     if (_playerInitialized) { console.warn('[audio1] loadAndPlay bloqueado — playerInitialized guard'); return; }
     _playerInitialized = true;
@@ -1347,9 +1343,10 @@
         if (_clickedEarly) {
           // Usuário clicou antes de o áudio estar pronto — toca agora
           _clickedEarly = false;
-          hideAutoplayOverlay();
           audioPlayer1.manualPlay();
-          finishLoading(() => { showState('player'); startEqualizer(); });
+          hideAutoplayOverlay();
+          showState('player');
+          startEqualizer();
         }
         // Se não clicou ainda: overlay já está visível, aguarda o clique
       },
@@ -1459,7 +1456,8 @@
         // Áudio já carregado — toca imediatamente (gesture válido no iOS)
         audioPlayer1.manualPlay();
         hideAutoplayOverlay();
-        finishLoading(() => { showState('player'); startEqualizer(); });
+        showState('player');
+        startEqualizer();
       } else {
         // Áudio ainda carregando (< 1s) — guarda intenção
         _clickedEarly = true;
