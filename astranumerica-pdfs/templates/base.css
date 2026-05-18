@@ -216,6 +216,13 @@ li::before {
   top: 5px;
 }
 
+/* ── HR (separadores --- do markdown) ────── */
+hr {
+  border: none;
+  border-top: 1px solid rgba(184,146,42,0.15);
+  margin: 18px 0;
+}
+
 /* ── DIVISOR ──────────────────────────────── */
 .divider {
   display: flex;

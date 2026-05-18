@@ -50,7 +50,11 @@ function parseArgs() {
 function readMd(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return ''; } }
 
 function mdToHtml(md) {
-  const clean = md.split('\n').filter(l => !l.startsWith('> ')).join('\n');
+  const clean = md.split('\n')
+    .filter(l => !l.startsWith('> '))  // strip blockquote metadata
+    .filter(l => !/^# /.test(l))       // strip H1 document-title markers
+    .filter(l => l.trim() !== '---')   // strip HR separators (sec-hero/h2 borders provide structure)
+    .join('\n');
   return marked.parse(clean);
 }
 
@@ -156,26 +160,36 @@ function imgPage(src, caption = '') {
 function splitPages(html, n, footerFn, startPg) {
   const sep = '|||BREAK|||';
   const tagged = html
-    .replace(/<\/p>/gi,   '</p>'  + sep)
-    .replace(/<\/h[1-6]>/gi, m => m + sep)
-    .replace(/<\/ul>/gi,  '</ul>' + sep)
-    .replace(/<\/ol>/gi,  '</ol>' + sep)
-    .replace(/<\/blockquote>/gi, '</blockquote>' + sep);
+    .replace(/<\/p>/gi,          '</p>'          + sep)
+    .replace(/<\/h[1-6]>/gi,     m => m          + sep)
+    .replace(/<\/ul>/gi,         '</ul>'         + sep)
+    .replace(/<\/ol>/gi,         '</ol>'         + sep)
+    .replace(/<\/blockquote>/gi, '</blockquote>' + sep)
+    .replace(/<hr\s*\/?>/gi,     m => m          + sep);
 
   const blocks = tagged.split(sep).map(b => b.trim()).filter(Boolean);
-
-  const pages  = [];
-  const total  = blocks.length;
   const target = Math.max(n, 1);
+  const total  = blocks.length;
 
-  for (let i = 0; i < target; i++) {
+  // Distribute blocks uniformly across pages
+  const pageBlocks = Array.from({ length: target }, (_, i) => {
     const s = Math.floor(i * total / target);
     const e = Math.floor((i + 1) * total / target);
-    const chunk = blocks.slice(s, e).join('\n') || '<p style="opacity:0">​</p>';
-    pages.push(pageDiv(chunk, footerFn(startPg + i)));
+    return blocks.slice(s, e);
+  });
+
+  // Prevent orphan headings: never end a page with an h2-h6
+  for (let i = 0; i < pageBlocks.length - 1; i++) {
+    const pg = pageBlocks[i];
+    if (pg.length > 1 && /<h[2-6]/i.test(pg[pg.length - 1])) {
+      pageBlocks[i + 1].unshift(pg.pop());
+    }
   }
 
-  return pages.join('\n');
+  return pageBlocks.map((pg, i) => {
+    const chunk = pg.join('\n') || '<p style="opacity:0">​</p>';
+    return pageDiv(chunk, footerFn(startPg + i));
+  }).join('\n');
 }
 
 // ── Página de índice ──────────────────────────────────────────
