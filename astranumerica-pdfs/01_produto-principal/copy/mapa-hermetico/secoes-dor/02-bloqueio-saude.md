@@ -15,6 +15,8 @@ Isso não é fraqueza. Não é exagero. Não é algo que você inventou para jus
 
 É um bloqueio energético profundo que estava impedindo o fluxo vital de circular como deveria no seu campo.
 
+<!-- PAGEBREAK -->
+
 ## Como o bloqueio funcionava
 
 No mapa hermético, o bloqueio de saúde aparece como uma obstrução no Canal Vital — o caminho energético que distribui a força de vida por todos os sistemas do seu ser: físico, emocional e energético.
@@ -26,6 +28,8 @@ Quando esse canal está comprometido, o impacto é sentido em todas as camadas s
 **No emocional:** Irritabilidade, ansiedade, tristeza sem motivo aparente. Quando o fluxo vital está bloqueado, o sistema emocional fica sobrecarregado. As emoções que deveriam circular e se processar ficam presas, acumulando peso.
 
 **Na energia geral:** A famosa sensação de "falta de gás". Você começa as coisas, mas não sustenta o ritmo. Projetos, rotinas, relacionamentos — tudo exige um esforço desproporcional porque a fonte de energia está comprometida.
+
+<!-- PAGEBREAK -->
 
 ## A origem do bloqueio
 

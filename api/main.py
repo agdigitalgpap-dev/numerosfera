@@ -24,6 +24,7 @@ from fastapi.staticfiles import StaticFiles
 from api.config import settings
 from api.routes.audio     import router as audio_router
 from api.routes.analytics import router as analytics_router
+from api.routes.webhook   import router as webhook_router
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,7 @@ app.add_middleware(
 # Rotas da API
 app.include_router(audio_router)
 app.include_router(analytics_router)
+app.include_router(webhook_router)
 
 # Serve os MP3s do cache como arquivos estáticos
 app.mount(

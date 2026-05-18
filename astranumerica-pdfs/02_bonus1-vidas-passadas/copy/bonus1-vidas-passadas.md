@@ -20,6 +20,8 @@ A tradição hermética tem uma explicação para isso. Alguns padrões não nas
 
 Este relatório identifica o que foi encontrado no seu campo: os ciclos que deixaram marcas ativas, os padrões que eles criaram, os talentos que trouxeram junto — e o protocolo para integrar o que ainda está em aberto.
 
+<!-- PAGEBREAK -->
+
 ## O que a tradição hermética entende sobre vidas passadas
 
 Não é curiosidade espiritual. É informação prática.

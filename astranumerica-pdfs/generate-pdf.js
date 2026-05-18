@@ -135,11 +135,12 @@ function sectionOpener(num, roman, title, sub, bg = '') {
     ${bgLayer}
     ${logoStampAbs()}
     <div class="page-inner" style="justify-content:center;align-items:center;text-align:center;position:relative;z-index:1;">
-      <div class="sec-label" style="letter-spacing:0.4em;margin-bottom:14px;color:var(--gold-mid);text-shadow:0 0 18px rgba(212,168,75,0.35);">Parte ${roman}</div>
-      <div style="font-family:var(--f-title);font-size:9.5pt;color:var(--gold);letter-spacing:0.3em;margin-bottom:28px;text-transform:uppercase;text-shadow:0 0 14px rgba(184,146,42,0.4);">— Seção ${num} —</div>
-      <div style="font-family:var(--f-display);font-size:28pt;color:var(--gold-hi);line-height:1.2;text-shadow:0 0 60px rgba(212,168,75,0.35);margin-bottom:18px;max-width:500px;">${title}</div>
+      <div class="sec-label" style="letter-spacing:0.4em;margin-bottom:14px;color:var(--gold-mid);">Parte ${roman}</div>
+      <div style="font-family:var(--f-title);font-size:9.5pt;color:var(--gold-dim);letter-spacing:0.3em;margin-bottom:24px;text-transform:uppercase;">— Seção ${num} —</div>
+      <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 28px;"></div>
+      <div style="font-family:var(--f-display);font-size:26pt;color:var(--gold-hi);line-height:1.2;margin-bottom:18px;max-width:500px;">${title}</div>
       ${sub ? `<div style="font-family:var(--f-label);font-size:10pt;color:var(--cream-dim);letter-spacing:0.08em;max-width:360px;line-height:1.6;">${sub}</div>` : ''}
-      <div style="margin-top:56px;color:var(--gold-dim);letter-spacing:8px;font-size:11pt;">✦ ✦ ✦</div>
+      <div style="margin-top:50px;color:var(--gold-dim);letter-spacing:8px;font-size:9pt;">✦ ✦ ✦</div>
     </div>
   </div>`;
 }
@@ -156,10 +157,16 @@ function imgPage(src, caption = '') {
 }
 
 // ── Divide HTML em N páginas forçadas ─────────────────────────
+// Suporta <!-- PAGEBREAK --> no HTML para forçar quebra de página exata.
 // Cada div.page = exatamente 1 página PDF
 function splitPages(html, n, footerFn, startPg) {
   const sep = '|||BREAK|||';
-  const tagged = html
+  const FORCED = '|||FORCED|||';
+
+  // Substitui marcadores explícitos de quebra de página
+  const withBreaks = html.replace(/<!--\s*PAGEBREAK\s*-->/gi, sep + FORCED + sep);
+
+  const tagged = withBreaks
     .replace(/<\/p>/gi,          '</p>'          + sep)
     .replace(/<\/h[1-6]>/gi,     m => m          + sep)
     .replace(/<\/ul>/gi,         '</ul>'         + sep)
@@ -167,18 +174,38 @@ function splitPages(html, n, footerFn, startPg) {
     .replace(/<\/blockquote>/gi, '</blockquote>' + sep)
     .replace(/<hr\s*\/?>/gi,     m => m          + sep);
 
-  const blocks = tagged.split(sep).map(b => b.trim()).filter(Boolean);
-  const target = Math.max(n, 1);
-  const total  = blocks.length;
+  const allBlocks = tagged.split(sep).map(b => b.trim()).filter(Boolean);
 
-  // Distribute blocks uniformly across pages
-  const pageBlocks = Array.from({ length: target }, (_, i) => {
-    const s = Math.floor(i * total / target);
-    const e = Math.floor((i + 1) * total / target);
-    return blocks.slice(s, e);
+  // Divide em segmentos nos marcadores FORCED
+  const segments = [];
+  let currentSeg = [];
+  for (const b of allBlocks) {
+    if (b === FORCED) { segments.push(currentSeg); currentSeg = []; }
+    else currentSeg.push(b);
+  }
+  segments.push(currentSeg);
+
+  const totalBlocks = allBlocks.filter(b => b !== FORCED).length;
+  const target = Math.max(n, segments.length);
+
+  // Distribui páginas entre segmentos proporcionalmente (floor favorece segmentos iniciais menores)
+  const pagesPerSeg = segments.map(s => Math.max(1, Math.floor(s.length / totalBlocks * target)));
+  const usedPages = pagesPerSeg.slice(0, -1).reduce((a, b) => a + b, 0);
+  pagesPerSeg[pagesPerSeg.length - 1] = Math.max(1, target - usedPages);
+
+  // Constrói os blocos de página de cada segmento
+  const pageBlocks = [];
+  segments.forEach((seg, si) => {
+    const pgs = pagesPerSeg[si];
+    const tot = seg.length;
+    for (let i = 0; i < pgs; i++) {
+      const s = Math.floor(i * tot / pgs);
+      const e = Math.floor((i + 1) * tot / pgs);
+      pageBlocks.push(seg.slice(s, e));
+    }
   });
 
-  // Prevent orphan headings: never end a page with an h2-h6
+  // Previne headings órfãs: nunca terminar uma página com h2-h6
   for (let i = 0; i < pageBlocks.length - 1; i++) {
     const pg = pageBlocks[i];
     if (pg.length > 1 && /<h[2-6]/i.test(pg[pg.length - 1])) {
@@ -320,10 +347,12 @@ ${pageDiv(`
     <div class="sec-label" style="margin-bottom:16px;letter-spacing:0.3em;">Documento Confidencial e Personalizado</div>
     <h1 style="font-size:28pt;margin-bottom:8px;line-height:1.2;">MAPA<br>HERMÉTICO</h1>
     <div style="font-family:var(--f-label);color:var(--cream-dim);letter-spacing:0.14em;font-size:8.5pt;margin-bottom:40px;text-transform:uppercase;">NUMEROSFERA · Astrologia Hermética</div>
-    <div class="title-page-box" style="margin-bottom:28px;min-width:300px;">
-      <div class="sec-label" style="margin-bottom:8px;letter-spacing:0.2em;">Preparado exclusivamente para</div>
+    <div style="margin-bottom:32px;">
+      <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:0 auto 20px;"></div>
+      <div class="sec-label" style="margin-bottom:10px;letter-spacing:0.2em;">Preparado exclusivamente para</div>
       <div class="letter-name" style="font-size:24pt;">${nome}</div>
       <div style="font-family:var(--f-label);color:var(--gold-dim);margin-top:8px;font-size:8pt;letter-spacing:0.2em;text-transform:uppercase;">${signo}</div>
+      <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:20px auto 0;"></div>
     </div>
     ${iSep ? `<img src="${iSep}" style="max-width:320px;max-height:40px;object-fit:contain;opacity:0.5;margin-bottom:20px;">` : ''}
     <p style="font-size:11pt;color:var(--cream-dim);max-width:380px;text-align:center;font-style:italic;">
@@ -354,7 +383,7 @@ ${splitPages(secHeader('Seção 2 · O Bloqueio', `${nome}, isso explica tudo`, 
 ${sectionOpener(3, 'III', 'Seus 5 Talentos Ocultos', 'Capacidades genuínas que estavam suprimidas pelo bloqueio', iInflu)}
 
 <!-- P.22–30 — SEÇÃO 3: TALENTOS (9 páginas) -->
-${splitPages(secHeader('Seção 3 · Talentos Ocultos', `${nome}, você tem talentos que nunca soube usar`, 'Não porque eles não existam — porque estavam bloqueados') + s3, 9, f, 22)}
+${splitPages(secHeader('Seção 3 · Talentos Ocultos', 'O que o bloqueio estava suprimindo', 'Capacidades genuínas que finalmente estão acessíveis') + s3, 9, f, 22)}
 
 <!-- P.31 — DIVISOR IV -->
 ${sectionOpener(4, 'IV', 'A Técnica dos 7 Minutos', 'O protocolo hermético de manutenção do campo', iResil)}
@@ -411,12 +440,12 @@ ${splitPages(secHeader('Seção 10 · Ritual de Manutenção', 'O que acontece s
     <div style="margin-bottom:28px;">${logoSvg(72)}</div>
     <div style="font-family:var(--f-label);font-size:7pt;color:var(--gold);letter-spacing:0.4em;text-transform:uppercase;margin-bottom:18px;">NUMEROSFERA</div>
     <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 32px;"></div>
-    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);line-height:1.4;letter-spacing:0.03em;text-shadow:0 0 40px rgba(212,168,75,0.4);margin-bottom:28px;">
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);line-height:1.4;letter-spacing:0.03em;margin-bottom:28px;">
       "O que estava bloqueado<br>agora está aberto.<br>O que era seu,<br>começa a chegar."
     </div>
     <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:0 auto 28px;"></div>
     <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Astrologia Hermética Personalizada</div>
-    <div style="font-family:var(--f-title);font-size:10pt;color:var(--gold-mid);letter-spacing:0.12em;">numerosfera.com.br</div>
+    <div style="font-family:var(--f-title);font-size:10pt;color:var(--gold-mid);letter-spacing:0.12em;">Astrologia Hermética Personalizada</div>
   </div>
 </div>
 
@@ -435,8 +464,6 @@ async function buildBoasVindas(args) {
     border-left: 2px solid var(--gold-dim);
     padding: 14px 20px;
     margin: 18px 0;
-    background: rgba(184,146,42,0.04);
-    border-radius: 0 4px 4px 0;
   }
   .testimonial p { font-style: italic; font-size: 11.5pt; color: var(--cream-dim); margin-bottom: 8px; }
   .testimonial strong { color: var(--gold-mid); font-style: normal; font-size: 10pt; display: block; }
@@ -444,37 +471,32 @@ async function buildBoasVindas(args) {
 </style></head><body>
 
 <!-- P.01 — CAPA -->
-<div class="page" style="background:var(--ink);position:relative;">
+<div class="page" style="background:var(--navy);position:relative;">
   ${frame()}
   ${logoStampAbs()}
-  <!-- Gradiente de fundo -->
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%, rgba(58,31,106,0.35) 0%, transparent 70%),radial-gradient(ellipse 60% 40% at 20% 80%, rgba(184,146,42,0.1) 0%, transparent 60%);z-index:0;pointer-events:none;"></div>
-  <div class="page-inner" style="justify-content:center;align-items:center;text-align:center;position:relative;z-index:1;">
-    <div style="margin-bottom:32px;">${logoSvg(100)}</div>
-    <div style="font-family:var(--f-label);font-size:8pt;color:var(--gold);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:20px;">Material Hermético Personalizado</div>
-    <div style="font-family:var(--f-display);font-size:38pt;color:var(--gold-hi);line-height:1.1;letter-spacing:0.04em;text-shadow:0 0 60px rgba(212,168,75,0.45);margin-bottom:16px;">COMECE<br>POR AQUI</div>
-    <div style="width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 24px;"></div>
-    <div style="font-family:var(--f-title);font-size:11pt;color:var(--cream-dim);letter-spacing:0.1em;max-width:320px;line-height:1.6;">Uma mensagem de<br><span style="color:var(--gold-mid);">Madame Celeste</span><br>antes de tudo</div>
-    <div style="margin-top:56px;color:var(--gold-dim);letter-spacing:8px;font-size:11pt;">✦ ✦ ✦</div>
+  <div class="page-inner" style="justify-content:center;align-items:center;text-align:center;">
+    <div style="margin-bottom:36px;">${logoSvg(96)}</div>
+    <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold-dim);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:24px;">Material Hermético Personalizado</div>
+    <div style="font-family:var(--f-display);font-size:38pt;color:var(--gold-hi);line-height:1.1;letter-spacing:0.04em;margin-bottom:20px;">COMECE<br>POR AQUI</div>
+    <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 24px;"></div>
+    <div style="font-family:var(--f-title);font-size:10.5pt;color:var(--cream-dim);letter-spacing:0.1em;max-width:300px;line-height:1.7;">Uma mensagem de<br><span style="color:var(--gold-mid);">Madame Celeste</span><br>antes de tudo</div>
+    <div style="margin-top:60px;color:var(--gold-dim);letter-spacing:8px;font-size:9pt;">✦ ✦ ✦</div>
   </div>
 </div>
 
 <!-- P.02 — Página de apresentação "Para {nome}" -->
 ${pageDiv(`
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
-    <div class="letter-header" style="margin-bottom:24px;">
-      <span class="letter-name" style="font-size:24pt;">Para ${nome}</span>
-      <span class="letter-sub">Uma mensagem antes de tudo</span>
-    </div>
-    <div style="margin-bottom:28px;">${logoSvg(56)}</div>
-    <p style="max-width:380px;font-style:italic;color:var(--cream-dim);font-size:12pt;line-height:1.85;margin-bottom:24px;">
+    <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold-dim);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:16px;">Carta de Abertura</div>
+    <div style="font-family:var(--f-display);font-size:26pt;color:var(--gold-hi);line-height:1.2;letter-spacing:0.04em;margin-bottom:6px;">Para ${nome}</div>
+    <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:16px auto 32px;"></div>
+    <p style="max-width:380px;font-style:italic;color:var(--cream-dim);font-size:12pt;line-height:1.9;margin-bottom:36px;">
       "O que você tem em mãos foi preparado exclusivamente para você.<br>Leia este documento primeiro — antes de qualquer outro material."
     </p>
-    <div style="color:var(--gold-dim);letter-spacing:8px;font-size:11pt;margin-bottom:28px;">✦ ✦ ✦</div>
     <div>
-      <div style="font-family:var(--f-label);font-size:8pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;">Uma mensagem de</div>
-      <div style="font-family:var(--f-display);font-size:16pt;color:var(--gold-hi);margin-top:8px;letter-spacing:0.04em;">Madame Celeste</div>
-      <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--gold-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px;">Especialista em Astrologia Hermética</div>
+      <div style="font-family:var(--f-label);font-size:7.5pt;color:var(--cream-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;">Uma mensagem de</div>
+      <div style="font-family:var(--f-display);font-size:15pt;color:var(--gold-hi);letter-spacing:0.04em;">Madame Celeste</div>
+      <div style="font-family:var(--f-label);font-size:7pt;color:var(--gold-dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px;">Especialista em Astrologia Hermética</div>
     </div>
   </div>
 `, `<span>NUMEROSFERA · Comece por Aqui</span><span>02</span>`)}
@@ -497,11 +519,11 @@ ${pageDiv(`
   <p style="font-size:11.5pt;line-height:1.85;color:var(--cream);margin-bottom:18px;">
     Em 23 anos de prática, já orientou mais de 12.000 pessoas em todo o país. Seu método é reconhecido pela precisão com que identifica bloqueios energéticos no mapa astral — padrões que muitas vezes passam despercebidos por décadas, sabotando silenciosamente o florescimento nos relacionamentos, nas finanças, na saúde e na busca por propósito.
   </p>
-  <div style="border-left:2px solid var(--gold-dim);padding:13px 18px;background:rgba(184,146,42,0.05);border-radius:0 4px 4px 0;">
+  <div style="border-left:2px solid var(--gold-dim);padding:13px 20px;">
     <p style="font-style:italic;font-size:11.5pt;color:var(--cream-dim);line-height:1.7;margin:0;">
       "O céu não mente. Ele apenas espera que você aprenda a ouvi-lo. Cada mapa é único — e cada pessoa carrega dentro do seu campo a semente exata do que precisa florescer."
     </p>
-    <div style="font-family:var(--f-display);font-size:13pt;color:var(--gold-hi);margin-top:8px;">Madame Celeste</div>
+    <div style="font-family:var(--f-display);font-size:12pt;color:var(--gold-mid);margin-top:10px;">Madame Celeste</div>
   </div>
 `, `<span>NUMEROSFERA · Comece por Aqui</span><span>03</span>`)}
 
@@ -522,13 +544,13 @@ ${pageDiv(`
       ['03', 'Acesse os Bônus na ordem certa', 'Bônus 1 → Bônus 2 → Bônus 3. Cada material foi pensado para aprofundar o que veio antes. A sequência importa.'],
       ['04', 'Repita a leitura em 21 dias', 'Seu mapa não é um documento para ler uma vez. Volte a ele em 21 dias — você verá padrões que não viu na primeira leitura.'],
   ].map(([n, title, desc]) => `
-    <div style="display:flex;gap:16px;margin-bottom:18px;align-items:flex-start;">
-      <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(184,146,42,0.25),rgba(184,146,42,0.08));border:1px solid rgba(184,146,42,0.4);display:flex;align-items:center;justify-content:center;">
-        <span style="font-family:var(--f-label);font-size:8pt;color:var(--gold);letter-spacing:0.05em;">${n}</span>
+    <div style="display:flex;gap:20px;margin-bottom:22px;align-items:flex-start;padding-bottom:22px;border-bottom:1px solid rgba(184,146,42,0.1);">
+      <div style="flex-shrink:0;padding-top:3px;">
+        <span style="font-family:var(--f-label);font-size:8pt;color:var(--gold-dim);letter-spacing:0.1em;">${n}</span>
       </div>
       <div style="flex:1;">
-        <div style="font-family:var(--f-title);font-size:11.5pt;color:var(--gold-hi);margin-bottom:4px;">${title}</div>
-        <div style="font-size:10.5pt;color:var(--cream-dim);line-height:1.7;">${desc}</div>
+        <div style="font-family:var(--f-title);font-size:11.5pt;color:var(--gold-hi);margin-bottom:5px;">${title}</div>
+        <div style="font-size:10.5pt;color:var(--cream-dim);line-height:1.75;">${desc}</div>
       </div>
     </div>`).join('')}
 `, `<span>NUMEROSFERA · Comece por Aqui</span><span>12</span>`)}
@@ -553,7 +575,7 @@ async function buildBonus1(args) {
   <div style="position:absolute;top:36px;left:0;right:0;text-align:center;z-index:2;">${logoSvg(56)}</div>
   <div style="position:absolute;bottom:90px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
     <div class="bonus-badge" style="margin-bottom:12px;">Bônus 1</div>
-    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;text-shadow:0 0 40px rgba(212,168,75,0.4);">Leitura de Vidas Passadas</div>
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;">Leitura de Vidas Passadas</div>
     <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.12em;">Preparado exclusivamente para ${nome}</div>
   </div>
   ${logoStampAbs()}
@@ -572,7 +594,7 @@ ${pageDiv(`
   </p>
 `, `<span>NUMEROSFERA · Bônus 1 · Leitura de Vidas Passadas</span><span>01</span>`)}
 
-${splitPages(content, 12, (p) => `<span>NUMEROSFERA · Bônus 1 · Leitura de Vidas Passadas</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
+${splitPages(content, 15, (p) => `<span>NUMEROSFERA · Bônus 1 · Leitura de Vidas Passadas</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
 
 </body></html>`;
 }
@@ -593,7 +615,7 @@ async function buildBonus2(args) {
   <div style="position:absolute;top:36px;left:0;right:0;text-align:center;z-index:2;">${logoSvg(56)}</div>
   <div style="position:absolute;bottom:90px;left:0;right:0;text-align:center;padding:0 60px;z-index:2;">
     <div class="bonus-badge" style="margin-bottom:12px;">Bônus 2</div>
-    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;text-shadow:0 0 40px rgba(212,168,75,0.4);">Biblioteca Secreta<br>de Emergências</div>
+    <div style="font-family:var(--f-display);font-size:20pt;color:var(--gold-hi);margin-bottom:10px;line-height:1.2;">Biblioteca Secreta<br>de Emergências</div>
     <div style="font-family:var(--f-label);font-size:9pt;color:var(--cream-dim);letter-spacing:0.12em;">4 rituais de ação imediata</div>
   </div>
   ${logoStampAbs()}
@@ -632,30 +654,35 @@ ${pageDiv(`
     <div style="margin-bottom:20px;">${logoSvg(72)}</div>
     <div class="bonus-badge" style="margin-bottom:16px;">Bônus 3</div>
     <h1 style="font-size:20pt;margin-bottom:8px;line-height:1.2;">Áudio de Potencialização<br>Hermética</h1>
-    <div class="bonus-value" style="margin-bottom:28px;">Valor real: <span>R$ 297,00</span> — Incluso no seu pacote hermético</div>
-    <div class="title-page-box" style="max-width:380px;">
-      <div class="sec-label" style="margin-bottom:10px;">Instrução principal</div>
+    <div class="bonus-value" style="margin-bottom:32px;">Valor real: <span>R$ 297,00</span> — Incluso no seu pacote hermético</div>
+    <div style="max-width:360px;text-align:center;">
+      <div style="width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 20px;"></div>
+      <div class="sec-label" style="margin-bottom:12px;">Instrução principal</div>
       <div style="font-family:var(--f-display);font-size:15pt;color:var(--gold-hi);line-height:1.4;">
         Ouça por 7 minutos<br>antes de dormir
       </div>
-      <p style="margin-top:14px;font-size:11pt;color:var(--cream-dim);margin-bottom:0;">
+      <p style="margin-top:16px;font-size:11pt;color:var(--cream-dim);margin-bottom:0;line-height:1.7;">
         Use fones de ouvido. Olhos fechados.<br>Volume médio a baixo.
       </p>
     </div>
   </div>
 `, `<span>NUMEROSFERA · Bônus 3 · Áudio de Potencialização Hermética</span><span>01</span>`)}
 
-${splitPages(content, 9, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Potencialização</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
+${splitPages(content, 13, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Potencialização</span><span>${String(p).padStart(2,'0')}</span>`, 2)}
 
 </body></html>`;
 }
 
 // ── Renderiza PDF via Puppeteer ───────────────────────────────
 async function renderPdf(html, outPath) {
-  const browser = await puppeteer.launch({
+  const launchOpts = {
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
-  });
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--disable-dev-shm-usage'],
+  };
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOpts.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  const browser = await puppeteer.launch(launchOpts);
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
   // Aguarda fontes do Google Fonts carregarem (até 60s)

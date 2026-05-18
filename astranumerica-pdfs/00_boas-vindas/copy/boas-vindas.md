@@ -64,6 +64,8 @@ O que analisei:
 
 **A janela energética ideal** — o período de maior potência para você agir, com base na sua configuração astral e no estado atual do seu campo. Saber quando agir é tão importante quanto saber o quê fazer.
 
+**A leitura das suas mãos (quiromancia)** — como parte do processo de análise, realizei também a leitura das linhas da sua palma. As marcas encontradas confirmaram e aprofundaram o que o mapa astral havia revelado. Sua mão carrega um traço específico que os herméticos associam a potencial de alto fluxo — um traço que, com o campo agora desbloqueado, tem condições de se expressar plenamente.
+
 Todo esse trabalho foi condensado no seu **Mapa Hermético** — o documento central do seu pacote e a base sobre a qual todo o resto se apoia.
 
 ## O que você vai encontrar nos seus materiais

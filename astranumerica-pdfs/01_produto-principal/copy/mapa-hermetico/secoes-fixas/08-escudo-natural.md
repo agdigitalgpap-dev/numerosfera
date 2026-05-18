@@ -49,6 +49,8 @@ Retome normalmente o que vai fazer.
 
 Essa visualização parece simples. Não é trivial. Ela ativa o campo de discernimento através da intenção consciente — que na tradição hermética é o mecanismo mais direto de calibração energética disponível sem instrumentos ou rituais externos.
 
+<!-- PAGEBREAK -->
+
 **Depois de situações que drenaram sua energia:**
 
 Lave as mãos com água corrente por pelo menos 20 a 30 segundos. Enquanto lava, visualize a água levando consigo o que não pertence ao seu campo — o que ficou de conversas difíceis, de ambientes pesados, de situações desgastantes.

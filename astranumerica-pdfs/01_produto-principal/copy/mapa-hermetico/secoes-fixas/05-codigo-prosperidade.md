@@ -46,6 +46,8 @@ Com o canal limpo, sua frequência de Atração foi recalibrada.
 
 O campo agora está configurado para reconhecer e puxar para a sua órbita o que corresponde ao seu potencial real. Oportunidades que antes não chegavam até você — porque o campo as repelia antes mesmo de você perceber — começam a entrar no seu raio de alcance.
 
+<!-- PAGEBREAK -->
+
 ### Frequência 3 — Sustentação
 
 Esta é a frequência que menos se fala, mas é a mais transformadora na prática.

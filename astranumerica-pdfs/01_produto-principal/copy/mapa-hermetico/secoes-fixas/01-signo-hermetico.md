@@ -51,6 +51,16 @@ Regula como você atrai e repele pessoas. Um portal limpo atrai as pessoas certa
 
 Com o ritual realizado, os três portais de {signo} foram desobstruídos.
 
+## A Leitura das Suas Mãos
+
+Além do mapa astral, realizei também a quiromancia — a leitura das linhas da sua mão.
+
+Na tradição hermética, as linhas da palma não são traços fixos de nascença. Elas refletem o estado do campo energético do ser e se modificam ao longo da vida conforme o campo se transforma. Ler as mãos de alguém é ler o registro físico daquilo que está gravado no campo invisível.
+
+O que as suas mãos revelaram confirmou e ampliou o que o mapa astral de {signo} havia mostrado. Identifiquei em suas linhas uma marca específica que os herméticos chamam de *traço de campo aberto* — uma configuração que indica potencial de alto fluxo quando a energia circula sem obstrução. Essa mesma configuração ficava suprimida enquanto o bloqueio estava ativo.
+
+Com o campo desbloqueado, esse traço tem condições de se expressar. O que sua mão já carregava como potencial agora tem o canal para se tornar realidade.
+
 ## O que isso significa para você
 
 A partir de agora, sua energia opera em um nível diferente.

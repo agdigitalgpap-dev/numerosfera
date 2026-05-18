@@ -172,6 +172,8 @@ Visualize: uma abertura no campo — não um buraco, uma janela luminosa — pel
 
 O foco desta semana é na abertura para o externo. O trabalho interno está consolidado. Agora é sobre receber o que está chegando no mundo ao redor.
 
+<!-- PAGEBREAK -->
+
 ## Combinações com seu sistema hermético completo
 
 O áudio foi desenvolvido para funcionar dentro do sistema completo. As combinações mais eficazes:

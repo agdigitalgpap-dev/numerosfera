@@ -80,6 +80,8 @@ Para emergências que se repetem com frequência, consulte a seção de Protocol
 
 ---
 
+<!-- PAGEBREAK -->
+
 **Preparação**
 
 Sente-se. Beba metade do copo de água lentamente, sem pressa. Feche os olhos. Respire cinco vezes fundo — em cada expiração, solte uma camada de tensão.
@@ -173,6 +175,8 @@ Diga em voz alta: *"O que não é meu, vai embora. O que é meu, fica e se forta
 
 Repita três vezes.
 
+<!-- PAGEBREAK -->
+
 **Fase 3 — Selamento do escudo (3 minutos)**
 
 De pé, olhos fechados, visualize uma esfera de luz dourada se expandindo do seu centro — do ponto ao redor do umbigo, crescendo para fora, passando pela pele, expandindo até formar uma camada sólida de 30 centímetros ao redor de todo o seu corpo.
@@ -226,6 +230,8 @@ Olhe para a nota por 30 segundos completos. Não como papel — como símbolo de
 
 Feche os olhos.
 
+<!-- PAGEBREAK -->
+
 **Fase 1 — Clareza de intenção (3 minutos)**
 
 Defina internamente o valor exato de que precisa e para qual finalidade.
@@ -266,6 +272,8 @@ Declare em voz alta três vezes: *"Estou aberto para receber. O que é meu, cheg
 
 Visualize-se com o recurso resolvido — não ansioso por ele, com ele já resolvido. Como você se sente? Fique nessa sensação por 3 minutos completos. Deixe o campo registrar esse estado.
 
+<!-- PAGEBREAK -->
+
 **Encerramento**
 
 Apague a vela soprando (não com os dedos). Guarde a nota — não a gaste por 7 dias. Ela é âncora energética. Guarde o papel junto com ela.
@@ -295,6 +303,8 @@ O campo abriu a possibilidade. A ação fecha o circuito. Ritual sem ação nest
 
 ---
 
+<!-- PAGEBREAK -->
+
 **Preparação**
 
 Sente-se com a coluna ereta. Escreva no papel, em uma única frase, a decisão que precisa ser tomada. Coloque o papel à sua frente.
@@ -320,6 +330,8 @@ Observe o que emerge. A resposta do campo raramente chega como argumento — che
 Se vier uma imagem: o que ela sugere?
 Se vier uma sensação física: expansão ou contração?
 Se vier uma palavra: o que ela significa sem filtro de julgamento?
+
+<!-- PAGEBREAK -->
 
 **Fase 3 — Incorporação (4 minutos)**
 
