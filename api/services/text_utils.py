@@ -23,11 +23,11 @@ def normalize_tts_text(text: str) -> str:
     text = unicodedata.normalize("NFC", text)
 
     substitutions = [
-        ("…", "."),
-        ("—", ", "),
-        ("–", ", "),
-        ("—", ", "),
-        ("–", ", "),
+        ("…", "..."),   # ellipsis preserva pausa longa
+        ("—", " — "),   # travessão preserva pausa retórica
+        ("–", " — "),
+        ("—", " — "),
+        ("–", " — "),
         ("✨", ""),
         ("⚠️", ""),
         ("✦", ""),
@@ -62,8 +62,12 @@ def normalize_tts_text(text: str) -> str:
     # Remove linhas técnicas como "CTA FINAL", "BLOCO 1", "TRANSICAO CTA"
     text = _TECH_LINE_RE.sub("", text)
 
-    # Múltiplas reticências / pontos → ponto único
-    text = re.sub(r"\.{2,}", ".", text)
+    # Colapsa 4+ pontos → reticências; preserva "..." (3 pontos = pausa)
+    text = re.sub(r"\.{4,}", "...", text)
+
+    # Adiciona quebra de linha entre frases — ElevenLabs pausa naturalmente
+    # em quebras de linha, criando ritmo mais humano entre sentenças
+    text = re.sub(r'([.!?]) +(?=[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ\"“])', r'\1\n', text)
 
     # Colapsa espaços e linhas em branco excessivos
     text = re.sub(r"[ \t]{2,}", " ", text)
