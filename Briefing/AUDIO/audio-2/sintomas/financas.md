@@ -1,6 +1,6 @@
 
-- Sempre as pessoas erradas
-- Relacionamentos que não evoluem
-- Solidão mesmo cercado de gente
-- O eterno quase
-- Sensação de ser invisível romanticamente
+- Conta no vermelho mesmo com renda
+- Aquela sensação de que o dinheiro some sem explicação
+- Planos financeiros que nunca saem do papel
+- Dívida que você quita e outra aparece no lugar
+- A angústia de olhar pro saldo e sentir vergonha
