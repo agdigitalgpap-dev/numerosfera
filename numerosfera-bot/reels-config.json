@@ -1,0 +1,20 @@
+{
+  "ultimo_estilo": 1,
+  "estilos": [
+    {
+      "id": 1,
+      "nome": "Fundo escuro + partículas douradas",
+      "script": "exemplo-opcao1.js"
+    },
+    {
+      "id": 2,
+      "nome": "Geometria sagrada animada",
+      "script": "exemplo-opcao2.js"
+    },
+    {
+      "id": 3,
+      "nome": "Leonardo AI split-frame",
+      "script": "exemplo-opcao3.js"
+    }
+  ]
+}

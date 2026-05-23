@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1080px;
+    background: #080810;
+    font-family: 'Georgia', serif;
+    color: #e8dfc8;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+  }
+
+  /* Fundo com gradiente radial dourado sutil */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(184,146,42,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Bordas douradas */
+  .border-outer {
+    position: absolute;
+    inset: 24px;
+    border: 1px solid rgba(196,164,72,0.35);
+    pointer-events: none;
+  }
+  .border-inner {
+    position: absolute;
+    inset: 34px;
+    border: 1px solid rgba(196,164,72,0.12);
+    pointer-events: none;
+  }
+
+  /* Cantos decorativos */
+  .corner {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-color: rgba(196,164,72,0.7);
+    border-style: solid;
+  }
+  .corner-tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
+
+  /* Número do slide */
+  .slide-num {
+    position: absolute;
+    top: 48px;
+    right: 60px;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: rgba(196,164,72,0.45);
+    text-transform: uppercase;
+  }
+
+  /* Logo no topo */
+  .logo {
+    position: absolute;
+    top: 44px;
+    left: 60px;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: rgba(196,164,72,0.55);
+    text-transform: uppercase;
+  }
+
+  /* Conteúdo principal */
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 860px;
+  }
+
+  /* Eyebrow (tag acima do título) */
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(196,164,72,0.65);
+    margin-bottom: 28px;
+  }
+
+  /* Divisor dourado */
+  .divider {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(196,164,72,0.5), transparent);
+    margin: 0 auto 32px;
+  }
+
+  /* Título principal */
+  .titulo {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 1px;
+    background: linear-gradient(180deg, #FFF0A0 0%, #F0D870 35%, #D4A84B 70%, #B8922A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 2px 16px rgba(196,164,72,0.3));
+  }
+
+  /* Subtítulo / corpo */
+  .corpo {
+    font-size: 26px;
+    line-height: 1.7;
+    color: rgba(232,223,200,0.82);
+    margin-bottom: 0;
+  }
+
+  /* Destaque dourado inline */
+  .destaque {
+    color: #D4A84B;
+    font-style: italic;
+  }
+
+  /* CTA (último slide) */
+  .cta-box {
+    margin-top: 40px;
+    padding: 20px 48px;
+    border: 1px solid rgba(196,164,72,0.4);
+    background: rgba(196,164,72,0.06);
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #D4A84B;
+  }
+
+  /* Linha decorativa */
+  .line {
+    width: 60px;
+    height: 1px;
+    background: rgba(196,164,72,0.4);
+    margin: 24px auto;
+  }
+</style>
+</head>
+<body>
+<div class="slide" id="slide">
+
+  <div class="border-outer"></div>
+  <div class="border-inner"></div>
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="logo">Numerosfera</div>
+  <div class="slide-num" id="slideNum">01 / 05</div>
+
+  <div class="content" id="conteudo">
+    <!-- Conteúdo injetado via JS -->
+  </div>
+
+</div>
+</body>
+</html>

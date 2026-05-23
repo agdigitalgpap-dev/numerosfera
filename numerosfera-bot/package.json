@@ -1,0 +1,27 @@
+{
+  "name": "numerosfera-bot",
+  "version": "1.0.0",
+  "description": "Sistema de automação Instagram + Facebook — Numerosfera",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "assemblyai": "^4.0.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "elevenlabs": "^0.13.0",
+    "express": "^4.19.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.0",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.52.0",
+    "puppeteer": "^25.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

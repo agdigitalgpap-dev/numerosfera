@@ -1,0 +1,33 @@
+{
+  "carrossel": {
+    "tema": "Os 3 números que revelam por que o dinheiro escorrega das suas mãos antes do fim do mês",
+    "angulo": "educacional",
+    "instrucao": "Slide 1: promessa. Slides 2-4: cada número vibracional e seu bloqueio específico. Slide 5: CTA para o quiz. Use linguagem de descoberta, não culpa. Máximo 40 palavras por slide."
+  },
+  "reel1": {
+    "tema": "Você ganha, paga, e no dia 15 já está no zero — isso tem nome na numerologia",
+    "angulo": "viral hook",
+    "instrucao": "Abra com a frase-gancho nos primeiros 2 segundos. Mostre o padrão repetitivo com gestos. Cite o número vibracional do bloqueio financeiro. Encerre com pergunta direta para o quiz.",
+    "dor": "financas"
+  },
+  "reel2": {
+    "tema": "A vibração da sua casa está mantendo sua família em guerra sem que ninguém perceba",
+    "angulo": "emocional",
+    "instrucao": "Comece com cena cotidiana de tensão familiar reconhecível. Voz suave, ritmo lento. Conecte o número do lar ao padrão de conflito. Termine com esperança real e link do quiz.",
+    "dor": "familia"
+  },
+  "estatico": {
+    "tema": "Se sua vida financeira parece um ciclo que nunca quebra, talvez não seja falta de esforço",
+    "angulo": "reflexivo",
+    "instrucao": "Imagem limpa com frase central impactante. Texto de apoio curto conectando padrão numerológico à sensação de estagnação. Sem solução entregue — desperte a curiosidade para o quiz."
+  },
+  "stories": {
+    "tema": "Eu descobri meu número de bloqueio e entendi por que o dinheiro nunca ficava comigo",
+    "angulo": "narrativo",
+    "instrucao": "Formato confissão pessoal em 3 stories sequenciais. Story 1: problema vivido. Story 2: descoberta numerológica. Story 3: virada e CTA direto para o quiz gratuito."
+  },
+  "dor_principal": "financas",
+  "data": "2026-05-23",
+  "cta_formato": "stories",
+  "encerramento": "Qual dessas situações você já viveu?"
+}

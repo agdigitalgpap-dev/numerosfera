@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1920px;
+    background: #080810;
+    font-family: 'Georgia', serif;
+    color: #e8dfc8;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 80px;
+  }
+
+  /* Gradiente radial dourado */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(184,146,42,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* Bordas douradas */
+  .border-outer {
+    position: absolute;
+    inset: 32px;
+    border: 1px solid rgba(196,164,72,0.35);
+    pointer-events: none;
+  }
+  .border-inner {
+    position: absolute;
+    inset: 46px;
+    border: 1px solid rgba(196,164,72,0.10);
+    pointer-events: none;
+  }
+
+  /* Cantos decorativos */
+  .corner {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-color: rgba(196,164,72,0.7);
+    border-style: solid;
+  }
+  .corner-tl { top: 32px; left: 32px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 32px; right: 32px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 32px; left: 32px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 32px; right: 32px; border-width: 0 2px 2px 0; }
+
+  /* Logo */
+  .logo {
+    position: absolute;
+    top: 70px;
+    left: 80px;
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: rgba(196,164,72,0.55);
+    text-transform: uppercase;
+  }
+
+  /* Número da cena */
+  .scene-num {
+    position: absolute;
+    top: 70px;
+    right: 80px;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: rgba(196,164,72,0.35);
+    text-transform: uppercase;
+  }
+
+  /* Conteúdo central */
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 860px;
+    width: 100%;
+    background: rgba(4, 4, 12, 0.72);
+    border: 1px solid rgba(196,164,72,0.18);
+    border-radius: 4px;
+    padding: 56px 64px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(196,164,72,0.65);
+    margin-bottom: 36px;
+  }
+
+  /* Divisor */
+  .divider {
+    width: 140px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(196,164,72,0.5), transparent);
+    margin: 0 auto 44px;
+  }
+
+  /* Título — tamanho grande para hook */
+  .titulo {
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: 0.5px;
+    background: linear-gradient(180deg, #FFF0A0 0%, #F0D870 30%, #D4A84B 65%, #B8922A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 2px 20px rgba(196,164,72,0.35));
+  }
+
+  .titulo.titulo-grande {
+    font-size: 90px;
+    line-height: 1.05;
+  }
+
+  /* Corpo */
+  .corpo {
+    font-size: 32px;
+    line-height: 1.7;
+    color: rgba(232,223,200,0.82);
+  }
+
+  /* CTA box */
+  .cta-box {
+    margin-top: 52px;
+    padding: 26px 60px;
+    border: 1px solid rgba(196,164,72,0.45);
+    background: rgba(196,164,72,0.06);
+    font-size: 20px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #D4A84B;
+  }
+
+  .line {
+    width: 60px;
+    height: 1px;
+    background: rgba(196,164,72,0.4);
+    margin: 30px auto;
+  }
+
+  /* Rodapé CTA */
+  .footer-cta {
+    position: absolute;
+    bottom: 90px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: rgba(196,164,72,0.5);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="slide" id="slide">
+
+  <div class="border-outer"></div>
+  <div class="border-inner"></div>
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="logo">Numerosfera</div>
+  <div class="scene-num" id="sceneNum">01 / 05</div>
+
+  <div class="content" id="conteudo">
+    <!-- Conteúdo injetado via JS -->
+  </div>
+
+  <div class="footer-cta" id="footerCta"></div>
+
+</div>
+</body>
+</html>
