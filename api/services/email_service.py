@@ -67,6 +67,24 @@ _HTML_TEMPLATE = """\
                     <td style="padding:6px 0 6px 12px;font-size:13px;color:rgba(232,223,200,0.85);">Bônus 3 — Áudio de Potencialização</td></tr>
               </table>
 
+              <!-- Botão do áudio bônus -->
+              <table cellpadding="0" cellspacing="0" style="margin:0 0 32px 0;width:100%;">
+                <tr>
+                  <td style="background:rgba(184,146,42,0.08);border:1px solid rgba(184,146,42,0.25);border-radius:6px;padding:20px 24px;">
+                    <p style="margin:0 0 4px 0;font-size:11px;letter-spacing:3px;color:#b8922a;text-transform:uppercase;">
+                      Bônus 3 — Áudio de Potencialização Hermética
+                    </p>
+                    <p style="margin:0 0 16px 0;font-size:13px;color:rgba(232,223,200,0.65);line-height:1.6;">
+                      Frequências sagradas para acelerar os resultados do ritual.
+                    </p>
+                    <a href="https://numerosfera.store/assets/audio-potencializacao-hermetica.mp3"
+                       style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#b8922a,#d4a84b);color:#0a0a1a;font-family:Georgia,serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:4px;">
+                      Ouvir Áudio
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
               <p style="margin:0 0 12px 0;font-size:14px;color:rgba(232,223,200,0.7);line-height:1.8;">
                 Comece pelo documento <em>Comece por Aqui</em> — ele contém as instruções
                 para ativar corretamente cada parte do seu sistema.
