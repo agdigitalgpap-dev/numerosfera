@@ -677,7 +677,8 @@ ${splitPages(content, 13, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Pot
 async function renderPdf(browser, html, outPath) {
   const page = await browser.newPage();
   try {
-    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 120000 });
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await new Promise(r => setTimeout(r, 2500)); // aguarda fontes e imagens sem chamadas CDP
     await page.pdf({
       path: outPath,
       format: 'A4',
