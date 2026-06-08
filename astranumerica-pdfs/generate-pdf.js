@@ -673,28 +673,22 @@ ${splitPages(content, 13, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Pot
 </body></html>`;
 }
 
-// ── Renderiza PDF via Puppeteer ───────────────────────────────
-async function renderPdf(html, outPath) {
-  const launchOpts = {
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security', '--disable-dev-shm-usage'],
-  };
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-    launchOpts.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
-  }
-  const browser = await puppeteer.launch(launchOpts);
+// ── Renderiza PDF via Puppeteer (browser compartilhado) ──────
+async function renderPdf(browser, html, outPath) {
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
-  // Aguarda fontes do Google Fonts carregarem (até 60s)
-  await page.evaluate(() => document.fonts.ready).catch(() => {});
-  await page.pdf({
-    path: outPath,
-    format: 'A4',
-    printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 }
-  });
-  await browser.close();
-  console.log(`  ✓ ${path.basename(outPath)}`);
+  try {
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.evaluate(() => document.fonts.ready).catch(() => {});
+    await page.pdf({
+      path: outPath,
+      format: 'A4',
+      printBackground: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 }
+    });
+    console.log(`  ✓ ${path.basename(outPath)}`);
+  } finally {
+    await page.close().catch(() => {});
+  }
 }
 
 // ── Main ──────────────────────────────────────────────────────
@@ -706,11 +700,35 @@ async function main() {
   fs.mkdirSync(out, { recursive: true });
   console.log(`\n🔮 Gerando PDFs — ${nome} · ${signo} · ${sexo} · ${dor}\n`);
 
-  if (produto === 'boas-vindas' || produto === 'todos') await renderPdf(await buildBoasVindas(args), path.join(out, `00-comece-por-aqui-${slug}.pdf`));
-  if (produto === 'mapa'        || produto === 'todos') await renderPdf(await buildMapaHermetico(args), path.join(out, `mapa-hermetico-${slug}.pdf`));
-  if (produto === 'bonus1'      || produto === 'todos') await renderPdf(await buildBonus1(args),        path.join(out, `bonus1-vidas-passadas-${slug}.pdf`));
-  if (produto === 'bonus2'      || produto === 'todos') await renderPdf(await buildBonus2(args),        path.join(out, `bonus2-biblioteca-${slug}.pdf`));
-  if (produto === 'bonus3'      || produto === 'todos') await renderPdf(await buildBonus3(args),        path.join(out, `bonus3-audio-${slug}.pdf`));
+  const launchOpts = {
+    headless: 'new',
+    protocolTimeout: 180000,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-web-security',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--no-first-run',
+      '--single-process',
+    ],
+  };
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOpts.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+
+  const browser = await puppeteer.launch(launchOpts);
+  try {
+    if (produto === 'boas-vindas' || produto === 'todos') await renderPdf(browser, await buildBoasVindas(args), path.join(out, `00-comece-por-aqui-${slug}.pdf`));
+    if (produto === 'mapa'        || produto === 'todos') await renderPdf(browser, await buildMapaHermetico(args), path.join(out, `mapa-hermetico-${slug}.pdf`));
+    if (produto === 'bonus1'      || produto === 'todos') await renderPdf(browser, await buildBonus1(args),        path.join(out, `bonus1-vidas-passadas-${slug}.pdf`));
+    if (produto === 'bonus2'      || produto === 'todos') await renderPdf(browser, await buildBonus2(args),        path.join(out, `bonus2-biblioteca-${slug}.pdf`));
+    if (produto === 'bonus3'      || produto === 'todos') await renderPdf(browser, await buildBonus3(args),        path.join(out, `bonus3-audio-${slug}.pdf`));
+  } finally {
+    await browser.close().catch(() => {});
+  }
 
   console.log(`\n✅ Concluído! PDFs em: ${out}\n`);
 }
