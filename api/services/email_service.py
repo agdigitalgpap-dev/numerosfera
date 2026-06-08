@@ -114,7 +114,9 @@ _HTML_TEMPLATE = """\
 """
 
 
-_BATCH_LIMIT_BYTES = 35 * 1024 * 1024  # 35 MB — margem abaixo dos 40 MB do Resend
+# Resend limita o email inteiro a 40 MB. Anexos são base64 (+33% vs tamanho em disco).
+# Limite conservador em tamanho bruto: 28 MB raw → ~37 MB base64 → margem de segurança ok.
+_BATCH_LIMIT_BYTES = 28 * 1024 * 1024
 
 _HTML_BONUS = """\
 <!DOCTYPE html>
