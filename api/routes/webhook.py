@@ -51,21 +51,17 @@ async def kiwify_webhook(request: Request, background_tasks: BackgroundTasks):
 
     logger.info("[Kiwify] Payload COMPLETO: %s", str(body)[:1000])
 
-    event  = (body.get("event") or "").upper()
+    # Kiwify usa webhook_event_type (não "event") e order_status (não "order.status")
+    event  = (body.get("webhook_event_type") or body.get("event") or "").upper()
+    status = (body.get("order_status") or (body.get("order", {}) or {}).get("status") or "").lower()
 
-    # Kiwify pode enviar status em vários lugares do payload
-    status_order  = (body.get("order",    {}) or {}).get("status", "")
-    status_top    = (body.get("status",   "") or "")
-    status_charge = (body.get("charge",   {}) or {}).get("status", "")
-    any_status    = (status_order or status_top or status_charge).lower()
-
-    EVENTOS_COMPRA = {"PURCHASE_APPROVED", "PURCHASE_COMPLETE", "ORDER_APPROVED", "ORDER_PAID"}
+    EVENTOS_COMPRA = {"ORDER_APPROVED", "PURCHASE_APPROVED", "PURCHASE_COMPLETE", "ORDER_PAID"}
     STATUS_COMPRA  = {"paid", "complete", "approved", "active"}
 
-    is_approved = event in EVENTOS_COMPRA or any_status in STATUS_COMPRA
+    is_approved = event in EVENTOS_COMPRA or status in STATUS_COMPRA
 
     if not is_approved:
-        logger.info("[Kiwify] Evento ignorado: event=%s status=%s", event, any_status)
+        logger.info("[Kiwify] Evento ignorado: event=%s status=%s", event, status)
         return {"ok": True, "ignored": True}
 
     # Extrai dados do cliente
