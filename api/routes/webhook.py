@@ -49,13 +49,15 @@ async def kiwify_webhook(request: Request, background_tasks: BackgroundTasks):
     except Exception:
         raise HTTPException(status_code=400, detail="Payload inválido")
 
-    logger.info("[Kiwify] Payload recebido: event=%s", body.get("event") or body.get("status"))
+    logger.info("[Kiwify] Payload COMPLETO: %s", str(body)[:1000])
 
-    # Kiwify envia event=PURCHASE_APPROVED ou order.status=paid
     event  = (body.get("event") or "").upper()
     status = (body.get("order", {}) or {}).get("status", "")
 
-    if event not in ("PURCHASE_APPROVED", "PURCHASE_COMPLETE") and status != "paid":
+    EVENTOS_COMPRA = {"PURCHASE_APPROVED", "PURCHASE_COMPLETE", "ORDER_APPROVED", "ORDER_PAID"}
+    is_approved = event in EVENTOS_COMPRA or status in ("paid", "complete", "approved")
+
+    if not is_approved:
         logger.info("[Kiwify] Evento ignorado: event=%s status=%s", event, status)
         return {"ok": True, "ignored": True}
 
