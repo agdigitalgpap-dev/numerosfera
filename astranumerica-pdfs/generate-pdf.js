@@ -677,8 +677,7 @@ ${splitPages(content, 13, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Pot
 async function renderPdf(browser, html, outPath) {
   const page = await browser.newPage();
   try {
-    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await page.evaluate(() => document.fonts.ready).catch(() => {});
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 120000 });
     await page.pdf({
       path: outPath,
       format: 'A4',
@@ -710,9 +709,7 @@ async function main() {
       '--disable-dev-shm-usage',
       '--disable-gpu',
       '--disable-extensions',
-      '--disable-background-networking',
       '--no-first-run',
-      '--single-process',
     ],
   };
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
