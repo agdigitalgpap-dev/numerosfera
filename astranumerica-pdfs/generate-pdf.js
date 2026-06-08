@@ -675,10 +675,13 @@ ${splitPages(content, 13, (p) => `<span>NUMEROSFERA · Bônus 3 · Áudio de Pot
 
 // ── Renderiza PDF via Puppeteer (browser compartilhado) ──────
 async function renderPdf(browser, html, outPath) {
+  // Escreve HTML em arquivo temporário — evita enviar 15MB+ via WebSocket CDP
+  const tmpHtml = outPath.replace('.pdf', '.tmp.html');
+  fs.writeFileSync(tmpHtml, html, 'utf8');
   const page = await browser.newPage();
   try {
-    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    await new Promise(r => setTimeout(r, 2500)); // aguarda fontes e imagens sem chamadas CDP
+    await page.goto('file://' + tmpHtml, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await new Promise(r => setTimeout(r, 2000));
     await page.pdf({
       path: outPath,
       format: 'A4',
@@ -688,6 +691,7 @@ async function renderPdf(browser, html, outPath) {
     console.log(`  ✓ ${path.basename(outPath)}`);
   } finally {
     await page.close().catch(() => {});
+    fs.unlink(tmpHtml, () => {});
   }
 }
 
