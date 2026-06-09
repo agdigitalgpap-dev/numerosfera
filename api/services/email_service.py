@@ -15,7 +15,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 _RESEND_URL = "https://api.resend.com/emails"
-_FROM       = "Astra Numériка <support@numerosfera.store>"
+_FROM       = "NUMEROSFERA <support@numerosfera.store>"
 
 _HTML_TEMPLATE = """\
 <!DOCTYPE html>

@@ -6,6 +6,14 @@
   <title>Revelação Profunda · NUMEROSFERA</title>
   <link rel="stylesheet" href="assets/shared.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>!function(i,n){i._plt=i._plt||(n&&n.timeOrigin?n.timeOrigin+n.now():Date.now())}(window,performance);</script>
+  <link rel="preload" href="https://scripts.converteai.net/99f965f6-33db-45e3-95f1-ce7fda6b8fc5/players/6a26acb14274b9e59c8ab931/v4/player.js" as="script">
+  <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
+  <link rel="preload" href="https://cdn.converteai.net/99f965f6-33db-45e3-95f1-ce7fda6b8fc5/6a26aca45306f4786cd0469d/main.m3u8" as="fetch">
+  <link rel="dns-prefetch" href="https://cdn.converteai.net">
+  <link rel="dns-prefetch" href="https://scripts.converteai.net">
+  <link rel="dns-prefetch" href="https://images.converteai.net">
+  <link rel="dns-prefetch" href="https://license.vturb.com">
   <style>
     body { margin:0; background:var(--bg); overflow-x:hidden; font-family:'Poppins',sans-serif; }
 
@@ -14,8 +22,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px 16px 48px;
+      justify-content: flex-start;
+      padding: 8px;
       position: relative;
       z-index: 10;
     }
@@ -27,7 +35,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 24px;
-      padding: 36px 28px 32px;
+      padding: 0;
       backdrop-filter: blur(24px);
       box-shadow:
         0 0 80px rgba(196,164,72,0.06),
@@ -211,10 +219,10 @@
 
     /* ── Overlay premium de autoplay bloqueado ── */
     #autoplay-overlay-2 {
-      display: none;
-      position: fixed;
+      display: none !important;
+      position: fixed !important;
       inset: 0;
-      z-index: 1000;
+      z-index: 99999 !important;
       background: rgba(6,4,14,0.82);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
@@ -223,13 +231,72 @@
       padding: 24px;
     }
     #autoplay-overlay-2.visible {
-      display: flex;
+      display: flex !important;
       animation: overlay-fadein2 0.48s cubic-bezier(0.34,1.15,0.64,1) both;
     }
     @keyframes overlay-fadein2 {
       from { opacity:0; transform:scale(0.93); }
       to   { opacity:1; transform:scale(1); }
     }
+
+    /* ── Overlay de transição pós-áudio ── */
+    #transition-overlay {
+      display: none !important;
+      position: fixed !important;
+      inset: 0;
+      z-index: 99999 !important;
+      background: rgba(6,4,14,0.92);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #transition-overlay.visible {
+      display: flex !important;
+      animation: overlay-fadein2 0.6s cubic-bezier(0.34,1.15,0.64,1) both;
+    }
+    .tr-inner {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 20px; text-align: center; max-width: 340px; width: 100%; position: relative;
+    }
+    .tr-glow {
+      position: absolute; width: 260px; height: 260px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,164,72,0.1) 0%, transparent 70%);
+      filter: blur(40px); top: 50%; left: 50%;
+      transform: translate(-50%,-50%); pointer-events: none;
+    }
+    .tr-badge {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(196,164,72,0.7); font-weight: 600; position: relative;
+    }
+    .tr-title {
+      font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700;
+      color: var(--text); line-height: 1.35; position: relative;
+    }
+    .tr-title span { color: var(--gold-light); }
+    .tr-body {
+      font-size: 14px; color: var(--text-dim); line-height: 1.75;
+      position: relative; max-width: 300px;
+    }
+    #btn-ir-vsl {
+      padding: 18px 44px; border-radius: 50px;
+      border: 1px solid rgba(196,164,72,0.55);
+      background: linear-gradient(135deg, rgba(196,164,72,0.18), rgba(196,164,72,0.08));
+      color: var(--gold-light); font-family: 'Outfit', sans-serif;
+      font-size: 17px; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; position: relative;
+      transition: all 0.24s cubic-bezier(0.22,1,0.36,1);
+      box-shadow: 0 0 32px rgba(196,164,72,0.18), 0 8px 28px rgba(0,0,0,0.45);
+      animation: deep-breathe 3s ease-in-out infinite;
+    }
+    #btn-ir-vsl:hover {
+      background: linear-gradient(135deg, rgba(196,164,72,0.32), rgba(196,164,72,0.16));
+      border-color: var(--gold-light);
+      box-shadow: 0 0 48px rgba(196,164,72,0.3), 0 10px 32px rgba(0,0,0,0.55);
+      transform: translateY(-3px);
+    }
+    #btn-ir-vsl:active { transform: scale(0.97); }
     .ap2-inner {
       display: flex; flex-direction: column; align-items: center;
       gap: 22px; text-align: center; max-width: 320px; width: 100%; position: relative;
@@ -360,78 +427,24 @@
     .retry-btn:hover { background:rgba(200,180,224,0.08); }
 
 
-    /* ── Video Space ─────────────────────────────────────────────────────── */
+    /* ── Video Space (VTurb) ─────────────────────────────────────────────── */
     .video-space {
-      position: relative;
       width: 100%;
-      height: 520px;
-      border: 1px solid rgba(200,180,224,0.4);
-      border-bottom: none;
-      border-radius: 16px 16px 0 0;
-      background: transparent;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
+      background: #000;
       overflow: hidden;
-      padding: 28px 20px;
-      box-sizing: border-box;
+      position: relative;
     }
+    .video-space vturb-smartplayer { display: block; width: 100%; }
 
-    /* ── Overlays de notificação durante o áudio ─────────────────────────── */
-    .notif-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 20;
-      padding: 14px 20px 28px;
-      background: linear-gradient(to bottom, rgba(8,6,4,0.96) 50%, transparent);
-      pointer-events: none;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(-6px);
-      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
-    }
-    .notif-overlay.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .notif-overlay .no-label {
-      font-family: 'Outfit', sans-serif;
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--gold);
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .notif-overlay .no-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      line-height: 1.2;
-    }
-    .notif-overlay .no-title .no-nome {
-      color: var(--gold-light);
-    }
-    .video-space .deep-orb-wrap { margin-bottom: 0; }
-    .video-space #state-loading,
-    .video-space #state-player,
-    .video-space #state-error,
-    .video-space #state-autoplay { width: 100%; }
-
-    /* ── Subtitle Space ──────────────────────────────────────────────────── */
+    /* ── Subtitle Space — overlay no rodapé do vídeo ─────────────────────── */
     .subtitle-space {
-      width: 100%;
-      min-height: 140px;
-      background: rgba(6,10,34,0.92);
-      border: 1px solid rgba(200,180,224,0.32);
-      border-top: none;
-      border-radius: 0 0 16px 16px;
-      padding: 22px 28px;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 5;
+      min-height: 100px;
+      background: rgba(6,10,34,0.88);
+      border-top: 1px solid rgba(196,164,72,0.25);
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -450,9 +463,7 @@
     }
 
     @media (max-width: 768px) {
-      .video-space    { height: 420px; padding: 20px 16px; }
-      .subtitle-space { min-height: 120px; padding: 18px 16px; }
-      .subtitle-text  { font-size: 14px; }
+      .subtitle-text { font-size: 14px; }
     }
 
   </style>
@@ -465,113 +476,61 @@
 <div class="page">
   <div class="reveal-card anim-1">
 
-    <div class="site-logo"><span class="site-logo-star">✦</span> NUMEROSFERA <span class="site-logo-star">✦</span></div>
-
-    <!-- Badge -->
-    <div style="display:flex;justify-content:center;">
-      <div class="badge-reveal">
-        <span class="badge-gem"></span>
-        Revelação Profunda
-      </div>
-    </div>
-
-    <!-- Título -->
-    <h1 class="reveal-title">
-      Aprofundando a leitura<br>
-      de <span id="lead-nome">—</span>
-    </h1>
-    <p class="reveal-sub">
-      ✦ Mapa de <span id="lead-signo">—</span> ✦
-    </p>
-
-    <!-- VIDEO SPACE — container central para vídeo futuramente -->
+    <!-- VIDEO: VTurb VSL 2 -->
     <div class="video-space">
-
-      <!-- Orb profundo — centralizado -->
-      <div class="deep-orb-wrap">
-        <div class="lilac-ring r1"></div>
-        <div class="lilac-ring r2"></div>
-        <div class="deep-orb">
-          <img id="signo-icon" src="" alt="" style="width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(196,164,72,0.55));">
-        </div>
+      <vturb-smartplayer id="vid-6a26acb14274b9e59c8ab931" style="display:block;width:100%;"></vturb-smartplayer>
+      <script type="text/javascript">
+        var s=document.createElement("script");
+        s.src="https://scripts.converteai.net/99f965f6-33db-45e3-95f1-ce7fda6b8fc5/players/6a26acb14274b9e59c8ab931/v4/player.js",
+        s.async=!0,document.head.appendChild(s);
+      </script>
+      <!-- LEGENDA: overlay no rodapé do vídeo, sinc com o áudio personalizado -->
+      <div class="subtitle-space" id="subtitle-box">
+        <p class="subtitle-text" id="subtitle-text">—</p>
       </div>
-
-      <!-- Estado: Loading -->
-      <div id="state-loading">
-        <div class="gen-loader">
-          <div class="gen-ring"></div>
-          <div class="gen-ring gen-ring--2"></div>
-          <div class="gen-spark"></div>
-        </div>
-        <div class="gen-bar-wrap">
-          <div class="gen-bar-track">
-            <div class="gen-bar-fill" id="gen-bar-fill"></div>
-          </div>
-          <span class="gen-bar-pct" id="gen-bar-pct">0%</span>
-        </div>
-        <p class="gen-phrase" id="gen-phrase">Aprofundando sua análise...</p>
-        <p class="gen-hint">Revelação profunda em preparação</p>
-      </div>
-
-      <!-- Estado: Player -->
-      <div id="state-player">
-        <div class="wave-wrap" id="wave">
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-          <div class="wave-bar"></div><div class="wave-bar"></div>
-        </div>
-        <div class="prog-wrap" style="margin-bottom:10px;">
-          <div class="prog-track">
-            <div class="prog-fill" id="prog-fill"></div>
-          </div>
-        </div>
-        <button id="btn-continuar-vsl" onclick="window.location.href='vsl.html'">
-          Acessar minha revelação completa →
-        </button>
-      </div>
-
-      <!-- Estado: Erro -->
-      <div id="state-error">
-        <div class="error-icon">⚠️</div>
-        <p class="error-msg">Não foi possível carregar a revelação.<br>Verifique sua conexão e tente novamente.</p>
-        <button class="retry-btn" onclick="retryInit()">Tentar novamente</button>
-      </div>
-
-      <!-- Estado: Autoplay bloqueado -->
-      <div id="state-autoplay">
-        <p class="autoplay-msg">Toque para iniciar sua revelação</p>
-        <button id="btn-iniciar-2" class="start-btn">&#9654; Iniciar revelação</button>
-      </div>
-
-      <!-- Overlay 1: 10s–70s -->
-      <div id="notif-overlay2-1" class="notif-overlay" aria-hidden="true">
-        <div class="no-label">✦ revelação importante ✦</div>
-        <div class="no-title">BLOQUEIO IDENTIFICADO</div>
-      </div>
-
-      <!-- Overlay 2: 90s–150s -->
-      <div id="notif-overlay2-2" class="notif-overlay" aria-hidden="true">
-        <div class="no-label">✦ <span class="no-nome" id="notif-nome-2">—</span>, ouça com atenção ✦</div>
-        <div class="no-title">SEU CAMPO SE ABRE AGORA</div>
-      </div>
-
-      <!-- Overlay 3: 180s–240s -->
-      <div id="notif-overlay2-3" class="notif-overlay" aria-hidden="true">
-        <div class="no-label">✦ momento de transformação ✦</div>
-        <div class="no-title">REMOÇÃO EM ANDAMENTO</div>
-      </div>
-
-    </div><!-- /video-space -->
-
-    <!-- SUBTITLE SPACE — legenda/transcrição do áudio -->
-    <div class="subtitle-space" id="subtitle-box">
-      <p class="subtitle-text" id="subtitle-text">—</p>
     </div>
 
+    <!-- CTA pós-áudio (aparece quando o áudio termina) -->
+    <div id="cta-vsl-wrap" style="display:none;padding:16px 20px 0;">
+      <button id="btn-continuar-vsl"
+        style="display:block;width:100%;padding:20px 24px;border-radius:16px;border:1px solid rgba(200,180,224,0.55);background:linear-gradient(135deg,rgba(200,180,224,0.2),rgba(200,180,224,0.08));color:var(--lilac);font-family:Outfit,sans-serif;font-size:18px;font-weight:700;letter-spacing:0.3px;cursor:pointer;opacity:0;transition:opacity 800ms ease;box-shadow:0 0 36px rgba(200,180,224,0.18),0 8px 24px rgba(0,0,0,0.45);"
+        onclick="window.location.href='vsl.html'">
+        Acessar minha revelação completa →
+      </button>
+    </div>
 
+    <!-- Estado de erro (oculto, só aparece em falha de áudio) -->
+    <div id="state-error" style="display:none;text-align:center;padding:16px 20px;">
+      <p id="error-msg-text" style="display:block;font-size:14px;color:var(--text-dim);line-height:1.6;margin-bottom:16px;">Não foi possível carregar a revelação.<br>Verifique sua conexão e tente novamente.</p>
+      <button class="retry-btn" onclick="retryInit()">Tentar novamente</button>
+    </div>
+
+    <!-- Estados de áudio ocultos (necessários para o JS do player) -->
+    <div id="state-loading"  style="display:none;"></div>
+    <div id="state-player"   style="display:none;"></div>
+    <div id="state-autoplay" style="display:none;"></div>
+    <div id="gen-bar-fill"   style="display:none;"></div>
+    <div id="gen-bar-pct"    style="display:none;"></div>
+    <p   id="gen-phrase"     style="display:none;"></p>
+    <div id="prog-fill"      style="display:none;"></div>
+    <div id="wave"           style="display:none;"></div>
+    <div id="notif-overlay2-1" style="display:none;"></div>
+    <div id="notif-overlay2-2" style="display:none;"></div>
+    <div id="notif-overlay2-3" style="display:none;"><span id="notif-nome-2"></span></div>
+    <img id="signo-icon"     style="display:none;" src="" alt="">
+
+
+  </div>
+</div>
+
+<!-- Overlay de transição — aparece ao fim do áudio -->
+<div id="transition-overlay" aria-modal="true" role="dialog" aria-label="Próxima etapa">
+  <div class="tr-inner">
+    <div class="tr-glow"></div>
+    <p class="tr-badge">✦ NUMEROSFERA</p>
+    <h2 class="tr-title"><span id="tr-nome">Sua</span> revelação está completa.</h2>
+    <p class="tr-body">O que você acabou de receber é a leitura mais precisa que existe sobre o seu campo energético.<br><br>Agora há uma última etapa — e ela muda tudo.</p>
+    <button id="btn-ir-vsl">Ver minha etapa final →</button>
   </div>
 </div>
 
@@ -619,23 +578,13 @@
 
   // ── Captura erros fatais — garante que loading nunca fica preso ──────────
   window.addEventListener('unhandledrejection', function(e) {
-    console.error('[FATAL audio2] Promise rejeitada:', e.reason);
-    try {
-      stopLoading();
-      var msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
-      document.querySelector('.error-msg').innerHTML =
-        'Erro inesperado. Recarregue a página e tente novamente.<br><small style="color:var(--text-dimmer)">' + msg + '</small>';
-      showState('error');
-    } catch(_) {}
+    // Só loga — não mostra erro ao usuário. O player já trata seus erros via onError().
+    // Rejeições não tratadas de scripts de terceiros (VTurb, CDN) não devem quebrar a UI.
+    console.warn('[audio2] Promise rejeitada (ignorada na UI):', e.reason);
   });
   window.onerror = function(msg, src, line, col, err) {
-    console.error('[FATAL audio2] Erro JS:', msg, src + ':' + line);
-    try {
-      stopLoading();
-      document.querySelector('.error-msg').innerHTML =
-        'Erro inesperado. Recarregue a página e tente novamente.';
-      showState('error');
-    } catch(_) {}
+    // Só loga — não quebra a UI. O overlay já está visível desde DOMContentLoaded.
+    console.error('[audio2] Erro JS capturado:', msg, src, line);
     return true;
   };
 
@@ -728,14 +677,34 @@
 
   // ── Estados de UI ──────────────────────────────────────────────────────────
   function showState(name) {
-    ['loading','player','error','autoplay'].forEach(s => {
-      document.getElementById('state-'+s).style.display = s === name ? 'block' : 'none';
-    });
+    const errEl = document.getElementById('state-error');
+    if (errEl) errEl.style.display = name === 'error' ? 'block' : 'none';
+    if (name === 'loading') {
+      const sub = document.getElementById('subtitle-text');
+      if (sub && sub.textContent === '—') sub.textContent = 'Preparando sua revelação...';
+    }
   }
 
   // ── Overlay de autoplay bloqueado ──────────────────────────────────────────
   function showAutoplayOverlay2() {
-    document.getElementById('autoplay-overlay-2').classList.add('visible');
+    const el = document.getElementById('autoplay-overlay-2');
+    if (!el) return;
+    el.classList.add('visible');
+    // CSS .visible { display: flex !important } sobrescreve display:none !important
+  }
+
+  function showTransitionOverlay() {
+    const el = document.getElementById('transition-overlay');
+    if (!el) { window.location.href = 'vsl.html'; return; }
+    try {
+      const lead = LeadManager.getLead();
+      const nome = LeadManager.getNomeFormatado(lead);
+      if (nome) {
+        const nomeEl = document.getElementById('tr-nome');
+        if (nomeEl) nomeEl.textContent = nome + ', sua';
+      }
+    } catch(e) {}
+    el.classList.add('visible');
   }
 
   function hideAutoplayOverlay2() {
@@ -797,14 +766,49 @@
     if (w) w.classList.remove('eq-realtime');
   }
 
+  // ── Sync pausa: Áudio → VTurb ─────────────────────────────────────────────
+  let _syncLock2 = false;
+
+  function setupSyncPausePlay2() {
+    const VTID = 'vid-6a26acb14274b9e59c8ab931';
+
+    function tryAttach() {
+      const vp = document.getElementById(VTID);
+      if (!vp) { setTimeout(tryAttach, 500); return; }
+
+      const _origPause = audioPlayer2.pause.bind(audioPlayer2);
+      audioPlayer2.pause = function() {
+        _origPause();
+        if (_syncLock2) return;
+        _syncLock2 = true;
+        if (typeof vp.pause === 'function') vp.pause();
+        _syncLock2 = false;
+      };
+
+      const _origResume = audioPlayer2.resume.bind(audioPlayer2);
+      audioPlayer2.resume = function() {
+        _origResume();
+        if (_syncLock2) return;
+        _syncLock2 = true;
+        if (typeof vp.play === 'function') vp.play().catch(() => {});
+        _syncLock2 = false;
+      };
+
+      console.log('[SYNC2] Áudio → VTurb conectados');
+    }
+
+    setTimeout(tryAttach, 1000);
+  }
+
   function _showBtnContinuar() {
     stopEqualizer2();
     console.log('[AUDIO2 COMPLETE]');
-    const btn = document.getElementById('btn-continuar-vsl');
-    if (btn) {
-      btn.style.display = 'block';
+    const wrap = document.getElementById('cta-vsl-wrap');
+    if (wrap) {
+      wrap.style.display = 'block';
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        btn.style.opacity = '1';
+        const btn = document.getElementById('btn-continuar-vsl');
+        if (btn) btn.style.opacity = '1';
       }));
     }
   }
@@ -872,7 +876,9 @@
   let _readyFired    = false;   // true após onReady ou onAutoplayBlocked
   let _audioRetried  = false;   // auto-retry único quando o arquivo MP3 retorna 404
   let _audioReady2   = false;   // true quando o áudio está pronto para tocar
+  let _noLeadMode    = false;   // true quando não há dados do quiz — botão vira "Refazer Quiz"
   let _clickedEarly2 = false;   // true se o usuário clicou antes do áudio estar pronto
+  let _audioEnded    = false;   // guard onEnd para evitar redirect duplo
 
   // ── Init ──────────────────────────────────────────────────────────────────
   function init() {
@@ -885,31 +891,57 @@
 
     console.log('[AUDIO2 INIT]');
 
+    // SEMPRE mostra o overlay primeiro — garante botão visível em qualquer cenário
+    showAutoplayOverlay2();
+
     const lead = LeadManager.getLead();
+    console.log('[audio2] lead.nome =', lead && lead.nome);
+
     if (!lead || !lead.nome) {
-      document.querySelector('.error-msg').innerHTML =
+      document.getElementById('error-msg-text').innerHTML =
         'Dados não encontrados.<br><a href="index.html" style="color:var(--lilac)">Clique aqui para refazer o quiz</a>.';
       showState('error');
+      _noLeadMode = true;
+      const btn = document.getElementById('btn-start-reading-2');
+      if (btn) btn.textContent = '← Refazer o Quiz';
       return;
     }
 
     console.log('AUDIO2 LEAD', lead);
     console.log('AUDIO2 PAYLOAD', LeadManager.toApiPayload(lead, 'audio2'));
 
-    document.getElementById('lead-nome').textContent  = LeadManager.getNomeFormatado(lead);
-    document.getElementById('lead-signo').textContent = LeadManager.getSignoDisplay(lead);
+    // Registra lead no servidor — garante dados do quiz antes da compra
+    (function() {
+      try {
+        const email = (localStorage.getItem('email') || '').trim();
+        if (!email) return;
+        const p = LeadManager.toApiPayload(lead, 'audio2');
+        fetch(window.ASTRA_API_URL + '/api/leads/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email, nome: lead.nome,
+            signo: p.signo || lead.signo || 'Virgem',
+            sexo:  p.sexo  || lead.sexo  || 'feminino',
+            dor:   p.dor   || lead.dor   || 'financas',
+          }),
+        }).catch(function(){});
+      } catch(e) {}
+    })();
+
+    const _nomeEl  = document.getElementById('lead-nome');
+    const _signoEl = document.getElementById('lead-signo');
+    if (_nomeEl)  _nomeEl.textContent  = LeadManager.getNomeFormatado(lead);
+    if (_signoEl) _signoEl.textContent = LeadManager.getSignoDisplay(lead);
     document.title = 'Revelação de ' + LeadManager.getNomeFormatado(lead) + ' · NUMEROSFERA';
     _initNotifOverlays2();
 
     const icon    = document.getElementById('signo-icon');
     const iconSrc = LeadManager.getSignoIcon(lead);
-    if (iconSrc) {
+    if (icon && iconSrc) {
       icon.src = iconSrc;
       icon.alt = LeadManager.getSignoDisplay(lead);
     }
 
-    // Mostra overlay imediatamente — áudio carrega em paralelo
-    showAutoplayOverlay2();
     showState('loading');
     startLoading();
 
@@ -952,7 +984,7 @@
         if (_audioEnded) return;
         _audioEnded = true;
         if (window.AstraAnalytics) AstraAnalytics.track('audio2_complete');
-        _showBtnContinuar();
+        showTransitionOverlay();
       },
       onRetry(attempt, maxRetries) {
         showState('loading');
@@ -994,8 +1026,20 @@
         } else {
           errHtml = 'Erro ao preparar sua revelação.<br>Tente novamente em alguns instantes.';
         }
-        document.querySelector('.error-msg').innerHTML = errHtml;
+        document.getElementById('error-msg-text').innerHTML = errHtml;
         showState('error');
+
+        // Reset completo — próximo clique no overlay chama init() novamente
+        audioPlayer2.reset();
+        _initDone              = false;
+        _readyFired            = false;
+        _audioReady2           = false;
+        _clickedEarly2         = false;
+        window.__audio2Started = false;
+        // Re-exibe overlay com botão de retry
+        const btn = document.getElementById('btn-start-reading-2');
+        if (btn && !_noLeadMode) { btn.textContent = 'Tentar novamente →'; btn.disabled = false; }
+        showAutoplayOverlay2();
       },
     });
   }
@@ -1006,6 +1050,7 @@
     _readyFired            = false;
     _audioReady2           = false;
     _clickedEarly2         = false;
+    _noLeadMode            = false;
     window.__audio2Started = false;
     const btn = document.getElementById('btn-start-reading-2');
     if (btn) { btn.textContent = 'Escute a revelação →'; btn.disabled = false; }
@@ -1013,11 +1058,23 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    // Garante overlay visível mesmo antes de init() — protege contra qualquer erro
+    showAutoplayOverlay2();
+
     // Overlay de autoplay: único listener, adicionado uma vez
     document.getElementById('btn-start-reading-2').addEventListener('click', function () {
+      // Sem dados do quiz — redireciona ao quiz
+      if (_noLeadMode) { window.location.href = 'index.html'; return; }
+
+      // Pós-erro: estado resetado — reinicia completamente
+      if (!_initDone) { init(); return; }
+
       console.log('[MANUAL PLAY AUDIO2]');
+      // Inicia VTurb junto com o áudio
+      const vp = document.getElementById('vid-6a26acb14274b9e59c8ab931');
+      if (vp && typeof vp.play === 'function') vp.play().catch(() => {});
       if (_audioReady2) {
-        audioPlayer2.manualPlay();   // síncrono — iOS exige play() direto no handler
+        audioPlayer2.manualPlay();
         hideAutoplayOverlay2();
         finishLoading(() => { showState('player'); startEqualizer2(); });
       } else {
@@ -1028,13 +1085,19 @@
       }
     });
 
+    document.getElementById('btn-ir-vsl').addEventListener('click', function() {
+      window.location.href = 'vsl.html';
+    });
+
+    setupSyncPausePlay2();
+
     try {
       init();
     } catch(err) {
       console.error('[FATAL audio2] init() lançou exceção:', err);
       try {
         stopLoading();
-        document.querySelector('.error-msg').innerHTML =
+        document.getElementById('error-msg-text').innerHTML =
           'Erro ao iniciar. Recarregue a página.<br><small style="color:var(--text-dimmer)">' + err.message + '</small>';
         showState('error');
       } catch(_) {}
