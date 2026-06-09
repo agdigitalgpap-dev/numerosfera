@@ -22,10 +22,15 @@ const BASE_DIR = __dirname;
 
 // ── Imagem → base64 data URI ─────────────────────────────────
 function imgB64(rel) {
-  const full = path.join(BASE_DIR, rel);
+  // Prefere versão .jpg se existir (arquivos comprimidos ~80% menores)
+  let resolved = path.join(BASE_DIR, rel);
+  if (rel.endsWith('.png')) {
+    const jpg = resolved.replace(/\.png$/, '.jpg');
+    if (fs.existsSync(jpg)) resolved = jpg;
+  }
   try {
-    const data = fs.readFileSync(full);
-    const ext  = path.extname(full).toLowerCase().replace('.', '');
+    const data = fs.readFileSync(resolved);
+    const ext  = path.extname(resolved).toLowerCase().replace('.', '');
     const mime = (ext === 'jpg' || ext === 'jpeg') ? 'image/jpeg'
                : ext === 'webp' ? 'image/webp' : 'image/png';
     return `data:${mime};base64,${data.toString('base64')}`;
